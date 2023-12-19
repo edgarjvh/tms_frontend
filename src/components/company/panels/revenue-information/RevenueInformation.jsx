@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import $ from 'jquery';
+import $, { merge } from 'jquery';
 import Draggable from 'react-draggable';
 import './RevenueInformation.css';
 import MaskedInput from 'react-text-mask';
@@ -15,6 +15,7 @@ import { Calendar } from './../../panels';
 import moment from 'moment';
 import axios from 'axios';
 import NumberFormat from 'react-number-format';
+import * as XLSX from 'xlsx';
 import {
     setAdminHomePanels,
     setCompanyHomePanels,
@@ -40,6 +41,9 @@ import {
     Dispatch
 } from './../../../company';
 
+import ToPrint from './ToPrint';
+import { useReactToPrint } from 'react-to-print';
+
 const RevenueInformation = (props) => {
     const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
     const [isDateEndCalendarShown, setIsDateEndCalendarShown] = useState(false);
@@ -60,6 +64,8 @@ const RevenueInformation = (props) => {
             setIsDateEndCalendarShown(false)
         }
     });
+
+    const refPrint = useRef();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -996,6 +1002,221 @@ const RevenueInformation = (props) => {
         }
     }
 
+    const handlePrint = useReactToPrint({
+        pageStyle: () => {
+            return `
+                @media print {
+                    @page {
+                        size: 8.5in 11in !important; 
+                        margin: 7mm;                        
+                    }
+                    .page-block {
+                        page-break-after: auto !important;
+                        page-break-beforer: auto !important; 
+                        page-break-inside: avoid !important;
+                    } 
+                    .no-print{
+                        display:none !important;
+                    } 
+                    .container-sheet{
+                        box-shadow: initial !important;
+                        margin: 0 !important
+                    }
+                }
+            `
+        },
+        content: () => refPrint.current,
+    });
+
+    const handleExport = () => {
+        if (orders.length > 0) {
+            const startingRowData = 3;
+            let rowCount = 0;
+            let merges = [];
+            let title = [
+                {
+                    A: 'Revenue Information'
+                },
+                {}
+            ]
+
+            let table = [
+                {
+                    A: 'Order Date',
+                    B: 'Order Number',
+                    C: 'Customer Charges',
+                    D: 'Carrier Costs',
+                    E: 'Profit',
+                    F: 'Percentage'
+                }
+            ]
+
+            merges.push(XLSX.utils.decode_range('A1:F1'));
+            merges.push(XLSX.utils.decode_range('A2:F2'));
+
+            orders.map((item1, index1) => {
+                const { id, code, code_number, name, city, state } = item1.billToCustomer;
+                const { dateGroup } = item1;
+                rowCount++;
+
+                merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+                table.push({
+                    A: `Bill To: ${code}${(code_number || 0) > 0 ? code_number : ''} - ${name} - ${city}, ${state}`
+                });
+
+                (dateGroup || []).map((item2, index2) => {
+                    const { months } = item2;
+                    rowCount++;
+
+                    merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+                    table.push({
+                        A: item2.year
+                    });
+
+                    (months || []).map((item3, index3) => {
+                        const { orders } = item3;
+                        rowCount++;
+
+                        merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+                        table.push({
+                            A: item3.month
+                        });
+
+                        (orders || []).map((order, index4) => {
+                            rowCount++;
+
+                            table.push({
+                                A: moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY'),
+                                B: order.order_number,
+                                C: `$${new Intl.NumberFormat('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }).format(
+                                    order.total_customer_rating
+                                )}`,
+                                D: `$${new Intl.NumberFormat('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }).format(
+                                    order.total_carrier_rating
+                                )}`,
+                                E: `$${new Intl.NumberFormat('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }).format(
+                                    order.total_customer_rating - order.total_carrier_rating
+                                )}`,
+                                F: `${((order.total_customer_rating > 0 || order.total_carrier_rating > 0)
+                                    ?
+                                    ((order.total_customer_rating - order.total_carrier_rating) * 100)
+                                    /
+                                    (
+                                        order.total_customer_rating > 0
+                                            ? order.total_customer_rating
+                                            : order.total_carrier_rating
+                                    )
+                                    : 0).toFixed(2)}%`
+                            })
+
+                            return true;
+                        })
+
+                        return true;
+                    })
+
+                    return true;
+                })
+
+                return true;
+            })
+
+            rowCount++;
+
+            table.push({
+                A: 'Totals',
+                B: `Orders: ${orders.reduce((a, b) => {
+                    return a + b.totals.orderCount
+                }, 0)}`,
+                C: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0)
+                )}`,
+                D: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)
+                )}`,
+                E: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0) - orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)
+                )}`,
+                F: `${((orders.reduce((a, b) => {
+                    return a + b.totals.customerCharges
+                }, 0) > 0 || orders.reduce((a, b) => {
+                    return a + b.totals.carrierCosts
+                }, 0) > 0)
+                    ? ((orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0) - orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)) * 100)
+                    /
+                    (
+                        orders.reduce((a, b) => {
+                            return a + b.totals.customerCharges
+                        }, 0) > 0
+                            ? orders.reduce((a, b) => {
+                                return a + b.totals.customerCharges
+                            }, 0)
+                            : orders.reduce((a, b) => {
+                                return a + b.totals.carrierCosts
+                            }, 0)
+                    )
+                    : 0).toFixed(2)}%`
+            });
+
+            const finalData = [...title, ...table];
+
+            const book = XLSX.utils.book_new();
+            const sheet = XLSX.utils.json_to_sheet(finalData, {skipHeader: true});
+            sheet['!merges'] = merges;
+
+            const colLengths = [
+                20,20,20,20,20,20
+            ]
+
+            let properties = [];
+
+            colLengths.forEach((col) => {
+                properties.push({
+                    width: col
+                });
+            });
+
+            sheet['!cols'] = properties;
+
+            XLSX.utils.book_append_sheet(book,sheet, 'Revenue Information');
+
+            XLSX.writeFile(book, 'Revenue Information.xlsx');
+        }
+    }
+
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -1003,6 +1224,17 @@ const RevenueInformation = (props) => {
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
+
+            {
+                (orders || []).length > 0 &&
+                <div style={{ display: 'none' }}>
+                    <ToPrint
+                        ref={refPrint}
+                        orders={orders}
+                    />
+                </div>
+
+            }
 
             {
                 loadingTransition((style, item) => item &&
@@ -1536,7 +1768,17 @@ const RevenueInformation = (props) => {
                         <div className="top-border top-border-left"></div>
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
-                            <div className="mochi-button">
+                            <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
+                                handleExport();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Export</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+
+                            <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
+                                handlePrint();
+                            }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Print</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1593,8 +1835,8 @@ const RevenueInformation = (props) => {
                                                                 isOnPanel={true}
                                                                 isAdmin={props.isAdmin}
                                                                 origin={props.origin}
-                                                                
-                                                                
+
+
                                                                 customer_id={id}
                                                             />
                                                         ),
@@ -1725,8 +1967,8 @@ const RevenueInformation = (props) => {
                                                                                                                         isOnPanel={true}
                                                                                                                         isAdmin={props.isAdmin}
                                                                                                                         origin={props.origin}
-                                                                                                                        
-                                                                                                                        
+
+
 
                                                                                                                         order_id={order.id}
                                                                                                                     />

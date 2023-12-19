@@ -14,6 +14,26 @@
         
     }
 
+    .input-box-container.insurance-status {
+        background-color: rgba(0, 0, 0, 0.3);
+    
+        input:read-only {
+          color: black;
+        }
+      }
+    
+      .input-box-container.insurance-status.active {
+        background-color: lightgreen;
+      }
+    
+      .input-box-container.insurance-status.warning {
+        background-color: yellow;
+      }
+    
+      .input-box-container.insurance-status.expired {
+        background-color: lightcoral !important;
+      }
+
     .selected-carrier-contact-primary-phone {
         position      : absolute;
         right         : 5px;
@@ -30,7 +50,11 @@
 
     .routing-pickup-container{
         flex-grow: 1;
-        position: relative;
+        position: absolute;
+        width: calc(100% - 5px);
+        height: calc(100% - 10px);
+        overflow-y: auto;
+        overflow-x: hidden;
 
         .routing-pickup-item{
             font-size: 0.8rem;
@@ -55,7 +79,11 @@
 
     .routing-delivery-container{
         flex-grow: 1;
-        position: relative;
+        position: absolute;
+        width: calc(100% - 5px);
+        height: calc(100% - 10px);
+        overflow-y: auto;
+        overflow-x: hidden;
 
         .routing-delivery-item{
             font-size: 0.8rem;
@@ -81,7 +109,11 @@
 
     .routing-route-container{
         flex-grow: 1;
-        position: relative;
+        position: absolute;
+        width: calc(100% - 5px);
+        height: calc(100% - 10px);
+        overflow-y: auto;
+        overflow-x: hidden;
 
         .routing-route-item{
             font-size: 0.8rem;

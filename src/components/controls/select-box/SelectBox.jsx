@@ -4,29 +4,42 @@ import { useTransition, animated } from "react-spring";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import classnames from "classnames";
-import { useDetectClickOutside } from "react-detect-click-outside";
+import './SelectBox.css';
 
 function SelectBox(props) {
-    const { refInput, refItems, refPopupItems, refDropdown } = props.refs;
+    const { refInput, refPopupItems, refDropdown } = props.refs;
 
 
-
-    const popupTransition = useTransition((props.items || []).length > 0, {
+    const popupTransition = useTransition(props.isDropdownEnabled && (props.items || []).length > 0, {
         from: { opacity: 0, top: props.transitionFromTop || "calc(100% + 7px)" },
         enter: { opacity: 1, top: props.transitionEnterTop || "calc(100% + 12px)" },
         leave: { opacity: 0, top: props.transitionLeaveTop || "calc(100% + 7px)" },
         config: { duration: 100 },
-        reverse: (props.items || []).length > 0,
+        reverse: props.isDropdownEnabled && (props.items || []).length > 0,
     });
 
     return (
-        <div className="select-box-container" style={{ ...(props.boxStyle || {}) }}>
-            <div className="select-box-wrapper">
+        <div className={`select-box-container ${props.className || ''}`} style={{
+            pointerEvents: props.disabled ? "none" : "all",
+            userSelect: props.disabled ? 'none' : 'all',
+            ...(props.boxStyle || {})
+        }}>
+            <div className="select-box-wrapper" style={{
+                gap: 7,
+                backgroundColor: props.disabled ? 'rgba(0,0,0,0.01)' : 'white'
+            }}>
+                {
+                    props.placeholderFixed &&
+                    <div style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold'
+                    }}>{props.placeholder}</div>
+                }
                 <input
                     type="text"
                     tabIndex={props.tabIndex || 0}
                     style={{ ...(props.inputStyle || {}) }}
-                    placeholder={props.placeholder}
+                    placeholder={props.placeholderFixed ? '' : props.placeholder}
                     ref={refInput}
                     readOnly={props.readOnly}
                     onKeyDown={async e => {
@@ -35,88 +48,93 @@ function SelectBox(props) {
                         switch (key) {
                             case 37:
                             case 38: // arrow left | arrow up
-                                e.preventDefault();
-                                if ((props.items || []).length > 0) {
-                                    let selectedIndex = (props.items || []).findIndex(item => item.selected);
+                                if (props.isDropdownEnabled) {
+                                    e.preventDefault();
+                                    if ((props.items || []).length > 0) {
+                                        let selectedIndex = (props.items || []).findIndex(item => item.selected);
 
-                                    if (selectedIndex === -1) {
-                                        await props.setItems(
-                                            (props.items || []).map((item, index) => {
-                                                item.selected = index === 0;
-                                                return item;
-                                            })
-                                        );
-                                    } else {
-                                        await props.setItems(
-                                            (props.items || []).map((item, index) => {
-                                                if (selectedIndex === 0) {
-                                                    item.selected = index === (props.items || []).length - 1;
-                                                } else {
-                                                    item.selected = index === selectedIndex - 1;
-                                                }
-                                                return item;
-                                            })
-                                        );
-                                    }
-
-                                    refPopupItems.current.map((r, i) => {
-                                        if (r && r.classList.contains("selected")) {
-                                            r.scrollIntoView({
-                                                behavior: "auto",
-                                                block: "center",
-                                                inline: "nearest",
-                                            });
+                                        if (selectedIndex === -1) {
+                                            await props.setItems(
+                                                (props.items || []).map((item, index) => {
+                                                    item.selected = index === 0;
+                                                    return item;
+                                                })
+                                            );
+                                        } else {
+                                            await props.setItems(
+                                                (props.items || []).map((item, index) => {
+                                                    if (selectedIndex === 0) {
+                                                        item.selected = index === (props.items || []).length - 1;
+                                                    } else {
+                                                        item.selected = index === selectedIndex - 1;
+                                                    }
+                                                    return item;
+                                                })
+                                            );
                                         }
-                                        return true;
-                                    });
-                                } else {
-                                    props.getItems();
+
+                                        refPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains("selected")) {
+                                                r.scrollIntoView({
+                                                    behavior: "auto",
+                                                    block: "center",
+                                                    inline: "nearest",
+                                                });
+                                            }
+                                            return true;
+                                        });
+                                    } else {
+                                        props.getItems();
+                                    }
                                 }
                                 break;
 
                             case 39:
                             case 40: // arrow right | arrow down
-                                e.preventDefault();
-                                if ((props.items || []).length > 0) {
-                                    let selectedIndex = (props.items || []).findIndex(item => item.selected);
+                                if (props.isDropdownEnabled) {
+                                    e.preventDefault();
+                                    if ((props.items || []).length > 0) {
+                                        let selectedIndex = (props.items || []).findIndex(item => item.selected);
 
-                                    if (selectedIndex === -1) {
-                                        await props.setItems(
-                                            (props.items || []).map((item, index) => {
-                                                item.selected = index === 0;
-                                                return item;
-                                            })
-                                        );
-                                    } else {
-                                        await props.setItems(
-                                            (props.items || []).map((item, index) => {
-                                                if (selectedIndex === (props.items || []).length - 1) {
+                                        if (selectedIndex === -1) {
+                                            await props.setItems(
+                                                (props.items || []).map((item, index) => {
                                                     item.selected = index === 0;
-                                                } else {
-                                                    item.selected = index === selectedIndex + 1;
-                                                }
-                                                return item;
-                                            })
-                                        );
-                                    }
-
-                                    refPopupItems.current.map((r, i) => {
-                                        if (r && r.classList.contains("selected")) {
-                                            r.scrollIntoView({
-                                                behavior: "auto",
-                                                block: "center",
-                                                inline: "nearest",
-                                            });
+                                                    return item;
+                                                })
+                                            );
+                                        } else {
+                                            await props.setItems(
+                                                (props.items || []).map((item, index) => {
+                                                    if (selectedIndex === (props.items || []).length - 1) {
+                                                        item.selected = index === 0;
+                                                    } else {
+                                                        item.selected = index === selectedIndex + 1;
+                                                    }
+                                                    return item;
+                                                })
+                                            );
                                         }
-                                        return true;
-                                    });
-                                } else {
-                                    props.getItems();
+
+                                        refPopupItems.current.map((r, i) => {
+                                            if (r && r.classList.contains("selected")) {
+                                                r.scrollIntoView({
+                                                    behavior: "auto",
+                                                    block: "center",
+                                                    inline: "nearest",
+                                                });
+                                            }
+                                            return true;
+                                        });
+                                    } else {
+                                        props.getItems();
+                                    }
                                 }
                                 break;
 
                             case 27: // escape
                                 props.setItems([]);
+                                e.stopPropagation();
                                 break;
 
                             case 13: // enter
@@ -124,14 +142,19 @@ function SelectBox(props) {
                                 break;
 
                             case 9: // tab
-                                if ((props.items || []).length > 0) {
-                                    e.preventDefault();
+                                if (props.avoidCheckItemsOnTab) {
                                     props.onTab(e);
-                                }else{
-                                    if (props.triggerField === 1){
-                                        props.validateToSave(e);
+                                } else {
+                                    if ((props.items || []).length > 0) {
+                                        e.preventDefault();
+                                        props.onTab(e);
+                                    } else {
+                                        if (props.triggerField === 1) {
+                                            props.validateToSave(e);
+                                        }
                                     }
                                 }
+
                                 break;
 
                             default:
@@ -153,11 +176,12 @@ function SelectBox(props) {
                     <FontAwesomeIcon
                         className="dropdown-button"
                         icon={faCaretDown}
-                        onClick={() => {
+                        onClick={(e) => {
+
                             if ((props.items || []).length > 0) {
                                 props.setItems([]);
                             } else {
-                                props.onDropdownClick();
+                                props.onDropdownClick(e);
                             }
                             refInput.current.focus();
                         }}
@@ -197,11 +221,20 @@ function SelectBox(props) {
                                                     key={index}
                                                     className={mochiItemClasses}
                                                     id={item.id || ""}
-                                                    onClick={() => { props.onPopupClick(item) }}
+                                                    onClick={() => {
+                                                        props.onPopupClick(item)
+                                                    }}
                                                     ref={(element) => refPopupItems.current.push(element)}
                                                 >
-                                                    {item.name}
-                                                    {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                    {
+                                                        (props.labelType || 'default') === 'name'
+                                                            ? (item?.name || '')
+                                                            : (props.labelType || 'default') === 'contact_first_last'
+                                                                ? (item?.first_name || '') + ' ' + (item?.last_name || '')
+                                                                : (item?.name || '')
+                                                    }
+                                                    {item.selected && <FontAwesomeIcon className="dropdown-selected"
+                                                        icon={faCaretRight} />}
                                                 </div>
                                             );
                                         })}
@@ -211,7 +244,7 @@ function SelectBox(props) {
                         </animated.div>
                     )
             )}
-        </div>        
+        </div>
     );
 }
 

@@ -302,24 +302,7 @@ export default class ToPrint extends Component {
                                         alignItems: 'center',
                                         justifyContent: 'center'
                                     }} onClick={() => {
-                                        let panel = {
-                                            panelName: `${this.props.panelName}-invoice`,
-                                            component: <Invoice
-                                                pageName={'Invoice'}
-                                                title={'Invoice'}
-                                                panelName={`${this.props.panelName}-invoice`}
-                                                tabTimes={500046 + this.props.tabTimes}
-                                                screenFocused={this.props.invoiceScreenFocused}
-                                                componentId={moment().format('x')}
-                                                isOnPanel={true}
-                                                origin={this.props.origin}
-                                                openPanel={this.props.openPanel}
-                                                closePanel={this.props.closePanel}
-                                                order_id={(this.props.selectedOrder?.id || 0)}
-                                            />
-                                        }
-
-                                        this.props.openPanel(panel, this.props.origin);
+                                        this.props.openInvoicedOrder();
                                     }}>Invoiced</div>
                                 }
                                 {/* <div style={{ ...this.styleFlexRow }}><span style={{ ...this.styleFieldName, marginRight: 5 }}>PO NUMBERS:</span>
@@ -802,10 +785,10 @@ export default class ToPrint extends Component {
                                                                 Numbers:
                                                             </div>
                                                             <div style={{ ...this.styleFieldData }}>
-                                                                {route.type === 'pickup' ? (pickup.bol_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
-                                                                }) : (delivery.bol_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                                {route.type === 'pickup' ? (pickup.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
+                                                                }) : (delivery.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                                 })}</div>
                                                         </div>
 
@@ -814,10 +797,11 @@ export default class ToPrint extends Component {
                                                                 Numbers:
                                                             </div>
                                                             <div style={{ ...this.styleFieldData }}>
-                                                                {route.type === 'pickup' ? (pickup.po_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
-                                                                }) : (delivery.po_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                                {route.type === 'pickup' ? (pickup.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
+                                                                }) : (delivery.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                                 })}
                                                             </div>
                                                         </div>
@@ -827,10 +811,10 @@ export default class ToPrint extends Component {
                                                                 Numbers:
                                                             </div>
                                                             <div style={{ ...this.styleFieldData }}>
-                                                                {route.type === 'pickup' ? (pickup.ref_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
-                                                                }) : (delivery.ref_numbers || '').split('|').map((item, index) => {
-                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                                {route.type === 'pickup' ? (pickup.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
+                                                                }) : (delivery.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                                    return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                                 })}
                                                             </div>
                                                         </div>
@@ -971,19 +955,19 @@ export default class ToPrint extends Component {
                             }}>
                                 <div style={{ ...this.styleFlexRow, marginBottom: 5 }}><span
                                     style={{ ...this.styleFieldName, width: '4rem' }}>NAME:</span> <span
-                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.first_name || '').toUpperCase()} {(this.props.selectedOrder?.driver?.last_name || '').toUpperCase()}</span>
+                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.first_name || '')} {(this.props.selectedOrder?.driver?.last_name || '')}</span>
                                 </div>
                                 <div style={{ ...this.styleFlexRow, marginBottom: 5 }}><span
                                     style={{ ...this.styleFieldName, width: '4rem' }}>PHONE:</span> <span
-                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.phone || '').toUpperCase()}</span>
+                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.contact_phone || '')}</span>
                                 </div>
                                 <div style={{ ...this.styleFlexRow, marginBottom: 5 }}><span
                                     style={{ ...this.styleFieldName, width: '4rem' }}>UNIT:</span> <span
-                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.truck || '').toUpperCase()}</span>
+                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.tractor?.number || '')}</span>
                                 </div>
                                 <div style={{ ...this.styleFlexRow, marginBottom: 5 }}><span
                                     style={{ ...this.styleFieldName, width: '4rem' }}>TRAILER:</span> <span
-                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.trailer || '').toUpperCase()}</span>
+                                        style={{ ...this.styleFieldData }}>{(this.props.selectedOrder?.driver?.trailer?.number || '')}</span>
                                 </div>
                             </div>
                         </div>
@@ -1120,7 +1104,7 @@ export default class ToPrint extends Component {
                                                 minWidth: '3rem',
                                                 maxWidth: '8rem',
                                                 textAlign: 'center'
-                                            }}>{item.user_id}</span>
+                                            }}>{item?.user_code?.code || ''}</span>
                                         </div>
                                     )
                                 })

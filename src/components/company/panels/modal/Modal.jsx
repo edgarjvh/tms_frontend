@@ -39,6 +39,7 @@ const Modal = (props) => {
             carrier_id: props.selectedParent.id,
             factoring_company_id: props.selectedParent.id,
             order_id: props.selectedParent.id,
+            template_id: props.selectedParent.id,
             division_id: props.selectedParent.id,
             doc_id: props.selectedParent.id,
             text: props.selectedData.text,

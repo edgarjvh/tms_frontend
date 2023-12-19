@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import "./CarrierConfirmation.css";
 import NumberFormat from "react-number-format";
+import ReactDOMServer from 'react-dom/server';
 import QRCode from 'react-qr-code';
 
 export default class CarrierConfirmation extends Component {
@@ -115,17 +116,7 @@ export default class CarrierConfirmation extends Component {
                             right: 0,
                             top: 50
                         }}>
-                            <QRCode value={
-                                `Order Number: ${(this.props.selected_order?.order_number || '')}\nCarrier Assigned: ${(this.props.selectedCarrierInfo?.name || '')}\nPay Rate: ${new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'USD'
-                                }).format(Number(((this.props.selected_order?.order_carrier_ratings || []).reduce((a, b) => {
-                                    return {
-                                        total_charges: Number(a.total_charges) + Number(b.total_charges),
-                                    };
-                                }, { total_charges: "" })?.total_charges || "")
-                                    .toString()
-                                    .replace(",", "")))}`} size={100} />
+                            <img src={this.props.selected_order?.qrcode || ''} alt="" />
                         </div>
                     }
 
@@ -361,8 +352,8 @@ export default class CarrierConfirmation extends Component {
                                             BOL Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(pickup.bol_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(pickup.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -374,8 +365,8 @@ export default class CarrierConfirmation extends Component {
                                             PO Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(pickup.po_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(pickup.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -387,8 +378,8 @@ export default class CarrierConfirmation extends Component {
                                             REF Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(pickup.ref_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(pickup.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -411,8 +402,8 @@ export default class CarrierConfirmation extends Component {
                                             BOL Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(delivery.bol_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(delivery.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -424,8 +415,8 @@ export default class CarrierConfirmation extends Component {
                                             PO Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(delivery.po_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(delivery.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -437,8 +428,8 @@ export default class CarrierConfirmation extends Component {
                                             REF Numbers:
                                         </div>
                                         <div style={{ ...this.styleFieldData }}>
-                                            {(delivery.ref_numbers || '').split('|').map((item, index) => {
-                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                            {(delivery.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                             })}
                                         </div>
                                     </div>)}
@@ -599,7 +590,7 @@ export default class CarrierConfirmation extends Component {
                         as certificate holder.
                     </div>
 
-                    <div style={{ ...this.styleFieldData, marginTop: "1.5rem", display: 'flex', flexDirection: "row", gap: 40 }}>
+                    <div style={{ ...this.styleFieldData, marginTop: "1.5rem", display: 'flex', flexDirection: "row", position: 'relative' }}>
                         <div>
                             <div>
                                 <b>
@@ -619,21 +610,11 @@ export default class CarrierConfirmation extends Component {
                             </div>
                         </div>
 
-                        <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'absolute', top: '50%', left: 300, transform: 'translateY(-50%)' }}>
                             {
                                 !this.props.isLoading &&
                                 <div style={{ position: 'absolute', top: '50%', left: '0px', transform: 'translateY(-50%)' }}>
-                                    <QRCode value={
-                                        `Order Number: ${(this.props.selected_order?.order_number || '')}\nCarrier Assigned: ${(this.props.selectedCarrierInfo?.name || '')}\nPay Rate: ${new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD'
-                                        }).format(Number(((this.props.selected_order?.order_carrier_ratings || []).reduce((a, b) => {
-                                            return {
-                                                total_charges: Number(a.total_charges) + Number(b.total_charges),
-                                            };
-                                        }, { total_charges: "" })?.total_charges || "")
-                                            .toString()
-                                            .replace(",", "")))}`} size={100} />
+                                    <img src={this.props.selected_order?.qrcode || ''} alt="" />
                                 </div>
                             }
                         </div>

@@ -26,10 +26,16 @@ import {
 
 } from './../../../../actions';
 
+import { EmailRecipientInput } from '../../panels/index';
+import {Invoice} from './../../index';
+
 const Order = (props) => {
     const [selectedOrder, setSelectedOrder] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const componentRef = useRef();
+
+    const [showEmailRecipientInput, setShowEmailRecipientInput] = useState(false);
+    const [dataEmail, setDataEmail] = useState({});
 
     const handlePrint = useReactToPrint({
         pageStyle: () => {
@@ -87,6 +93,14 @@ const Order = (props) => {
         reverse: isLoading,
     });
 
+    const emailRecipientInputTransition = useTransition(showEmailRecipientInput, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showEmailRecipientInput,
+        config: { duration: 100 }
+    });
+
     useEffect(() => {
         if ((props.selectedOrderId || 0) > 0) {
             axios.post(props.serverUrl + '/getOrderById', { id: props.selectedOrderId }).then(res => {
@@ -100,6 +114,25 @@ const Order = (props) => {
             })
         }
     }, [])
+
+    const openInvoicedOrder = () => {
+        let panel = {
+            panelName: `${props.panelName}-invoice`,
+            component: <Invoice
+                pageName={'Invoice'}
+                title={'Invoice'}
+                panelName={`${props.panelName}-invoice`}
+                tabTimes={500046 + props.tabTimes}
+                screenFocused={props.invoiceScreenFocused}
+                componentId={moment().format('x')}
+                isOnPanel={true}
+                origin={props.origin}                
+                order_id={(selectedOrder?.id || 0)}
+            />
+        }
+
+        openPanel(panel, props.origin);
+    }
 
     const openPanel = (panel, origin) => {
         if (origin === 'admin-home') {
@@ -268,7 +301,97 @@ const Order = (props) => {
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
 
-                <div className="mochi-button">
+                <div className="mochi-button" onClick={() => {
+                    let user_first_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.first_name || '')).trim()
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? ((selectedOrder.user_code?.employee?.first_name || '')).trim()
+                            : '';
+
+                    let user_last_name = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? (((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.last_name || '')).trim()
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? ((selectedOrder.user_code?.employee?.last_name || '')).trim()
+                            : '';
+
+                    let user_email_address = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'work'
+                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_work || '')
+                            : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'personal'
+                                ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_personal || '')
+                                : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_email || '') === 'other'
+                                    ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.email_other || '')
+                                    : ''
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? (selectedOrder.user_code?.employee?.primary_email || '') === 'work'
+                                ? (selectedOrder.user_code?.employee?.email_work || '')
+                                : (selectedOrder.user_code?.employee?.primary_email || '') === 'personal'
+                                    ? (selectedOrder.user_code?.employee?.email_personal || '')
+                                    : (selectedOrder.user_code?.employee?.primary_email || '') === 'other'
+                                        ? (selectedOrder.user_code?.employee?.email_other || '')
+                                        : ''
+                            : ''
+
+                    let user_phone = (selectedOrder?.user_code?.type || '') === 'agent'
+                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'work'
+                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_work || '')
+                            : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'fax'
+                                ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_work_fax || '')
+                                : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'mobile'
+                                    ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_mobile || '')
+                                    : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'direct'
+                                        ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_direct || '')
+                                        : ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.primary_phone || '') === 'other'
+                                            ? ((selectedOrder.user_code?.agent?.contacts || []).find(x => x.id === (selectedOrder.user_code?.agent_contact_id || 0))?.phone_other || '')
+                                            : ''
+                        : (selectedOrder?.user_code?.type || '') === 'employee'
+                            ? (selectedOrder.user_code?.employee?.primary_phone || '') === 'work'
+                                ? (selectedOrder.user_code?.employee?.phone_work || '')
+                                : (selectedOrder.user_code?.employee?.primary_phone || '') === 'fax'
+                                    ? (selectedOrder.user_code?.employee?.phone_work_fax || '')
+                                    : (selectedOrder.user_code?.employee?.primary_phone || '') === 'mobile'
+                                        ? (selectedOrder.user_code?.employee?.phone_mobile || '')
+                                        : (selectedOrder.user_code?.employee?.primary_phone || '') === 'direct'
+                                            ? (selectedOrder.user_code?.employee?.phone_direct || '')
+                                            : (selectedOrder.user_code?.employee?.primary_phone || '') === 'other'
+                                                ? (selectedOrder.user_code?.employee?.phone_other || '')
+                                                : ''
+                            : ''
+
+                    let dataEmail = {
+                        order_number: selectedOrder.order_number,
+                        user_first_name,
+                        user_last_name,
+                        user_email_address,
+                        user_phone,
+                        type: 'customer',                    
+                        recipient_to: [],
+                        recipient_cc: [],
+                        recipient_bcc: []
+                    }
+
+                    let primaryContact = (selectedOrder?.bill_to_company?.contacts || []).find(x => x.is_primary === 1);
+
+                    if (primaryContact) {
+                        dataEmail.recipient_to = [{
+                            email: (primaryContact?.primary_email || 'work') === 'work'
+                                ? primaryContact?.email_work || ''
+                                : (primaryContact?.primary_email || 'work') === 'personal'
+                                    ? primaryContact?.email_personal || ''
+                                    : (primaryContact?.primary_email || 'work') === 'other'
+                                        ? primaryContact?.email_other || ''
+                                        : '',
+                            name: ((primaryContact?.first_name || '') + ' ' + (primaryContact?.last_name || '')).trim(),
+                            primary: true
+                        }]
+                    }
+
+                    setDataEmail(dataEmail);
+
+                    window.setTimeout(() => {
+                        setShowEmailRecipientInput(true);
+                    }, 100);
+                }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">E-Mail Order</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -295,14 +418,30 @@ const Order = (props) => {
                         screenFocused={props.invoiceScreenFocused}
                         isOnPanel={true}
                         origin={props.origin}
-                        
-                        
+                        openInvoicedOrder={openInvoicedOrder}
+
                         selectedOrder={selectedOrder}
                         selectedCompany={props.selectedCompany}
                         invoiceScreenFocused={true}
                     />
                 </div>
             </div>
+
+            {
+                emailRecipientInputTransition((style, item) => item && (
+                    <animated.div style={{ ...style }}>
+                        <EmailRecipientInput
+                            title={'E-Mail Customer Order'}
+                            dataEmail={dataEmail}
+                            successMessage={`Customer Order has been sent!`}
+                            sendingUrl="/sendOrderEmail"
+                            close={() => {
+                                setShowEmailRecipientInput(false);
+                            }}
+                        />
+                    </animated.div>
+                ))
+            }
         </div>
     )
 }

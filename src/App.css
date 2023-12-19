@@ -400,6 +400,9 @@ select:focus {
   max-height: 1.5rem;
   min-height: 1.5rem;
 }
+.input-toggle-container.disabled {
+  pointer-events: none !important;
+}
 .input-toggle-container input {
   display: none;
 }

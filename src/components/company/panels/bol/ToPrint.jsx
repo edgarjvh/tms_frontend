@@ -99,9 +99,9 @@ export default class ToPrint extends Component {
                                         ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[0].type === 'pickup') &&
                                         <span>
                                             {
-                                                ((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id).pu_date1 || '') !== ''
-                                                    ? moment((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id).pu_date1, 'MM/DD/YYYY').format('MMMM DD, YYYY')
-                                                    : ''
+                                                (this.props.selectedOrder?.ship_from?.pu_date1 || '') === ''
+                                                    ? ''
+                                                    : moment(this.props.selectedOrder?.ship_from?.pu_date1, 'MM/DD/YYYY').format('MMMM DD, YYYY')
                                             }
                                         </span>
                                     }
@@ -119,9 +119,9 @@ export default class ToPrint extends Component {
                                         ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].type === 'delivery') &&
                                         <span>
                                             {
-                                                ((this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id).delivery_date2 || '') !== ''
-                                                    ? moment((this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id).delivery_date2, 'MM/DD/YYYY').format('MMMM DD, YYYY')
-                                                    : ''
+                                                (this.props.selectedOrder?.ship_to?.delivery_date2 || '') === ''
+                                                    ? ''
+                                                    : moment(this.props.selectedOrder?.ship_to?.delivery_date2, 'MM/DD/YYYY').format('MMMM DD, YYYY')
                                             }
                                         </span>
                                     }
@@ -148,48 +148,44 @@ export default class ToPrint extends Component {
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[0].type === 'pickup') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.name || ''
+                                                    (this.props.selectedOrder?.ship_from?.original_name || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[0].type === 'pickup') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.address1 || ''
+                                                    (this.props.selectedOrder?.ship_from?.address1 || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[0].type === 'pickup') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.address2 || ''
+                                                    (this.props.selectedOrder?.ship_from?.address2 || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     {
-                                        ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[0].type === 'pickup') &&
                                         <div>
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.city || ''
+                                                    (this.props.selectedOrder?.ship_from?.city || '')
                                                 }
                                             </span>, <span>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.state || ''
+                                                    (this.props.selectedOrder?.ship_from?.state || '').toUpperCase()
                                                 }
                                             </span> <span>
                                                 {
-                                                    (this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].pickup_id)?.customer?.zip || ''
+                                                    (this.props.selectedOrder?.ship_from?.zip || '').toUpperCase()
                                                 }
                                             </span>
                                         </div>
@@ -221,48 +217,44 @@ export default class ToPrint extends Component {
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].type === 'delivery') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.name || ''
+                                                    (this.props.selectedOrder?.ship_to?.original_name || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].type === 'delivery') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.address1 || ''
+                                                    (this.props.selectedOrder?.ship_to?.address1 || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     <div>
                                         {
-                                            ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].type === 'delivery') &&
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.address2 || ''
+                                                    (this.props.selectedOrder?.ship_to?.address2 || '')
                                                 }
                                             </span>
                                         }
                                     </div>
                                     {
-                                        ((this.props.selectedOrder?.routing || []).length > 0 && this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].type === 'delivery') &&
                                         <div>
-                                            <span>
+                                            <span style={{ textTransform: 'capitalize' }}>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.city || ''
+                                                    (this.props.selectedOrder?.ship_to?.city || '')
                                                 }
                                             </span>, <span>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.state || ''
+                                                    (this.props.selectedOrder?.ship_to?.state || '').toUpperCase()
                                                 }
                                             </span> <span>
                                                 {
-                                                    (this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.zip || ''
+                                                    (this.props.selectedOrder?.ship_to?.zip || '').toUpperCase()
                                                 }
                                             </span>
                                         </div>
@@ -290,44 +282,30 @@ export default class ToPrint extends Component {
                                     gridTemplateRows: '1fr 1fr'
                                 }}>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>BOL Number: </span> {
-                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
-                                            return (
-                                                <span style={{ fontWeight: 'normal' }}>{
-                                                    (item.bol_numbers || '').split('|').map((item, index) => {
-                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
-                                                    })
-                                                }</span>
-                                            )
-                                        })
+                                        <span style={{ fontWeight: 'normal' }}>{
+                                            (this.props.selectedOrder?.ship_from?.bol_numbers || '').split('|').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                            })
+                                        }</span>
                                     }</div>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>PO Numbers: </span> {
-                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
-                                            return (
-                                                <span style={{ fontWeight: 'normal' }}>{
-                                                    (item.po_numbers || '').split('|').map((item, index) => {
-                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
-                                                    })
-                                                }</span>
-                                            )
-                                        })
+                                        <span style={{ fontWeight: 'normal' }}>{
+                                            (this.props.selectedOrder?.ship_from?.po_numbers || '').split('|').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                            })
+                                        }</span>
                                     }</div>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>REF Numbers: </span> {
-                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
-                                            return (
-                                                <span style={{ fontWeight: 'normal' }}>{
-                                                    (item.ref_numbers || '').split('|').map((item, index) => {
-                                                        return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
-                                                    })
-                                                }</span>
-                                            )
-                                        })
+                                        <span style={{ fontWeight: 'normal' }}>{
+                                            (this.props.selectedOrder?.ship_from?.ref_numbers || '').split('|').map((item, index) => {
+                                                return (<span style={{ color: index % 2 === 0 ? 'black' : '#535252' }}>{item} </span>)
+                                            })
+                                        }</span>
                                     }</div>
                                     <div style={{ marginBottom: 5 }}><span style={{ marginRight: 5, fontWeight: 'bold', marginBottom: 5 }}>SEAL Number: </span> {
-                                        (this.props.selectedOrder?.pickups || []).map((item, index) => {
-                                            return (
-                                                <span style={{ fontWeight: 'normal' }}>{item.seal_number}</span>
-                                            )
-                                        })
+                                        <span style={{ fontWeight: 'normal' }}>{
+                                            <span style={{ color: 'black' }}>{(this.props.selectedOrder?.ship_from?.seal_number || '')} </span>
+                                        }</span>
                                     }</div>
                                 </div>
                             </div>
@@ -352,56 +330,29 @@ export default class ToPrint extends Component {
                                     THIRD PARTY FREIGHT CHARGES BILL TO
                                 </div>
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
-                                    <div>
+                                    {
+                                        this.props.freightChargeTerms3rdParty &&
                                         <div>
-                                            {(this.props.selectedCompany?.mailing_address?.name || '')}
-                                        </div>
-                                        <div>
-                                            {(this.props.selectedCompany?.mailing_address?.address1 || '')}
-                                        </div>
-                                        <div>
-                                            {(this.props.selectedCompany?.mailing_address?.address2 || '')}
-                                        </div>
-                                        <div>
-                                            <span>
-                                                {(this.props.selectedCompany?.mailing_address?.city || '')}
-                                            </span>, <span>
-                                                {(this.props.selectedCompany?.mailing_address?.state || '').toUpperCase()}
-                                            </span> <span>
-                                                {(this.props.selectedCompany?.mailing_address?.zip || '')}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* {
-                                        ((this.props.selectedOrder?.bill_to_company?.code || '') + (this.props.selectedOrder?.bill_to_company?.code_number || 0) === 0 ? '' : this.props.selectedOrder?.bill_to_company?.code_number) !==
-                                            (((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].delivery_id)?.customer?.code || '') +
-                                                (((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].delivery_id)?.customer?.code_number || 0) === 0 ? '' : ((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0].delivery_id)?.customer?.code_number))) &&
-                                            ((this.props.selectedOrder?.bill_to_company?.code || '') + (this.props.selectedOrder?.bill_to_company?.code_number || 0) === 0 ? '' : this.props.selectedOrder?.bill_to_company?.code_number) !==
-                                            (((this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.code || '') +
-                                                (((this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.code_number || 0) === 0 ? '' : ((this.props.selectedOrder?.deliveries || []).find(x => x.id === this.props.selectedOrder?.routing[this.props.selectedOrder?.routing.length - 1].delivery_id)?.customer?.code_number)))
-                                            ? <div>
-                                                <div>
-                                                    {(this.props.selectedOrder?.bill_to_company?.name || '')}
-                                                </div>
-                                                <div>
-                                                    {(this.props.selectedOrder?.bill_to_company?.address1 || '')}
-                                                </div>
-                                                <div>
-                                                    {(this.props.selectedOrder?.bill_to_company?.address2 || '')}
-                                                </div>
-                                                <div>
-                                                    <span>
-                                                        {(this.props.selectedOrder?.bill_to_company?.city || '')}
-                                                    </span>, <span>
-                                                        {(this.props.selectedOrder?.bill_to_company?.state || '')}
-                                                    </span> <span>
-                                                        {(this.props.selectedOrder?.bill_to_company?.zip || '')}
-                                                    </span>
-                                                </div>
+                                            <div>
+                                                {(this.props.selectedCompany?.mailing_address?.name || '')}
                                             </div>
-                                            : ''
-                                    } */}
+                                            <div>
+                                                {(this.props.selectedCompany?.mailing_address?.address1 || '')}
+                                            </div>
+                                            <div>
+                                                {(this.props.selectedCompany?.mailing_address?.address2 || '')}
+                                            </div>
+                                            <div>
+                                                <span>
+                                                    {(this.props.selectedCompany?.mailing_address?.city || '')}
+                                                </span>, <span>
+                                                    {(this.props.selectedCompany?.mailing_address?.state || '').toUpperCase()}
+                                                </span> <span>
+                                                    {(this.props.selectedCompany?.mailing_address?.zip || '')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -418,8 +369,8 @@ export default class ToPrint extends Component {
                                 </div>
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     <div style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Truck Number: </span> <span>{(this.props.selectedOrder?.driver?.truck || '')}</span></div>
-                                        <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Trailer Number: </span> <span>{(this.props.selectedOrder?.driver?.trailer || '')}</span></div>
+                                        <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Truck Number: </span> <span>{(this.props.selectedOrder?.driver?.tractor?.number || '')}</span></div>
+                                        <div style={{ flexGrow: 1 }}><span style={{ fontWeight: 'bold', marginRight: 5 }}>Trailer Number: </span> <span>{(this.props.selectedOrder?.driver?.trailer?.number || '')}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -443,7 +394,7 @@ export default class ToPrint extends Component {
                                 </div>
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     {
-                                        ((this.props.selectedOrder?.pickups || []).find(x => x.id === this.props.selectedOrder?.routing[0]?.pickup_id)?.special_instructions || '')
+                                        (this.props.selectedOrder?.ship_from?.special_instructions || '')
                                     }
                                 </div>
                             </div>
@@ -469,15 +420,33 @@ export default class ToPrint extends Component {
                                     (Freight charges are prepaid unless marked otherwise)
                                 </div>
                                 <div style={{ ...this.styleFieldData, ...this.styleFlexRow, padding: 10, alignItems: 'center', justifyContent: 'space-evenly' }}>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Prepaid</label><input type="checkbox" /></div>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Collect</label><input type="checkbox" /></div>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">3rd Party</label><input type="checkbox" checked={(this.props.selectedCompany?.mailing_address?.id || 0) > 0} /></div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="freight-charge-terms-prepaid">Prepaid</label>
+                                        <input type="checkbox" id="freight-charge-terms-prepaid" checked={this.props.freightChargeTermsPrepaid} onChange={(e) => {
+                                            this.props.setFreightChargeTermsPrepaid(e.target.checked);
+                                        }} />
+                                    </div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="freight-charge-terms-collect">Collect</label>
+                                        <input type="checkbox" id="freight-charge-terms-collect" checked={this.props.freightChargeTermsCollect} onChange={(e) => {
+                                            this.props.setFreightChargeTermsCollect(e.target.checked);
+                                        }} />
+                                    </div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="freight-charge-terms-3rd-party">3rd Party</label>
+                                        <input type="checkbox" id="freight-charge-terms-3rd-party" checked={this.props.freightChargeTerms3rdParty} onChange={(e) => {
+                                            this.props.setFreightChargeTerms3rdParty(e.target.checked);
+                                        }} />
+                                    </div>
                                 </div>
                                 <div style={{
 
                                 }}>
                                     <div style={{ ...this.styleFlexRow, ...this.styleFieldData, alignItems: 'center', justifyContent: 'center', padding: 5, borderTop: '1px solid rgba(0,0,0,0.3)' }}>
-                                        <input type="checkbox" /><label htmlFor="">Master bill of lading with attached underlying bills of lading.</label>
+                                        <input type="checkbox" id="freight-charge-terms-master" checked={this.props.freightChargeTermsMaster} onChange={(e) => {
+                                            this.props.setFreightChargeTermsMaster(e.target.checked);
+                                        }} />
+                                        <label htmlFor="freight-charge-terms-master">Master bill of lading with attached underlying bills of lading.</label>
                                     </div>
                                 </div>
                             </div>
@@ -574,111 +543,180 @@ export default class ToPrint extends Component {
                             </div>
 
                             {
-                                (this.props.selectedOrder?.order_customer_ratings || []).map((rating, index) => {
-                                    if ((rating.rate_type?.name || '').toLowerCase() === 'flat' ||
-                                        (rating.rate_type?.name || '').toLowerCase() === 'linehaul' ||
-                                        (rating.rate_type?.id || 0) === 0) {
-                                        return (
-                                            <div key={index} style={{
-                                                ...this.styleFlexRow,
-                                                minHeight: '1.5rem',
-                                                borderBottom: '1px solid rgba(0,0,0,0.3)'
+                                (this.props.ratingItems || []).map((rating, index) => {
+                                    return (
+                                        <div key={index} style={{
+                                            ...this.styleFlexRow,
+                                            minHeight: '1.5rem',
+                                            borderBottom: '1px solid rgba(0,0,0,0.3)'
+                                        }}>
+
+                                            <div style={{
+                                                borderRight: '1px solid rgba(0,0,0,0.3)',
+                                                ...this.styleFieldData,
+                                                padding: 5,
+                                                ...this.styleFlexCol,
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                minWidth: '5rem',
+                                                maxWidth: '5rem'
+                                            }}>
+                                                {/* <NumberFormat
+                                                    value={rating.pieces > 0 ? rating.pieces : ''}
+                                                    thousandsGroupStyle="thousand"
+                                                    thousandSeparator={true}
+                                                    decimalScale={Number.isInteger(rating.pieces) ? 0 : 2}
+                                                    fixedDecimalScale={true}
+                                                    prefix={''}
+                                                    type="text"
+                                                    displayType={'text'}
+                                                    
+                                                /> */}
+                                                <input
+                                                    type="text"
+                                                    style={{
+                                                        border: 0,
+                                                        textAlign: 'center',
+                                                        fontStyle: 'italic'
+                                                    }}
+                                                    onChange={(e) => {
+                                                        let _items = [...this.props.ratingItems];
+                                                        let newItem = { ..._items[index] };
+                                                        newItem.pieces = e.target.value;
+                                                        _items[index] = { ...newItem };
+
+                                                        this.props.setRatingItems([..._items]);
+                                                    }}
+                                                    value={rating?.pieces || ''}
+                                                />
+                                            </div>
+
+                                            <div style={{
+                                                borderRight: '1px solid rgba(0,0,0,0.3)',
+                                                ...this.styleFieldData,
+                                                padding: 5,
+                                                ...this.styleFlexCol,
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                minWidth: '5rem',
+                                                maxWidth: '5rem'
+                                            }}>
+                                                {/* {rating?.pieces_name || ''} */}
+
+                                                <input
+                                                    type="text"
+                                                    style={{
+                                                        border: 0,
+                                                        textAlign: 'center',
+                                                        fontStyle: 'italic'
+                                                    }}
+                                                    onChange={(e) => {
+                                                        let _items = [...this.props.ratingItems];
+                                                        let newItem = { ..._items[index] };
+                                                        newItem.pieces_name = e.target.value;
+                                                        _items[index] = { ...newItem };
+
+                                                        this.props.setRatingItems([..._items]);
+                                                    }}
+                                                    value={rating?.pieces_name || ''}
+                                                />
+
+                                            </div>
+
+                                            <div style={{
+                                                borderRight: '1px solid rgba(0,0,0,0.3)',
+                                                ...this.styleFieldData,
+                                                padding: 5,
+                                                ...this.styleFlexCol,
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                minWidth: '4.5rem',
+                                                maxWidth: '4.5rem'
+                                            }}>
+                                                {/* <NumberFormat
+                                                    value={rating.weight > 0 ? rating.weight : ''}
+                                                    thousandsGroupStyle="thousand"
+                                                    thousandSeparator={true}
+                                                    decimalScale={Number.isInteger(rating.weight) ? 0 : 2}
+                                                    fixedDecimalScale={true}
+                                                    prefix={''}
+                                                    type="text"
+                                                    displayType={'text'}
+                                                /> */}
+
+                                                <input
+                                                    type="text"
+                                                    style={{
+                                                        border: 0,
+                                                        textAlign: 'center',
+                                                        fontStyle: 'italic'
+                                                    }}
+                                                    onChange={(e) => {
+                                                        let _items = [...this.props.ratingItems];
+                                                        let newItem = { ..._items[index] };
+                                                        newItem.weight = e.target.value;
+                                                        _items[index] = { ...newItem };
+
+                                                        this.props.setRatingItems([..._items]);
+                                                    }}
+                                                    value={rating?.weight || ''}
+                                                />
+                                            </div>
+
+                                            <div style={{
+                                                borderRight: '1px solid rgba(0,0,0,0.3)',
+                                                ...this.styleFieldData,
+                                                padding: 5,
+                                                ...this.styleFlexCol,
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                minWidth: '4.5rem',
+                                                maxWidth: '4.5rem'
                                             }}>
 
-                                                <div style={{
-                                                    borderRight: '1px solid rgba(0,0,0,0.3)',
-                                                    ...this.styleFieldData,
-                                                    padding: 5,
-                                                    ...this.styleFlexCol,
-                                                    justifyContent: 'center',
-                                                    textAlign: 'center',
-                                                    minWidth: '5rem',
-                                                    maxWidth: '5rem'
-                                                }}>
-                                                    <NumberFormat
-                                                        value={rating.pieces > 0 ? rating.pieces : ''}
-                                                        thousandsGroupStyle="thousand"
-                                                        thousandSeparator={true}
-                                                        decimalScale={Number.isInteger(rating.pieces) ? 0 : 2}
-                                                        fixedDecimalScale={true}
-                                                        prefix={''}
-                                                        type="text"
-                                                        displayType={'text'}
-                                                    />
-                                                </div>
-
-                                                <div style={{
-                                                    borderRight: '1px solid rgba(0,0,0,0.3)',
-                                                    ...this.styleFieldData,
-                                                    padding: 5,
-                                                    ...this.styleFlexCol,
-                                                    justifyContent: 'center',
-                                                    textAlign: 'center',
-                                                    minWidth: '5rem',
-                                                    maxWidth: '5rem'
-                                                }}>
-                                                    {(rating.pieces_unit || '') === 'sk' ? 'Skids' : (rating.pieces_unit || '') === 'pc' ? 'Pieces' : ''}
-                                                </div>
-
-                                                <div style={{
-                                                    borderRight: '1px solid rgba(0,0,0,0.3)',
-                                                    ...this.styleFieldData,
-                                                    padding: 5,
-                                                    ...this.styleFlexCol,
-                                                    justifyContent: 'center',
-                                                    textAlign: 'center',
-                                                    minWidth: '4.5rem',
-                                                    maxWidth: '4.5rem'
-                                                }}>
-                                                    <NumberFormat
-                                                        value={rating.weight > 0 ? rating.weight : ''}
-                                                        thousandsGroupStyle="thousand"
-                                                        thousandSeparator={true}
-                                                        decimalScale={Number.isInteger(rating.weight) ? 0 : 2}
-                                                        fixedDecimalScale={true}
-                                                        prefix={''}
-                                                        type="text"
-                                                        displayType={'text'}
-                                                    />
-                                                </div>
-
-                                                <div style={{
-                                                    borderRight: '1px solid rgba(0,0,0,0.3)',
-                                                    ...this.styleFieldData,
-                                                    padding: 5,
-                                                    ...this.styleFlexCol,
-                                                    justifyContent: 'center',
-                                                    textAlign: 'center',
-                                                    minWidth: '4.5rem',
-                                                    maxWidth: '4.5rem'
-                                                }}>
-
-                                                </div>
-
-                                                <div style={{
-                                                    ...this.styleFieldData,
-                                                    ...this.styleFlexRow,
-                                                    justifyContent: 'center',
-                                                    flexGrow: 1
-                                                }}>
-                                                    <div style={{ flexGrow: 1, borderRight: '1px solid rgba(0,0,0,0.3)', padding: 5 }}>
-                                                        {rating.description}
-                                                    </div>
-                                                    <div style={{ minWidth: '4rem', maxWidth: '4rem', borderRight: '1px solid rgba(0,0,0,0.3)' }}>
-
-                                                    </div>
-                                                    <div style={{ minWidth: '4rem', maxWidth: '4rem' }}>
-
-                                                    </div>
-
-                                                </div>
                                             </div>
-                                        )
-                                    }
+
+                                            <div style={{
+                                                ...this.styleFieldData,
+                                                ...this.styleFlexRow,
+                                                justifyContent: 'center',
+                                                flexGrow: 1
+                                            }}>
+                                                <div style={{ flexGrow: 1, borderRight: '1px solid rgba(0,0,0,0.3)', padding: 5 }}>
+                                                    {/* {rating.description} */}
+                                                    <input
+                                                        type="text"
+                                                        style={{
+                                                            border: 0,
+                                                            textAlign: 'left',
+                                                            fontStyle: 'italic',
+                                                            width: '100%'
+                                                        }}
+                                                        onChange={(e) => {
+                                                            let _items = [...this.props.ratingItems];
+                                                            let newItem = { ..._items[index] };
+                                                            newItem.description = e.target.value;
+                                                            _items[index] = { ...newItem };
+
+                                                            this.props.setRatingItems([..._items]);
+                                                        }}
+                                                        value={rating?.description || ''}
+                                                    />
+                                                </div>
+                                                <div style={{ minWidth: '4rem', maxWidth: '4rem', borderRight: '1px solid rgba(0,0,0,0.3)' }}>
+
+                                                </div>
+                                                <div style={{ minWidth: '4rem', maxWidth: '4rem' }}>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    )
                                 })
                             }
 
-                            {
+                            {/* {
                                 fillRows.map((row, index) => {
                                     return (
                                         <div key={index} style={{
@@ -759,7 +797,7 @@ export default class ToPrint extends Component {
                                         </div>
                                     )
                                 })
-                            }
+                            } */}
 
 
                         </div>
@@ -811,9 +849,24 @@ export default class ToPrint extends Component {
                                     alignItems: 'center'
                                 }}>
                                     <b>Fee Terms:</b>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Collet</label><input type="checkbox" /></div>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Prepaid</label><input type="checkbox" /></div>
-                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}><label htmlFor="">Customer check acceptable</label><input type="checkbox" /></div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="fee-terms-collect">Collet</label>
+                                        <input type="checkbox" id="fee-terms-collect" checked={this.props.feeTermsCollect} onChange={(e) => {
+                                            this.props.setFeeTermsCollect(e.target.checked);
+                                        }} />
+                                    </div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="fee-terms-prepaid">Prepaid</label>
+                                        <input type="checkbox" id="fee-terms-prepaid" checked={this.props.feeTermsPrepaid} onChange={(e) => {
+                                            this.props.setFeeTermsPrepaid(e.target.checked);
+                                        }} />
+                                    </div>
+                                    <div style={{ ...this.styleFlexRow, alignItems: 'center' }}>
+                                        <label htmlFor="fee-terms-check">Customer check acceptable</label>
+                                        <input type="checkbox" id="fee-terms-check" checked={this.props.feeTermsCheck} onChange={(e) => {
+                                            this.props.setFeeTermsCheck(e.target.checked);
+                                        }} />
+                                    </div>
                                 </div>
                             </div>
 
@@ -889,10 +942,17 @@ export default class ToPrint extends Component {
                             }}>
                                 <div style={{ ...this.styleFieldName, marginBottom: 5 }}>Trailer Loaded:</div>
                                 <div style={{ ...this.styleFlexRow, alignItems: 'center', ...this.styleFieldData }}>
-                                    <input type="checkbox" /><label htmlFor="">By shipper</label>
+                                    <input type="checkbox" id="trailer-loaded-by-shipper" checked={this.props.trailerLoadedByShipper} onChange={(e) => {
+                                        this.props.setTrailerLoadedByShipper(e.target.checked);
+                                    }} />
+                                    <label htmlFor="trailer-loaded-by-shipper">By shipper</label>
                                 </div>
+
                                 <div style={{ ...this.styleFlexRow, alignItems: 'center', ...this.styleFieldData }}>
-                                    <input type="checkbox" /><label htmlFor="">By driver</label>
+                                    <input type="checkbox" id="trailer-loaded-by-driver" checked={this.props.trailerLoadedByDriver} onChange={(e) => {
+                                        this.props.setTrailerLoadedByDriver(e.target.checked);
+                                    }} />
+                                    <label htmlFor="trailer-loaded-by-driver">By driver</label>
                                 </div>
                             </div>
 
@@ -905,13 +965,22 @@ export default class ToPrint extends Component {
                             }}>
                                 <div style={{ ...this.styleFieldName, marginBottom: 5 }}>Freight Counted::</div>
                                 <div style={{ ...this.styleFlexRow, alignItems: 'center', ...this.styleFieldData }}>
-                                    <input type="checkbox" /><label htmlFor="">By shipper</label>
+                                    <input type="checkbox" id="freight-counted-by-shipper" checked={this.props.freightCountedByShipper} onChange={(e) => {
+                                        this.props.setFreightCountedByShipper(e.target.checked);
+                                    }} />
+                                    <label htmlFor="freight-counted-by-shipper">By shipper</label>
                                 </div>
                                 <div style={{ ...this.styleFlexRow, alignItems: 'center', ...this.styleFieldData }}>
-                                    <input type="checkbox" /><label htmlFor="">By driver/pallets said to contain</label>
+                                    <input type="checkbox" id="freight-counted-by-driver-pallets" checked={this.props.freightCountedByDriverPallets} onChange={(e) => {
+                                        this.props.setFreightCountedByDriverPallets(e.target.checked);
+                                    }} />
+                                    <label htmlFor="freight-counted-by-driver-pallets">By driver/pallets said to contain</label>
                                 </div>
                                 <div style={{ ...this.styleFlexRow, alignItems: 'center', ...this.styleFieldData }}>
-                                    <input type="checkbox" /><label htmlFor="">By driver/pieces</label>
+                                    <input type="checkbox" id="freight-counted-by-driver-pieces" checked={this.props.freightCountedByDriverPieces} onChange={(e) => {
+                                        this.props.setFreightCountedByDriverPieces(e.target.checked);
+                                    }} />
+                                    <label htmlFor="freight-counted-by-driver-pieces">By driver/pieces</label>
                                 </div>
                             </div>
 

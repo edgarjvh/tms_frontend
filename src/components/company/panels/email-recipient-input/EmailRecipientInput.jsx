@@ -6,6 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Loader from 'react-loader-spinner';
 import axios from 'axios';
+import { useDetectClickOutside } from "react-detect-click-outside";
+import lodash from 'lodash';
+
+import { SelectBox } from './../../../controls';
 
 const EmailRecipientInput = (props) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +19,8 @@ const EmailRecipientInput = (props) => {
     const [mailMessage, setMailMessage] = useState('');
     const [messageType, setMessageType] = useState('SUCCESS');
 
+    const [contacts, setContacts] = useState([]);
+
     const [toInput, setToInput] = useState('');
     const [ccInput, setCcInput] = useState('');
     const [bccInput, setBccInput] = useState('');
@@ -23,17 +29,105 @@ const EmailRecipientInput = (props) => {
     const refCcInput = useRef();
     const refBccInput = useRef();
 
-    useEffect(() => {
-        setToList(props.dataEmail?.recipient_to || []);
+    const [toInputItems, setToInputItems] = useState([]);
+    const refToInputPopupItems = useRef([]);
+    const refToInputDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setToInputItems([])
+        }
+    });
 
-        refToInput.current.focus({
-            preventScroll: true
+    const [ccInputItems, setCcInputItems] = useState([]);
+    const refCcInputPopupItems = useRef([]);
+    const refCcInputDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setCcInputItems([])
+        }
+    });
+
+    const [bccInputItems, setBccInputItems] = useState([]);
+    const refBccInputPopupItems = useRef([]);
+    const refBccInputDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setBccInputItems([])
+        }
+    });
+
+    useEffect(() => {
+        setIsLoading(true);
+
+        axios.post(props.serverUrl + '/getEmailContacts').then(res => {
+            if (res.data.result === 'OK') {
+                let _contacts = [];
+
+                (res.data.contacts || []).map((item) => {
+                    if ((item?.email_work || '') !== '') {
+                        if (!_contacts.find(x => x.email === item.email_work)){
+                            _contacts.push({
+                                id: item.id,
+                                name: item.email_work + ((item?.name || '').trim() === '' ? '' : ` (${capitalizeName(item.name)})`),
+                                full_name: capitalizeName(item.name),
+                                email: item.email_work
+                            });
+                        }                        
+                    }
+
+                    if ((item?.email_personal || '') !== '') {
+                        if (!_contacts.find(x => x.email === item.email_personal)){
+                            _contacts.push({
+                                id: item.id,
+                                name: item.email_personal + ((item?.name || '').trim() === '' ? '' : ` (${item.name})`),
+                                full_name: item.name,
+                                email: item.email_personal
+                            });
+                        }
+                    }
+
+                    if ((item?.email_other || '') !== '') {
+                        if (!_contacts.find(x => x.email === item.email_other)){
+                            _contacts.push({
+                                id: item.id,
+                                name: item.email_other + ((item?.name || '').trim() === '' ? '' : ` (${item.name})`),
+                                full_name: item.name,
+                                email: item.email_other
+                            });
+                        }
+                    }
+
+                    return false;
+                })
+
+                
+
+                setContacts([..._contacts]);
+            }
+        }).catch(e => {
+            console.log("error getting contacts");
+        }).finally(() => {
+            setIsLoading(false);
+
+            setToList(props.dataEmail?.recipient_to || []);
+
+            refToInput.current.focus({
+                preventScroll: true
+            });
         });
     }, []);
 
     const isEmailValid = (email) => {
         let mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         return email.match(mailformat);
+    }
+
+    const capitalizeName = (name) => {
+        let nameSplitted = name.split(' ');
+
+        return nameSplitted.map(word => {
+            const firstLetter = word.charAt(0).toUpperCase();
+            const rest = word.slice(1).toLowerCase();
+
+            return firstLetter + rest;
+        }).join(' ');
     }
 
     return (
@@ -79,7 +173,206 @@ const EmailRecipientInput = (props) => {
                     <div className='email-recipient-to-container' style={{
                         width: '100%'
                     }}>
-                        <div className="input-box-container">
+                        <SelectBox
+                            placeholder="To"
+                            popupId="input-to"
+                            tabIndex={props.tabTimesFrom + props.tabTimes + 1}
+                            boxStyle={{
+                                width: '100%',
+                            }}
+                            inputStyle={{
+                                textTransform: 'lowercase'
+                            }}
+                            popupStyle={{
+                                left: '-20%',
+                                width: 400
+                            }}
+                            refs={{
+                                refInput: refToInput,
+                                refPopupItems: refToInputPopupItems,
+                                refDropdown: refToInputDropDown,
+                            }}
+                            readOnly={isLoading}
+                            isDropdownEnabled={false}
+                            avoidCheckItemsOnTab={true}
+                            popupPosition="vertical below"
+                            onEnter={async e => {
+                                let email = '';
+                                let name = '';
+
+                                if (toInputItems.length > 0 && toInputItems.findIndex(item => item.selected) > -1) {
+                                    let item = toInputItems[toInputItems.findIndex(item => item.selected)];
+
+                                    email = item.email;
+                                    name = item.full_name;
+                                } else {
+                                    email = toInput;
+                                    name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                }
+
+
+                                if (isEmailValid(email)) {
+                                    let exist = false;
+
+                                    (toList || []).map(item => {
+                                        if ((item.email || '') === email) {
+                                            exist = true;
+                                        }
+                                        return true;
+                                    })
+
+                                    if (exist) {
+                                        window.alert('E-mail address is already in the list');
+                                        setToInputItems([]);
+                                        refToInput.current.focus();
+                                    } else {
+                                        setToList(prev => {
+                                            return [
+                                                ...prev,
+                                                {
+                                                    name: name,
+                                                    email: email
+                                                }
+                                            ]
+                                        });
+
+                                        setToInput('');
+                                        setToInputItems([]);
+                                        refToInput.current.focus();
+                                    }
+
+                                } else {
+                                    window.alert('Invalid e-mail address!');
+                                    setToInputItems([]);
+                                    refToInput.current.focus();
+                                    return;
+                                }
+
+                                setContacts([...contacts.map(item => {
+                                    item.selected = false;
+                                    return item;
+                                })])
+                            }}
+                            onTab={async e => {
+                                if (toInput.trim() !== '') {
+                                    e.preventDefault();
+
+                                    let email = '';
+                                    let name = '';
+
+                                    if (toInputItems.length > 0 && toInputItems.findIndex(item => item.selected) > -1) {
+                                        let item = toInputItems[toInputItems.findIndex(item => item.selected)];
+
+                                        email = item.email;
+                                        name = item.full_name;
+
+                                    } else {
+                                        email = toInput;
+                                        name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                    }
+
+
+                                    if (isEmailValid(email)) {
+                                        let exist = false;
+
+                                        (toList || []).map(item => {
+                                            if ((item.email || '') === email) {
+                                                exist = true;
+                                            }
+                                            return true;
+                                        })
+
+                                        if (exist) {
+                                            window.alert('E-mail address is already in the list');
+                                            setToInputItems([]);
+                                            refToInput.current.focus();
+                                        } else {
+                                            setToList(prev => {
+                                                return [
+                                                    ...prev,
+                                                    {
+                                                        name: name,
+                                                        email: email
+                                                    }
+                                                ]
+                                            });
+
+                                            setToInput('');
+                                            setToInputItems([]);
+                                            refToInput.current.focus();
+                                        }
+
+                                    } else {
+                                        window.alert('Invalid e-mail address!');
+                                        setToInputItems([]);
+                                        refToInput.current.focus();
+                                        return;
+                                    }
+
+                                    setContacts([...contacts.map(item => {
+                                        item.selected = false;
+                                        return item;
+                                    })])
+                                }
+                            }}
+                            onBlur={e => { }}
+                            onInput={e => {
+                                setToInput(e.target.value);
+
+                                if (e.target.value.trim() === "") {
+                                    setToInputItems([]);
+                                } else {
+                                    setToInputItems([
+                                        ...(contacts || []).filter(x =>
+                                            (x.email || '').toLowerCase().includes(e.target.value.trim().toLowerCase()) ||
+                                            (x.name || '').toLowerCase().includes(e.target.value.trim().toLowerCase())).map((item, index) => {
+                                                item.selected = index === 0;
+                                                return item;
+                                            })
+                                    ])
+                                }
+                            }}
+                            onChange={e => {
+                                setToInput(e.target.value);
+                            }}
+                            value={toInput || ""}
+                            items={toInputItems}
+                            getItems={() => {
+                                setToInputItems([...contacts.map((item, index) => {
+                                    item.selected = index === 0;
+                                    return item;
+                                })]);
+
+                                refToInputPopupItems.current.map((r, i) => {
+                                    if (r && r.classList.contains("selected")) {
+                                        r.scrollIntoView({
+                                            behavior: "auto",
+                                            block: "center",
+                                            inline: "nearest",
+                                        });
+                                    }
+                                    return true;
+                                });
+                            }}
+                            setItems={setToInputItems}
+                            onDropdownClick={e => { }}
+                            onPopupClick={item => {
+                                setToList(prev => {
+                                    return [
+                                        ...prev,
+                                        {
+                                            name: item.full_name,
+                                            email: item.email
+                                        }
+                                    ]
+                                });
+
+                                setToInput('');
+                                setToInputItems([]);
+                                refToInput.current.focus();
+                            }}
+                        />
+                        {/* <div className="input-box-container">
                             <input
                                 readOnly={isLoading}
                                 ref={refToInput}
@@ -175,7 +468,7 @@ const EmailRecipientInput = (props) => {
                                 }}
                                 value={toInput || ''}
                             />
-                        </div>
+                        </div> */}
 
                         <div style={{
                             padding: '0 10px',
@@ -261,7 +554,206 @@ const EmailRecipientInput = (props) => {
                     <div className='email-recipient-cc-container' style={{
                         width: '100%'
                     }}>
-                        <div className="input-box-container">
+                        <SelectBox
+                            placeholder="Cc"
+                            popupId="input-cc"
+                            tabIndex={props.tabTimesFrom + props.tabTimes + 1}
+                            boxStyle={{
+                                width: '100%',
+                            }}
+                            inputStyle={{
+                                textTransform: 'lowercase'
+                            }}
+                            popupStyle={{
+                                left: '-20%',
+                                width: 400
+                            }}
+                            refs={{
+                                refInput: refCcInput,
+                                refPopupItems: refCcInputPopupItems,
+                                refDropdown: refCcInputDropDown,
+                            }}
+                            readOnly={isLoading}
+                            isDropdownEnabled={false}
+                            avoidCheckItemsOnTab={true}
+                            popupPosition="vertical below"
+                            onEnter={async e => {
+                                let email = '';
+                                let name = '';
+
+                                if (ccInputItems.length > 0 && ccInputItems.findIndex(item => item.selected) > -1) {
+                                    let item = ccInputItems[ccInputItems.findIndex(item => item.selected)];
+
+                                    email = item.email;
+                                    name = item.full_name;
+                                } else {
+                                    email = ccInput;
+                                    name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                }
+
+
+                                if (isEmailValid(email)) {
+                                    let exist = false;
+
+                                    (ccList || []).map(item => {
+                                        if ((item.email || '') === email) {
+                                            exist = true;
+                                        }
+                                        return true;
+                                    })
+
+                                    if (exist) {
+                                        window.alert('E-mail address is already in the list');
+                                        setCcInputItems([]);
+                                        refCcInput.current.focus();
+                                    } else {
+                                        setCcList(prev => {
+                                            return [
+                                                ...prev,
+                                                {
+                                                    name: name,
+                                                    email: email
+                                                }
+                                            ]
+                                        });
+
+                                        setCcInput('');
+                                        setCcInputItems([]);
+                                        refCcInput.current.focus();
+                                    }
+
+                                } else {
+                                    window.alert('Invalid e-mail address!');
+                                    setCcInputItems([]);
+                                    refCcInput.current.focus();
+                                    return;
+                                }
+
+                                setContacts([...contacts.map(item => {
+                                    item.selected = false;
+                                    return item;
+                                })])
+                            }}
+                            onTab={async e => {
+                                if (ccInput.trim() !== '') {
+                                    e.preventDefault();
+
+                                    let email = '';
+                                    let name = '';
+
+                                    if (ccInputItems.length > 0 && ccInputItems.findIndex(item => item.selected) > -1) {
+                                        let item = ccInputItems[ccInputItems.findIndex(item => item.selected)];
+
+                                        email = item.email;
+                                        name = item.full_name;
+
+                                    } else {
+                                        email = ccInput;
+                                        name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                    }
+
+
+                                    if (isEmailValid(email)) {
+                                        let exist = false;
+
+                                        (ccList || []).map(item => {
+                                            if ((item.email || '') === email) {
+                                                exist = true;
+                                            }
+                                            return true;
+                                        })
+
+                                        if (exist) {
+                                            window.alert('E-mail address is already in the list');
+                                            setCcInputItems([]);
+                                            refCcInput.current.focus();
+                                        } else {
+                                            setCcList(prev => {
+                                                return [
+                                                    ...prev,
+                                                    {
+                                                        name: name,
+                                                        email: email
+                                                    }
+                                                ]
+                                            });
+
+                                            setCcInput('');
+                                            setCcInputItems([]);
+                                            refCcInput.current.focus();
+                                        }
+
+                                    } else {
+                                        window.alert('Invalid e-mail address!');
+                                        setCcInputItems([]);
+                                        refCcInput.current.focus();
+                                        return;
+                                    }
+
+                                    setContacts([...contacts.map(item => {
+                                        item.selected = false;
+                                        return item;
+                                    })])
+                                }
+                            }}
+                            onBlur={e => { }}
+                            onInput={e => {
+                                setCcInput(e.target.value);
+
+                                if (e.target.value.trim() === "") {
+                                    setCcInputItems([]);
+                                } else {
+                                    setCcInputItems([
+                                        ...(contacts || []).filter(x =>
+                                            (x.email || '').toLowerCase().includes(e.target.value.trim().toLowerCase()) ||
+                                            (x.name || '').toLowerCase().includes(e.target.value.trim().toLowerCase())).map((item, index) => {
+                                                item.selected = index === 0;
+                                                return item;
+                                            })
+                                    ])
+                                }
+                            }}
+                            onChange={e => {
+                                setCcInput(e.target.value);
+                            }}
+                            value={ccInput || ""}
+                            items={ccInputItems}
+                            getItems={() => {
+                                setCcInputItems([...contacts.map((item, index) => {
+                                    item.selected = index === 0;
+                                    return item;
+                                })]);
+
+                                refCcInputPopupItems.current.map((r, i) => {
+                                    if (r && r.classList.contains("selected")) {
+                                        r.scrollInccView({
+                                            behavior: "aucc",
+                                            block: "center",
+                                            inline: "nearest",
+                                        });
+                                    }
+                                    return true;
+                                });
+                            }}
+                            setItems={setCcInputItems}
+                            onDropdownClick={e => { }}
+                            onPopupClick={item => {
+                                setCcList(prev => {
+                                    return [
+                                        ...prev,
+                                        {
+                                            name: item.full_name,
+                                            email: item.email
+                                        }
+                                    ]
+                                });
+
+                                setCcInput('');
+                                setCcInputItems([]);
+                                refCcInput.current.focus();
+                            }}
+                        />
+                        {/* <div className="input-box-container">
                             <input
                                 readOnly={isLoading}
                                 ref={refCcInput}
@@ -356,7 +848,7 @@ const EmailRecipientInput = (props) => {
                                     setCcInput(e.target.value);
                                 }}
                                 value={ccInput || ''} />
-                        </div>
+                        </div> */}
 
                         <div style={{
                             padding: '0 10px',
@@ -443,7 +935,206 @@ const EmailRecipientInput = (props) => {
                     <div className='email-recipient-bcc-container' style={{
                         width: '100%'
                     }}>
-                        <div className="input-box-container">
+                        <SelectBox
+                            placeholder="Bcc"
+                            popupId="input-bcc"
+                            tabIndex={props.tabTimesFrom + props.tabTimes + 1}
+                            boxStyle={{
+                                width: '100%',
+                            }}
+                            inputStyle={{
+                                textTransform: 'lowercase'
+                            }}
+                            popupStyle={{
+                                left: '-20%',
+                                width: 400
+                            }}
+                            refs={{
+                                refInput: refBccInput,
+                                refPopupItems: refBccInputPopupItems,
+                                refDropdown: refBccInputDropDown,
+                            }}
+                            readOnly={isLoading}
+                            isDropdownEnabled={false}
+                            avoidCheckItemsOnTab={true}
+                            popupPosition="vertical below"
+                            onEnter={async e => {
+                                let email = '';
+                                let name = '';
+
+                                if (bccInputItems.length > 0 && bccInputItems.findIndex(item => item.selected) > -1) {
+                                    let item = bccInputItems[bccInputItems.findIndex(item => item.selected)];
+
+                                    email = item.email;
+                                    name = item.full_name;
+                                } else {
+                                    email = bccInput;
+                                    name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                }
+
+
+                                if (isEmailValid(email)) {
+                                    let exist = false;
+
+                                    (bccList || []).map(item => {
+                                        if ((item.email || '') === email) {
+                                            exist = true;
+                                        }
+                                        return true;
+                                    })
+
+                                    if (exist) {
+                                        window.alert('E-mail address is already in the list');
+                                        setBccInputItems([]);
+                                        refBccInput.current.focus();
+                                    } else {
+                                        setBccList(prev => {
+                                            return [
+                                                ...prev,
+                                                {
+                                                    name: name,
+                                                    email: email
+                                                }
+                                            ]
+                                        });
+
+                                        setBccInput('');
+                                        setBccInputItems([]);
+                                        refBccInput.current.focus();
+                                    }
+
+                                } else {
+                                    window.alert('Invalid e-mail address!');
+                                    setBccInputItems([]);
+                                    refBccInput.current.focus();
+                                    return;
+                                }
+
+                                setContacts([...contacts.map(item => {
+                                    item.selected = false;
+                                    return item;
+                                })])
+                            }}
+                            onTab={async e => {
+                                if (bccInput.trim() !== '') {
+                                    e.preventDefault();
+
+                                    let email = '';
+                                    let name = '';
+
+                                    if (bccInputItems.length > 0 && bccInputItems.findIndex(item => item.selected) > -1) {
+                                        let item = bccInputItems[bccInputItems.findIndex(item => item.selected)];
+
+                                        email = item.email;
+                                        name = item.full_name;
+
+                                    } else {
+                                        email = bccInput;
+                                        name = (contacts || []).find(x => x.email === email)?.full_name || '';
+                                    }
+
+
+                                    if (isEmailValid(email)) {
+                                        let exist = false;
+
+                                        (bccList || []).map(item => {
+                                            if ((item.email || '') === email) {
+                                                exist = true;
+                                            }
+                                            return true;
+                                        })
+
+                                        if (exist) {
+                                            window.alert('E-mail address is already in the list');
+                                            setBccInputItems([]);
+                                            refBccInput.current.focus();
+                                        } else {
+                                            setBccList(prev => {
+                                                return [
+                                                    ...prev,
+                                                    {
+                                                        name: name,
+                                                        email: email
+                                                    }
+                                                ]
+                                            });
+
+                                            setBccInput('');
+                                            setBccInputItems([]);
+                                            refBccInput.current.focus();
+                                        }
+
+                                    } else {
+                                        window.alert('Invalid e-mail address!');
+                                        setBccInputItems([]);
+                                        refBccInput.current.focus();
+                                        return;
+                                    }
+
+                                    setContacts([...contacts.map(item => {
+                                        item.selected = false;
+                                        return item;
+                                    })])
+                                }
+                            }}
+                            onBlur={e => { }}
+                            onInput={e => {
+                                setBccInput(e.target.value);
+
+                                if (e.target.value.trim() === "") {
+                                    setBccInputItems([]);
+                                } else {
+                                    setBccInputItems([
+                                        ...(contacts || []).filter(x =>
+                                            (x.email || '').toLowerCase().includes(e.target.value.trim().toLowerCase()) ||
+                                            (x.name || '').toLowerCase().includes(e.target.value.trim().toLowerCase())).map((item, index) => {
+                                                item.selected = index === 0;
+                                                return item;
+                                            })
+                                    ])
+                                }
+                            }}
+                            onChange={e => {
+                                setBccInput(e.target.value);
+                            }}
+                            value={bccInput || ""}
+                            items={bccInputItems}
+                            getItems={() => {
+                                setBccInputItems([...contacts.map((item, index) => {
+                                    item.selected = index === 0;
+                                    return item;
+                                })]);
+
+                                refBccInputPopupItems.current.map((r, i) => {
+                                    if (r && r.classList.contains("selected")) {
+                                        r.scrollInbccView({
+                                            behavior: "aubcc",
+                                            block: "center",
+                                            inline: "nearest",
+                                        });
+                                    }
+                                    return true;
+                                });
+                            }}
+                            setItems={setBccInputItems}
+                            onDropdownClick={e => { }}
+                            onPopupClick={item => {
+                                setBccList(prev => {
+                                    return [
+                                        ...prev,
+                                        {
+                                            name: item.full_name,
+                                            email: item.email
+                                        }
+                                    ]
+                                });
+
+                                setBccInput('');
+                                setBccInputItems([]);
+                                refBccInput.current.focus();
+                            }}
+                        />
+                        {/* <div className="input-box-container">
                             <input
                                 readOnly={isLoading}
                                 ref={refBccInput}
@@ -538,7 +1229,7 @@ const EmailRecipientInput = (props) => {
                                     setBccInput(e.target.value);
                                 }}
                                 value={bccInput || ''} />
-                        </div>
+                        </div> */}
 
                         <div style={{
                             padding: '0 10px',
@@ -665,21 +1356,21 @@ const EmailRecipientInput = (props) => {
                                 setMailMessage('');
                                 setIsLoading(true);
 
-                                axios.post(props.serverUrl + '/sendRateConfEmail', {
+                                axios.post(props.serverUrl + props.sendingUrl, {
                                     ...props.dataEmail,
                                     recipient_to: [...toList],
                                     recipient_cc: [...ccList],
-                                    recipient_bcc: [...bccList]    
+                                    recipient_bcc: [...bccList]
                                 }).then(res => {
                                     if (res.data.result === 'SENT') {
                                         setMessageType('SUCCESS');
-                                        setMailMessage(`${(props.dataEmail?.type || 'carrier') === 'carrier' ? 'Carrier' : 'Customer'} Rate Conf has been sent!`);                                        
+                                        setMailMessage(props.successMessage || '');
                                     } else if (res.data.result === 'NO EMAIL ADDRESS') {
                                         setMessageType('WARNING');
                                         setMailMessage("There was an error with the recipient email address");
                                     } else {
                                         setMessageType('ERROR');
-                                        setMailMessage(`There was an error sending the email to the ${(props.dataEmail?.type || 'carrier')}`);                                        
+                                        setMailMessage(`There was an error sending the email to the ${(props.dataEmail?.type || 'carrier')}`);
                                     }
                                 }).catch(e => {
                                     console.log(e);
@@ -687,7 +1378,7 @@ const EmailRecipientInput = (props) => {
                                     setIsLoading(false);
                                     window.setTimeout(() => {
                                         props.close();
-                                    }, 2000);
+                                    }, 1500);
                                 });
                             }
                         }}>

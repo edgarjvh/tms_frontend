@@ -523,6 +523,7 @@ const RatingScreen = (props) => {
                 }
 
                 selectedBillToRating.order_id = (selectedOrder?.id || 0);
+                selectedBillToRating.template_id = (selectedOrder?.id || 0);
 
                 selectedBillToRating.pieces = Number((selectedBillToRating.pieces || 0).toString().replace(',', ''));
                 selectedBillToRating.percentage = Number((selectedBillToRating.percentage || 0).toString().replace(',', ''));
@@ -533,24 +534,46 @@ const RatingScreen = (props) => {
                 selectedBillToRating.rate = Number((selectedBillToRating.rate || 0).toString().replace(',', ''));
                 selectedBillToRating.total_charges = Number((selectedBillToRating.total_charges || 0).toString().replace(',', ''));
 
-                axios.post(props.serverUrl + '/saveOrderCustomerRating', selectedBillToRating).then(res => {
-                    if (res.data.result === 'OK') {
-                        let orderCustomerRatings = JSON.parse(JSON.stringify(res.data.order_customer_ratings));
-                        let totalCustomerRating = (orderCustomerRatings || []).reduce((accumulator, item) => {
-                            return accumulator + item.total_charges;
-                        }, 0);
-                        setSelectedOrder({
-                            ...selectedOrder,
-                            order_customer_ratings: orderCustomerRatings,
-                            total_customer_rating: totalCustomerRating
-                        });
+                let url = (props.owner || 'order') === 'template'
+                    ? '/saveTemplateCustomerRating'
+                    : '/saveOrderCustomerRating';
 
-                        props.setSelectedOrder({
-                            id: selectedOrder.id,
-                            order_customer_ratings: orderCustomerRatings,
-                            total_customer_rating: totalCustomerRating,
-                            component_id: props.componentId
-                        })
+                axios.post(props.serverUrl + url, selectedBillToRating).then(res => {
+                    if (res.data.result === 'OK') {
+                        if ((props.owner || 'order') === 'order') {
+                            let orderCustomerRatings = JSON.parse(JSON.stringify(res.data.order_customer_ratings));
+                            let totalCustomerRating = (orderCustomerRatings || []).reduce((accumulator, item) => {
+                                return accumulator + item.total_charges;
+                            }, 0);
+
+                            setSelectedOrder({
+                                ...selectedOrder,
+                                order_customer_ratings: orderCustomerRatings,
+                                total_customer_rating: totalCustomerRating
+                            });
+                            props.setSelectedOrder({
+                                id: selectedOrder.id,
+                                order_customer_ratings: orderCustomerRatings,
+                                total_customer_rating: totalCustomerRating,
+                                component_id: props.componentId
+                            })
+                        } else {
+                            let templateCustomerRatings = JSON.parse(JSON.stringify(res.data.template_customer_ratings));
+                            let totalCustomerRating = (templateCustomerRatings || []).reduce((accumulator, item) => {
+                                return accumulator + item.total_charges;
+                            }, 0);
+                            setSelectedOrder({
+                                ...selectedOrder,
+                                order_customer_ratings: templateCustomerRatings,
+                                total_customer_rating: totalCustomerRating
+                            });
+
+                            props.callback({
+                                type: 'customer',
+                                order_customer_ratings: templateCustomerRatings,
+                                total_customer_rating: totalCustomerRating
+                            });
+                        }
 
                         setSelectedBillToRating({});
                         refBillToRateTypes.current.focus();
@@ -756,6 +779,7 @@ const RatingScreen = (props) => {
                 }
 
                 selectedCarrierRating.order_id = (selectedOrder?.id || 0);
+                selectedCarrierRating.template_id = (selectedOrder?.id || 0);
 
                 selectedCarrierRating.pieces = Number((selectedCarrierRating.pieces || 0).toString().replace(',', ''));
                 selectedCarrierRating.percentage = Number((selectedCarrierRating.percentage || 0).toString().replace(',', ''));
@@ -766,26 +790,48 @@ const RatingScreen = (props) => {
                 selectedCarrierRating.rate = Number((selectedCarrierRating.rate || 0).toString().replace(',', ''));
                 selectedCarrierRating.total_charges = Number((selectedCarrierRating.total_charges || 0).toString().replace(',', ''));
 
-                axios.post(props.serverUrl + '/saveOrderCarrierRating', selectedCarrierRating).then(res => {
+                let url = (props.owner || 'order') === 'template'
+                    ? '/saveTemplateCarrierRating'
+                    : '/saveOrderCarrierRating';
+
+                axios.post(props.serverUrl + url, selectedCarrierRating).then(res => {
                     if (res.data.result === 'OK') {
+                        if ((props.owner || 'order') === 'order') {
+                            let orderCarrierRatings = JSON.parse(JSON.stringify(res.data.order_carrier_ratings));
+                            let totalCarrierRating = (orderCarrierRatings || []).reduce((accumulator, item) => {
+                                return accumulator + item.total_charges;
+                            }, 0);
 
-                        let orderCarrierRatings = JSON.parse(JSON.stringify(res.data.order_carrier_ratings));
-                        let totalCarrierRating = (orderCarrierRatings || []).reduce((accumulator, item) => {
-                            return accumulator + item.total_charges;
-                        }, 0);
+                            setSelectedOrder({
+                                ...selectedOrder,
+                                order_carrier_ratings: orderCarrierRatings,
+                                total_carrier_rating: totalCarrierRating
+                            });
 
-                        setSelectedOrder({
-                            ...selectedOrder,
-                            order_carrier_ratings: orderCarrierRatings,
-                            total_carrier_rating: totalCarrierRating
-                        });
+                            props.setSelectedOrder({
+                                id: selectedOrder.id,
+                                order_carrier_ratings: orderCarrierRatings,
+                                total_carrier_rating: totalCarrierRating,
+                                component_id: props.componentId
+                            });
+                        } else {
+                            let templateCarrierRatings = JSON.parse(JSON.stringify(res.data.template_carrier_ratings));
+                            let totalCarrierRating = (templateCarrierRatings || []).reduce((accumulator, item) => {
+                                return accumulator + item.total_charges;
+                            }, 0);
 
-                        props.setSelectedOrder({
-                            id: selectedOrder.id,
-                            order_carrier_ratings: orderCarrierRatings,
-                            total_carrier_rating: totalCarrierRating,
-                            component_id: props.componentId
-                        });
+                            setSelectedOrder({
+                                ...selectedOrder,
+                                order_carrier_ratings: templateCarrierRatings,
+                                total_carrier_rating: totalCarrierRating
+                            });
+
+                            props.callback({
+                                type: 'carrier',
+                                order_carrier_ratings: templateCarrierRatings,
+                                total_carrier_rating: totalCarrierRating
+                            })
+                        }
 
                         setSelectedCarrierRating({});
                         refCarrierRateTypes.current.focus();
@@ -998,23 +1044,56 @@ const RatingScreen = (props) => {
                                 'disabled': (selectedOrder?.id || 0) === 0 || (selectedBillToRating.id || 0) === 0
                             })} style={{ marginRight: 10 }} onClick={() => {
                                 if (window.confirm('Are you sure you want to delete this item?')) {
-                                    axios.post(props.serverUrl + '/deleteOrderCustomerRating', {
+                                    let url = (props.owner || 'order') === 'template'
+                                        ? '/deleteTemplateCustomerRating'
+                                        : '/deleteOrderCustomerRating';
+
+                                    axios.post(props.serverUrl + url, {
                                         id: selectedBillToRating.id,
-                                        order_id: selectedOrder.id
+                                        order_id: selectedOrder.id,
+                                        template_id: selectedOrder.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
-                                            setSelectedOrder(selectedOrder => {
-                                                return {
-                                                    ...selectedOrder,
-                                                    order_customer_ratings: JSON.parse(JSON.stringify(res.data.order_customer_ratings)),
-                                                }
-                                            });
+                                            if ((props.owner || 'order') === 'order') {
+                                                let orderCustomerRatings = JSON.parse(JSON.stringify(res.data.order_customer_ratings));
+                                                let totalCustomerRating = (orderCustomerRatings || []).reduce((accumulator, item) => {
+                                                    return accumulator + item.total_charges;
+                                                }, 0);
 
-                                            props.setSelectedOrder({
-                                                id: selectedOrder.id,
-                                                order_customer_ratings: JSON.parse(JSON.stringify(res.data.order_customer_ratings)),
-                                                component_id: props.componentId
-                                            })
+                                                setSelectedOrder(selectedOrder => {
+                                                    return {
+                                                        ...selectedOrder,
+                                                        order_customer_ratings: orderCustomerRatings,
+                                                        total_customer_rating: totalCustomerRating
+                                                    }
+                                                });
+
+                                                props.setSelectedOrder({
+                                                    id: selectedOrder.id,
+                                                    order_customer_ratings: orderCustomerRatings,
+                                                    total_customer_rating: totalCustomerRating,
+                                                    component_id: props.componentId
+                                                })
+                                            } else {
+                                                let templateCustomerRatings = JSON.parse(JSON.stringify(res.data.template_customer_ratings));
+                                                let totalCustomerRating = (templateCustomerRatings || []).reduce((accumulator, item) => {
+                                                    return accumulator + item.total_charges;
+                                                }, 0);
+
+                                                setSelectedOrder(selectedOrder => {
+                                                    return {
+                                                        ...selectedOrder,
+                                                        order_customer_ratings: templateCustomerRatings,
+                                                        total_customer_rating: totalCustomerRating
+                                                    }
+                                                });
+
+                                                props.callback({
+                                                    type: 'customer',
+                                                    order_customer_ratings: templateCustomerRatings,
+                                                    total_customer_rating: totalCustomerRating
+                                                })
+                                            }
 
                                             setSelectedBillToRating({});
 
@@ -4602,21 +4681,55 @@ const RatingScreen = (props) => {
                                 'disabled': (selectedOrder?.id || 0) === 0 || (selectedCarrierRating.id || 0) === 0
                             })} style={{ marginRight: 10 }} onClick={() => {
                                 if (window.confirm('Are you sure you want to delete this item?')) {
-                                    axios.post(props.serverUrl + '/deleteOrderCarrierRating', {
+                                    let url = (props.owner || 'order') === 'template'
+                                        ? '/deleteTemplateCarrierRating'
+                                        : '/deleteOrderCarrierRating';
+
+                                    axios.post(props.serverUrl + url, {
                                         id: selectedCarrierRating.id,
-                                        order_id: selectedOrder.id
+                                        order_id: selectedOrder.id,
+                                        template_id: selectedOrder.id
                                     }).then(res => {
                                         if (res.data.result === 'OK') {
-                                            setSelectedOrder({
-                                                ...selectedOrder,
-                                                order_carrier_ratings: JSON.parse(JSON.stringify(res.data.order_carrier_ratings)),
-                                            });
+                                            if ((props.owner || 'order') === 'order') {
+                                                let orderCarrierRatings = JSON.parse(JSON.stringify(res.data.order_carrier_ratings));
+                                                let totalCarrierRating = (orderCarrierRatings || []).reduce((accumulator, item) => {
+                                                    return accumulator + item.total_charges;
+                                                }, 0);
 
-                                            props.setSelectedOrder({
-                                                id: selectedOrder.id,
-                                                order_carrier_ratings: JSON.parse(JSON.stringify(res.data.order_carrier_ratings)),
-                                                component_id: props.componentId
-                                            })
+                                                setSelectedOrder({
+                                                    ...selectedOrder,
+                                                    order_carrier_ratings: orderCarrierRatings,
+                                                    total_carrier_rating: totalCarrierRating
+                                                });
+
+                                                props.setSelectedOrder({
+                                                    id: selectedOrder.id,
+                                                    order_carrier_ratings: orderCarrierRatings,
+                                                    total_carrier_rating: totalCarrierRating,
+                                                    component_id: props.componentId
+                                                })
+                                            } else {
+                                                let templateCarrierRatings = JSON.parse(JSON.stringify(res.data.template_carrier_ratings));
+                                                let totalCarrierRating = (templateCarrierRatings || []).reduce((accumulator, item) => {
+                                                    return accumulator + item.total_charges;
+                                                }, 0);
+
+                                                setSelectedOrder(selectedOrder => {
+                                                    return {
+                                                        ...selectedOrder,
+                                                        order_carrier_ratings: templateCarrierRatings,
+                                                        total_carrier_rating: totalCarrierRating
+                                                    }
+                                                });
+
+                                                props.callback({
+                                                    type: 'carrier',
+                                                    order_carrier_ratings: templateCarrierRatings,
+                                                    total_carrier_rating: totalCarrierRating
+                                                })
+                                            }
+
 
                                             setSelectedCarrierRating({});
 

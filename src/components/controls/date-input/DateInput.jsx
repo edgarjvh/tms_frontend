@@ -115,6 +115,7 @@ function DateInput(props) {
                     guide={false}
                     type="text"
                     placeholder={props.placeholder}
+                    autoFocus={props.autoFocus}
                     onKeyDown={(e) => {
                         props.onKeyDown(e);
                     }}

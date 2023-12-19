@@ -18,7 +18,7 @@ import ToPrint from './ToPrint.jsx';
 import { useReactToPrint } from 'react-to-print';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import NumberFormat from "react-number-format";
-import {    
+import {
     setSelectedCustomer,
     setSelectedContact,
     setAdminHomePanels,
@@ -1154,8 +1154,8 @@ const Customers = (props) => {
                 tabTimes={19000 + props.tabTimes}
                 panelName={`${props.panelName}-customer-import`}
                 origin={props.origin}
-                
-                
+
+
                 componentId={moment().format('x')}
             />
         }
@@ -1210,8 +1210,8 @@ const Customers = (props) => {
                 tabTimes={20000 + props.tabTimes}
                 panelName={`${props.panelName}-customer-search`}
                 origin={props.origin}
-                
-                
+
+
                 componentId={moment().format('x')}
                 customerSearch={customerSearch}
 
@@ -1394,8 +1394,8 @@ const Customers = (props) => {
                 owner='customer'
                 origin={props.origin}
                 suborigin='customer'
-                
-                
+
+
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
 
@@ -1437,8 +1437,8 @@ const Customers = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'customer'}
-                
-                
+
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedCustomer}
@@ -1457,8 +1457,8 @@ const Customers = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'customer'}
-                
-                
+
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedCustomer}
@@ -1478,8 +1478,8 @@ const Customers = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'customer'}
-                    
-                    
+
+
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedCustomer }}
                     selectedOwnerDocument={{
@@ -1924,8 +1924,8 @@ const Customers = (props) => {
                 permissionName='customer contacts'
                 origin={props.origin}
                 owner='customer'
-                
-                
+
+
                 componentId={moment().format('x')}
 
                 contactSearchCustomer={{
@@ -2099,7 +2099,19 @@ const Customers = (props) => {
             background: props.isOnPanel ? 'transparent' : 'radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
-        }}>
+        }}
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 9) {
+                    if (e.target.type === undefined) {
+                        e.preventDefault();
+                        refCustomerCode.current.focus();
+                    }
+                }
+            }}
+        >
 
             {
                 loadingTransition((style, item) => item &&
@@ -2161,7 +2173,7 @@ const Customers = (props) => {
                             searchByCode={searchCustomerByCode}
                             validateForSaving={validateCustomerForSaving}
                             selectedParent={selectedCustomer}
-                            setSelectedParent={setSelectedCustomer}                            
+                            setSelectedParent={setSelectedCustomer}
                             fields={[
                                 'code',
                                 'name',
@@ -3715,8 +3727,8 @@ const Customers = (props) => {
                                                 permissionName='customer contacts'
                                                 origin={props.origin}
                                                 owner='customer'
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
 
                                                 contactSearchCustomer={{
@@ -3754,8 +3766,8 @@ const Customers = (props) => {
                                                 tabTimes={137000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contact-list`}
                                                 origin={props.origin}
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
                                                 selectedCustomerId={selectedCustomer?.id || 0}
                                                 setContacts={(contacts) => {
@@ -3807,8 +3819,8 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 owner='customer'
                                                 isEditingContact={true}
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
 
                                                 contactSearchCustomer={{
@@ -5215,8 +5227,8 @@ const Customers = (props) => {
                                                 tabTimes={137000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contact-list`}
                                                 origin={props.origin}
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
                                                 selectedCustomerId={selectedCustomer?.id || 0}
                                                 setContacts={(contacts) => {
@@ -5268,8 +5280,8 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 owner='customer'
                                                 isEditingContact={true}
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
 
                                                 contactSearchCustomer={{
@@ -5771,8 +5783,8 @@ const Customers = (props) => {
                                                             origin={props.origin}
                                                             isOnPanel={true}
                                                             isAdmin={props.isAdmin}
-                                                            
-                                                            
+
+
                                                             componentId={moment().format('x')}
 
                                                             order_id={order.id}
@@ -5949,7 +5961,7 @@ const mapStateToProps = (state) => {
         scale: state.systemReducers.scale,
         serverUrl: state.systemReducers.serverUrl,
         user: state.systemReducers.user,
-        
+
         selectedCustomer: state.customerReducers.selectedCustomer,
         selectedContact: state.customerReducers.selectedContact,
 

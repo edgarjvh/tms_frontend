@@ -22,6 +22,8 @@ import {
     setCompanyReportPanels,
 
 } from './../../../../actions';
+import ReactDOMServer from 'react-dom/server';
+import QRCode from 'react-qr-code';
 import { useTransition, animated } from 'react-spring';
 import Loader from 'react-loader-spinner';
 import classNames from 'classnames';
@@ -98,8 +100,20 @@ const RateConf = (props) => {
     useEffect(() => {
         if ((props.selectedOrderId || 0) > 0) {
             axios.post(props.serverUrl + '/getOrderById', { id: props.selectedOrderId }).then(res => {
-                if (res.data.result === 'OK') {
-                    setSelectedOrder(res.data.order);
+                if (res.data.result === 'OK') {                    
+
+                    setSelectedOrder({...res.data.order, qrcode: `data:image/svg+xml,${escape(ReactDOMServer.renderToStaticMarkup(<QRCode value={
+                                
+                        `Order Number: ${(res.data.order?.order_number || '')}\nCarrier Assigned: ${(res.data.order?.carrier?.name || '')}\nPay Rate: ${new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }).format(Number(((res.data.order?.order_carrier_ratings || []).reduce((a, b) => {
+                            return {
+                                total_charges: Number(a.total_charges) + Number(b.total_charges),
+                            };
+                        }, { total_charges: "" })?.total_charges || "")
+                            .toString()
+                            .replace(",", "")))}`} size={100} />))}`});
                 }
             }).finally(() => {
                 setIsLoading(false);
@@ -353,7 +367,8 @@ const RateConf = (props) => {
                             : ''
 
                     let dataEmail = {
-                        order_number: selectedOrder.order_number,
+                        order_number: selectedOrder?.order_number,
+                        qrcode: selectedOrder?.qrcode,
                         user_first_name,
                         user_last_name,
                         user_email_address,
@@ -481,6 +496,8 @@ const RateConf = (props) => {
                         <EmailRecipientInput
                             title={showingCarrierConfirmation ? 'E-Mail Carrier Confirmation' : 'E-Mail Customer Confirmation'}
                             dataEmail={dataEmail}
+                            successMessage={`${(dataEmail?.type || 'carrier') === 'carrier' ? 'Carrier' : 'Customer'} Rate Conf has been sent!`}
+                            sendingUrl="/sendRateConfEmail"
                             close={() => {
                                 setShowEmailRecipientInput(false);
                             }}

@@ -55,7 +55,8 @@ import {
     Bol,
     Modal as DispatchModal,
     OrderImport,
-    RoutingMap
+    RoutingMap,
+    Template
 } from "./../panels";
 
 import {
@@ -65,11 +66,15 @@ import {
     LoadBoard,
     Dispatch as DispatchPanel,
 } from "./../../company";
+import ModalTemplate from "./modal-template/ModalTemplate";
 
 var delayTimer;
 
 const Dispatch = (props) => {
     const [selectedOrder, setSelectedOrder] = useState({});
+
+    const [selectedTemplate, setSelectedTemplate] = useState({});
+    const [showModalTemplate, setShowModalTemplate] = useState(false);
     const [isEditingTemplate, setIsEditingTemplate] = useState(false);
     const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
     const [selectedBillToCustomer, setSelectedBillToCustomer] = useState({});
@@ -555,18 +560,12 @@ const Dispatch = (props) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingOrder, setIsSavingOrder] = useState(false);
-    const [isSavingBillToCompanyInfo, setIsSavingBillToCompanyInfo] = useState(false);
-    const [isSavingBillToCompanyContact, setIsSavingBillToCompanyContact] = useState(false);
+    const [isSavingTemplate, setIsSavingTemplate] = useState(false);
     const [isSavingShipperCompanyInfo, setIsSavingShipperCompanyInfo] = useState(false);
-    const [isSavingShipperCompanyContact, setIsSavingShipperCompanyContact] = useState(false);
     const [isSavingConsigneeCompanyInfo, setIsSavingConsigneeCompanyInfo] = useState(false);
-    const [isSavingConsigneeCompanyContact, setIsSavingConsigneeCompanyContact] = useState(false);
-    const [isSavingRouting, setIsSavingRouting] = useState(false);
     const [isSavingPickupId, setIsSavingPickupId] = useState(-1);
     const [isSavingDeliveryId, setIsSavingDeliveryId] = useState(-1);
 
-    const [isSavingCarrierInfo, setIsSavingCarrierInfo] = useState(false);
-    const [isSavingCarrierContact, setIsSavingCarrierContact] = useState(false);
     const [isSavingCarrierDriver, setIsSavingCarrierDriver] = useState(false);
 
     const [showingChangeCarrier, setShowingChangeCarrier] = useState(false);
@@ -1059,7 +1058,7 @@ const Dispatch = (props) => {
 
     }, [selectedConsigneeCustomer?.contact_id])
 
-    useEffect(async () => {
+    useEffect(() => {
         let phones = [];
         (selectedCarrierContact?.phone_work || '') !== '' && phones.push({
             id: 1,
@@ -1087,7 +1086,7 @@ const Dispatch = (props) => {
             phone: selectedCarrierContact.phone_other
         });
 
-        await setCarrierContactPhoneItems(phones);
+        setCarrierContactPhoneItems(phones);
     }, [
         selectedCarrierContact?.phone_work,
         selectedCarrierContact?.phone_work_fax,
@@ -1321,9 +1320,7 @@ const Dispatch = (props) => {
                             setSelectedOrder({
                                 ...selectedOrder,
                                 deliveries: (selectedOrder?.deliveries || []).map((d, i) => {
-                                    if (
-                                        d.id === (selectedConsigneeCustomer?.delivery_id || 0)
-                                    ) {
+                                    if (d.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                         d.order_id = selectedOrder.id;
                                         d.customer = res.data.customers[0];
                                         d.customer_id = res.data.customers[0].id;
@@ -1350,13 +1347,12 @@ const Dispatch = (props) => {
 
                             new Promise((resolve, reject) => {
                                 setIsShowingConsigneeSecondPage(true);
-                            })
-                                .then((response) => {
-                                    refDeliveryDate1.current.inputElement.focus();
-                                })
-                                .catch((e) => {
+                                resolve(true);
+                            }).then((response) => {
+                                refDeliveryDate1.current.inputElement.focus();
+                            }).catch((e) => {
 
-                                });
+                            });
                         } else {
                             setSelectedConsigneeCustomer({});
                             setSelectedConsigneeCustomerContact({});
@@ -2094,7 +2090,7 @@ const Dispatch = (props) => {
             }
         });
 
-        return classes + " " + statusClass;
+        return (classes + " " + statusClass).trim();
     };
 
     const goToTabindex = (index) => {
@@ -2522,1162 +2518,6 @@ const Dispatch = (props) => {
         openPanel(panel, props.origin);
     };
 
-    const validateBillToCompanyInfoForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            clearTimeout(delayTimer);
-            delayTimer = null;
-
-            if ((selectedBillToCustomer.id || 0) === 0) {
-                return;
-            }
-
-            delayTimer = window.setTimeout(() => {
-                let selectedBillToCompanyInfo = selectedBillToCustomer;
-
-                if (selectedBillToCompanyInfo.id === undefined || selectedBillToCompanyInfo.id === -1) {
-                    selectedBillToCompanyInfo.id = 0;
-                    setSelectedBillToCustomer({ ...selectedBillToCustomer, id: 0 });
-                }
-
-                if ((selectedBillToCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
-                    (selectedBillToCompanyInfo.city || "").trim().replace(/\s/g, "") !== "" &&
-                    (selectedBillToCompanyInfo.state || "").trim().replace(/\s/g, "") !== "" &&
-                    (selectedBillToCompanyInfo.address1 || "").trim() !== "" &&
-                    (selectedBillToCompanyInfo.zip || "").trim() !== ""
-                ) {
-                    let parseCity = selectedBillToCompanyInfo.city.trim().replace(/\s/g, "").substring(0, 3);
-
-                    if (parseCity.toLowerCase() === "ft.") {
-                        parseCity = "FO";
-                    }
-                    if (parseCity.toLowerCase() === "mt.") {
-                        parseCity = "MO";
-                    }
-                    if (parseCity.toLowerCase() === "st.") {
-                        parseCity = "SA";
-                    }
-
-                    let mailingParseCity = (selectedBillToCompanyInfo.mailing_city || "").trim().replace(/\s/g, "").substring(0, 3);
-
-                    if (mailingParseCity.toLowerCase() === "ft.") {
-                        mailingParseCity = "FO";
-                    }
-                    if (mailingParseCity.toLowerCase() === "mt.") {
-                        mailingParseCity = "MO";
-                    }
-                    if (mailingParseCity.toLowerCase() === "st.") {
-                        mailingParseCity = "SA";
-                    }
-
-                    let newCode = (selectedBillToCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                        parseCity.substring(0, 2) +
-                        (selectedBillToCompanyInfo.state || "").trim().replace(/\s/g, "").substring(0, 2);
-                    let mailingNewCode = (selectedBillToCompanyInfo.mailing_name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                        mailingParseCity.substring(0, 2) +
-                        (selectedBillToCompanyInfo.mailing_state || "").trim().replace(/\s/g, "").substring(0, 2);
-
-                    selectedBillToCompanyInfo.code = newCode.toUpperCase();
-                    selectedBillToCompanyInfo.mailing_code = mailingNewCode.toUpperCase();
-
-                    if (!isSavingBillToCompanyInfo) {
-                        if (!isCreatingTemplate && !isEditingTemplate) {
-                            setIsSavingBillToCompanyInfo(true);
-
-                            axios.post(props.serverUrl + "/saveCustomer", selectedBillToCompanyInfo).then((res) => {
-                                if (res.data.result === "OK") {
-                                    if (selectedBillToCustomer.id === undefined || (selectedBillToCustomer.id || 0) === 0) {
-                                        setSelectedBillToCustomer((selectedBillToCustomer) => {
-                                            return {
-                                                ...selectedBillToCustomer,
-                                                id: res.data.customer.id,
-                                            };
-                                        });
-                                    }
-
-                                    setSelectedBillToCustomerContact(
-                                        res.data.customer.contacts ||
-                                        [].find((c) => c.is_primary === 1) ||
-                                        {}
-                                    );
-
-                                    if (selectedShipperCustomer?.id !== undefined &&
-                                        selectedShipperCustomer.id > 0 &&
-                                        selectedShipperCustomer.id === res.data.customer.id
-                                    ) {
-                                        setSelectedShipperCustomer({
-                                            ...selectedBillToCustomer,
-                                            id: res.data.customer.id,
-                                        });
-                                        setSelectedShipperCustomerContact(res.data.customer.contacts || [].find((c) => c.is_primary === 1) || {});
-                                    }
-
-                                    if (selectedConsigneeCustomer?.id !== undefined &&
-                                        selectedConsigneeCustomer.id > 0 &&
-                                        selectedConsigneeCustomer.id === res.data.customer.id
-                                    ) {
-                                        setSelectedConsigneeCustomer({
-                                            ...selectedBillToCustomer,
-                                            id: res.data.customer.id,
-                                        });
-                                        setSelectedConsigneeCustomerContact(res.data.customer.contacts || [].find((c) => c.is_primary === 1) || {});
-                                    }
-
-                                    setSelectedOrder((selectedOrder) => {
-                                        return {
-                                            ...selectedOrder,
-                                            pickups: selectedOrder.pickups.map((p, i) => {
-                                                if ((p.customer?.id || 0) === res.data.customer.id) {
-                                                    p.customer = { ...res.data.customer };
-                                                }
-                                                return p;
-                                            }),
-                                            deliveries: selectedOrder.deliveries.map((d, i) => {
-                                                if ((d.customer?.id || 0) === res.data.customer.id) {
-                                                    d.customer = { ...res.data.customer };
-                                                }
-                                                return d;
-                                            }),
-                                        };
-                                    });
-
-                                    props.setSelectedCustomer({
-                                        ...res.data.customer,
-                                        component_id: props.componentId,
-                                    });
-
-                                    props.setSelectedCustomer({
-                                        ...selectedOrder,
-                                        pickups: selectedOrder.pickups.map((p, i) => {
-                                            if ((p.customer?.id || 0) === res.data.customer.id) {
-                                                p.customer = { ...res.data.customer };
-                                            }
-                                            return p;
-                                        }),
-                                        deliveries: selectedOrder.deliveries.map((d, i) => {
-                                            if ((d.customer?.id || 0) === res.data.customer.id) {
-                                                d.customer = { ...res.data.customer };
-                                            }
-                                            return d;
-                                        }),
-                                        component_id: props.componentId,
-                                    });
-                                }
-
-                                setIsSavingBillToCompanyInfo(false);
-                            }).catch((e) => {
-                                console.log("error saving customer", e);
-                            });
-                        }
-                    }
-                }
-            }, 300);
-        }
-    };
-
-    const validateBillToCompanyContactForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            if (selectedBillToCustomer.id === undefined) {
-                return;
-            }
-
-            let contact = selectedBillToCustomerContact;
-
-            if (contact.customer_id === undefined || contact.customer_id === 0) {
-                contact.customer_id = selectedBillToCustomer.id;
-            }
-
-            if (
-                (contact.first_name || "").trim() === "" ||
-                (contact.last_name || "").trim() === "" ||
-                (contact.phone_work || "").trim() === ""
-            ) {
-                return;
-            }
-
-            if (
-                (contact.address1 || "").trim() === "" &&
-                (contact.address2 || "").trim() === ""
-            ) {
-                contact.address1 = selectedBillToCustomer.address1;
-                contact.address2 = selectedBillToCustomer.address2;
-                contact.city = selectedBillToCustomer.city;
-                contact.state = selectedBillToCustomer.state;
-                contact.zip_code = selectedBillToCustomer.zip;
-            }
-
-            if (!isSavingBillToCompanyContact) {
-                if (!isCreatingTemplate && !isEditingTemplate) {
-                    setIsSavingBillToCompanyContact(true);
-
-                    axios.post(props.serverUrl + "/saveContact", contact).then(async (res) => {
-                        if (res.data.result === "OK") {
-                            await setSelectedBillToCustomer({
-                                ...selectedBillToCustomer,
-                                contacts: res.data.contacts,
-                            });
-                            await setSelectedBillToCustomerContact(res.data.contact);
-                        }
-
-                        setIsSavingBillToCompanyContact(false);
-                    }).catch((e) => {
-                        console.log("error saving contact", e);
-                    });
-                }
-            }
-        }
-    };
-
-    useEffect(() => {
-        if (isSavingShipperCompanyInfo) {
-            if ((selectedShipperCustomer.id || 0) === 0) {
-                setIsSavingShipperCompanyInfo(false);
-                return;
-            }
-
-            let selectedShipperCompanyInfo = selectedShipperCustomer;
-
-            if (selectedShipperCompanyInfo.id === undefined || selectedShipperCompanyInfo.id === -1) {
-                selectedShipperCompanyInfo.id = 0;
-                setSelectedShipperCustomer({ ...selectedShipperCustomer, id: 0 });
-            }
-
-            if ((selectedShipperCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
-                (selectedShipperCompanyInfo.city || "").trim().replace(/\s/g, "") !== "" &&
-                (selectedShipperCompanyInfo.state || "").trim().replace(/\s/g, "") !== "" &&
-                (selectedShipperCompanyInfo.address1 || "").trim() !== "" &&
-                (selectedShipperCompanyInfo.zip || "").trim() !== "") {
-                let parseCity = selectedShipperCompanyInfo.city.trim().replace(/\s/g, "").substring(0, 3);
-
-                if (parseCity.toLowerCase() === "ft.") {
-                    parseCity = "FO";
-                }
-                if (parseCity.toLowerCase() === "mt.") {
-                    parseCity = "MO";
-                }
-                if (parseCity.toLowerCase() === "st.") {
-                    parseCity = "SA";
-                }
-
-                let mailingParseCity = (selectedShipperCompanyInfo.mailing_city || "").trim().replace(/\s/g, "").substring(0, 3);
-
-                if (mailingParseCity.toLowerCase() === "ft.") {
-                    mailingParseCity = "FO";
-                }
-                if (mailingParseCity.toLowerCase() === "mt.") {
-                    mailingParseCity = "MO";
-                }
-                if (mailingParseCity.toLowerCase() === "st.") {
-                    mailingParseCity = "SA";
-                }
-
-                let newCode = (selectedShipperCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                    parseCity.substring(0, 2) +
-                    (selectedShipperCompanyInfo.state || "").trim().replace(/\s/g, "").substring(0, 2);
-                let mailingNewCode = (selectedShipperCompanyInfo.mailing_name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                    mailingParseCity.substring(0, 2) +
-                    (selectedShipperCompanyInfo.mailing_state || "").trim().replace(/\s/g, "").substring(0, 2);
-
-                selectedShipperCompanyInfo.code = newCode.toUpperCase();
-                selectedShipperCompanyInfo.mailing_code = mailingNewCode.toUpperCase();
-
-                axios.post(props.serverUrl + "/saveCustomer", selectedShipperCompanyInfo).then((res) => {
-                    if (res.data.result === "OK") {
-                        if (selectedShipperCustomer.id === undefined || (selectedShipperCustomer.id || 0) === 0) {
-                            setSelectedShipperCustomer((selectedShipperCustomer) => {
-                                return {
-                                    ...selectedShipperCustomer,
-                                    id: res.data.customer.id,
-                                };
-                            });
-
-                            setSelectedShipperCustomerContact(res.data.customer.contacts.find((c) => c.is_primary === 1) || {});
-
-                            setSelectedOrder((selectedOrder) => {
-                                return {
-                                    ...selectedOrder,
-                                    pickups: selectedOrder.pickups.map((p, i) => {
-                                        if ((p.id || 0) === 0) {
-                                            p.customer = { ...res.data.customer };
-                                        }
-                                        return p;
-                                    }),
-                                    deliveries: selectedOrder.deliveries.map((d, i) => {
-                                        if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
-                                        }
-                                        return d;
-                                    }),
-                                };
-                            });
-                        } else {
-                            setSelectedOrder((selectedOrder) => {
-                                return {
-                                    ...selectedOrder,
-                                    pickups: selectedOrder.pickups.map((p, i) => {
-                                        if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
-                                        }
-                                        return p;
-                                    }),
-                                    deliveries: selectedOrder.deliveries.map((d, i) => {
-                                        if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
-                                        }
-                                        return d;
-                                    }),
-                                };
-                            });
-                        }
-
-                        if (selectedBillToCustomer?.id !== undefined &&
-                            selectedBillToCustomer.id > 0 &&
-                            selectedBillToCustomer.id === res.data.customer.id) {
-
-                            setSelectedBillToCustomer({
-                                ...selectedShipperCustomer,
-                                id: res.data.customer.id,
-                            });
-
-                            setSelectedBillToCustomerContact(
-                                res.data.customer.contacts ||
-                                [].find((c) => c.is_primary === 1) ||
-                                {}
-                            );
-                        }
-
-                        if (selectedConsigneeCustomer?.id !== undefined &&
-                            selectedConsigneeCustomer.id > 0 &&
-                            selectedConsigneeCustomer.id === res.data.customer.id) {
-
-                            setSelectedConsigneeCustomer({
-                                ...selectedShipperCustomer,
-                                id: res.data.customer.id,
-                            });
-
-                            setSelectedConsigneeCustomerContact(
-                                res.data.customer.contacts ||
-                                [].find((c) => c.is_primary === 1) ||
-                                {}
-                            );
-
-                        }
-
-                        props.setSelectedCustomer({
-                            ...res.data.customer,
-                            component_id: props.componentId,
-                        });
-
-                        props.setSelectedOrder({
-                            ...selectedOrder,
-                            pickups: selectedOrder.pickups.map((p, i) => {
-                                if (p.id === res.data.customer.id) {
-                                    p.customer = { ...res.data.customer };
-                                }
-                                return p;
-                            }),
-                            deliveries: selectedOrder.deliveries.map((d, i) => {
-                                if (d.id === res.data.customer.id) {
-                                    d.customer = { ...res.data.customer };
-                                }
-                                return d;
-                            }),
-                            component_id: props.componentId,
-                        });
-
-                        // validate postal code for calculating miles
-                        let doCalculateMiles = false;
-
-                        if ((selectedShipperCompanyInfo.zip_code || "") !== "" && selectedShipperCompanyInfo.zip_code !== res.data.customer.zip_code) {
-                            (selectedOrder?.routing || []).map((route, index) => {
-                                if (route.type === "pickup") {
-                                    if (selectedOrder?.pickups || [].find((p) => p.customer.id === res.data.customer.id) !== undefined) {
-                                        doCalculateMiles = true;
-                                    }
-                                }
-
-                                return false;
-                            });
-                        }
-
-                        if (doCalculateMiles) {
-                            let selected_order = selectedOrder || {};
-
-                            if ((selected_order?.id || 0) > 0) {
-                                selected_order.pickups = selected_order.pickups || [].map((p, i) => {
-                                    if ((p.customer?.id || 0) === res.data.customer.id) {
-                                        p.customer = { ...res.data.customer };
-                                    }
-
-                                    return p;
-                                });
-
-                                let origin = null;
-                                let destination = null;
-
-                                let start = selected_order.routing[0];
-                                let waypoints = [];
-                                let end = selected_order.routing[selected_order.routing.length - 1];
-
-                                if (start.type === 'pickup') {
-                                    selected_order.pickups.map((p, i) => {
-                                        if (p.id === start.pickup_id) {
-                                            if ((p.customer?.zip_data || '') !== '') {
-                                                origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                } else {
-                                    selected_order.deliveries.map((d, i) => {
-                                        if (d.id === start.delivery_id) {
-                                            if ((d.customer?.zip_data || '') !== '') {
-                                                origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                }
-
-                                selected_order.routing.map((item, i) => {
-                                    if (i > 0 && i < (selected_order.routing.length - 1)) {
-                                        if (item.type === 'pickup') {
-                                            selected_order.pickups.map((p, i) => {
-                                                if (p.id === item.pickup_id) {
-                                                    if ((p.customer?.zip_data || '') !== '') {
-                                                        waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
-                                                    }
-                                                }
-                                                return false;
-                                            })
-                                        } else {
-                                            selected_order.deliveries.map((d, i) => {
-                                                if (d.id === item.delivery_id) {
-                                                    if ((d.customer?.zip_data || '') !== '') {
-                                                        waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
-                                                    }
-                                                }
-                                                return false;
-                                            })
-                                        }
-                                    }
-
-                                    return true;
-                                });
-
-                                if (end.type === 'pickup') {
-                                    selected_order.pickups.map((p, i) => {
-                                        if (p.id === end.pickup_id) {
-                                            if ((p.customer?.zip_data || '') !== '') {
-                                                destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                } else {
-                                    selected_order.deliveries.map((d, i) => {
-                                        if (d.id === end.delivery_id) {
-                                            if ((d.customer?.zip_data || '') !== '') {
-                                                destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                }
-
-                                let params = {
-                                    'routingMode': 'fast',
-                                    'transportMode': 'car',
-                                    'origin': origin,
-                                    'via': new H.service.Url.MultiValueQueryParameter(waypoints),
-                                    'destination': destination,
-                                    'return': 'summary'
-                                }
-
-                                if (routingService) {
-                                    routingService.calculateRoute(
-                                        params,
-                                        (result) => {
-                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                return a + b.summary.length;
-                                            }, 0) || 0;
-
-                                            selected_order.miles = miles;
-
-                                            setSelectedOrder(selected_order);
-                                            setMileageLoaderVisible(false);
-
-                                            if (!isCreatingTemplate && !isEditingTemplate) {
-                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        });
-
-                                                        props.setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                            component_id: props.componentId,
-                                                        });
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error on saving order miles", e);
-                                                    setMileageLoaderVisible(false);
-                                                });
-                                            }
-                                        },
-                                        (error) => {
-                                            console.log("error getting mileage", error);
-                                            selected_order.miles = 0;
-
-                                            setSelectedOrder(selected_order);
-                                            setMileageLoaderVisible(false);
-
-                                            if (!isCreatingTemplate && !isEditingTemplate) {
-                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        });
-
-                                                        props.setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                            component_id: props.componentId,
-                                                        });
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error on saving order miles", e);
-                                                    setMileageLoaderVisible(false);
-                                                });
-                                            }
-                                        }
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    setIsSavingShipperCompanyInfo(false);
-                })
-                    .catch((e) => {
-                        console.log("error saving customer", e);
-                        setIsSavingShipperCompanyInfo(false);
-                    });
-            } else {
-                setIsSavingShipperCompanyInfo(false);
-            }
-        }
-    }, [isSavingShipperCompanyInfo]);
-
-    const validateShipperCompanyInfoForSaving = (e) => {
-        let key = e.keyCode || e.which;
-
-        if (key === 9) {
-            if (!isSavingShipperCompanyInfo) {
-                setIsSavingShipperCompanyInfo(true);
-            }
-        }
-    };
-
-    const validateShipperCompanyContactForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            e.preventDefault();
-            setIsShowingShipperSecondPage(true);
-        }
-    };
-
-    useEffect(() => {
-        if (isSavingConsigneeCompanyInfo) {
-            if ((selectedConsigneeCustomer.id || 0) === 0) {
-                setIsSavingConsigneeCompanyInfo(false);
-                return;
-            }
-
-            let selectedConsigneeCompanyInfo = selectedConsigneeCustomer;
-
-            if (selectedConsigneeCompanyInfo.id === undefined || selectedConsigneeCompanyInfo.id === -1) {
-                selectedConsigneeCompanyInfo.id = 0;
-                setSelectedConsigneeCustomer({ ...selectedConsigneeCustomer, id: 0 });
-            }
-
-            if ((selectedConsigneeCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
-                (selectedConsigneeCompanyInfo.city || "").trim().replace(/\s/g, "") !== "" &&
-                (selectedConsigneeCompanyInfo.state || "").trim().replace(/\s/g, "") !== "" &&
-                (selectedConsigneeCompanyInfo.address1 || "").trim() !== "" &&
-                (selectedConsigneeCompanyInfo.zip || "").trim() !== "") {
-                let parseCity = selectedConsigneeCompanyInfo.city.trim().replace(/\s/g, "").substring(0, 3);
-
-                if (parseCity.toLowerCase() === "ft.") {
-                    parseCity = "FO";
-                }
-                if (parseCity.toLowerCase() === "mt.") {
-                    parseCity = "MO";
-                }
-                if (parseCity.toLowerCase() === "st.") {
-                    parseCity = "SA";
-                }
-
-                let mailingParseCity = (selectedConsigneeCompanyInfo.mailing_city || "").trim().replace(/\s/g, "").substring(0, 3);
-
-                if (mailingParseCity.toLowerCase() === "ft.") {
-                    mailingParseCity = "FO";
-                }
-                if (mailingParseCity.toLowerCase() === "mt.") {
-                    mailingParseCity = "MO";
-                }
-                if (mailingParseCity.toLowerCase() === "st.") {
-                    mailingParseCity = "SA";
-                }
-
-                let newCode = (selectedConsigneeCompanyInfo.name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                    parseCity.substring(0, 2) +
-                    (selectedConsigneeCompanyInfo.state || "").trim().replace(/\s/g, "").substring(0, 2);
-                let mailingNewCode = (selectedConsigneeCompanyInfo.mailing_name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                    mailingParseCity.substring(0, 2) +
-                    (selectedConsigneeCompanyInfo.mailing_state || "").trim().replace(/\s/g, "").substring(0, 2);
-
-                selectedConsigneeCompanyInfo.code = newCode.toUpperCase();
-                selectedConsigneeCompanyInfo.mailing_code = mailingNewCode.toUpperCase();
-
-                axios.post(props.serverUrl + "/saveCustomer", selectedConsigneeCompanyInfo).then((res) => {
-                    if (res.data.result === "OK") {
-                        if (selectedConsigneeCustomer.id === undefined || (selectedConsigneeCustomer.id || 0) === 0) {
-                            setSelectedConsigneeCustomer((selectedConsigneeCustomer) => {
-                                return {
-                                    ...selectedConsigneeCustomer,
-                                    id: res.data.customer.id,
-                                };
-                            });
-                            setSelectedConsigneeCustomerContact(res.data.customer.contacts.find((c) => c.is_primary === 1) || {});
-
-                            setSelectedOrder((selectedOrder) => {
-                                return {
-                                    ...selectedOrder,
-                                    deliveries: selectedOrder.deliveries.map((d, i) => {
-                                        if ((d.id || 0) === 0) {
-                                            d.customer = { ...res.data.customer };
-                                        }
-                                        return d;
-                                    }),
-                                    pickups: selectedOrder.pickups.map((p, i) => {
-                                        if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
-                                        }
-                                        return p;
-                                    }),
-                                };
-                            });
-                        } else {
-                            setSelectedOrder((selectedOrder) => {
-                                return {
-                                    ...selectedOrder,
-                                    pickups: selectedOrder.pickups.map((p, i) => {
-                                        if (p.id === res.data.customer.id) {
-                                            p.customer = { ...res.data.customer };
-                                        }
-                                        return p;
-                                    }),
-                                    deliveries: selectedOrder.deliveries.map((d, i) => {
-                                        if (d.id === res.data.customer.id) {
-                                            d.customer = { ...res.data.customer };
-                                        }
-                                        return d;
-                                    }),
-                                };
-                            });
-                        }
-
-                        if (selectedBillToCustomer?.id !== undefined &&
-                            selectedBillToCustomer.id > 0 &&
-                            selectedBillToCustomer.id === res.data.customer.id) {
-                            setSelectedBillToCustomer({
-                                ...selectedShipperCustomer,
-                                id: res.data.customer.id,
-                            });
-                            setSelectedBillToCustomerContact(res.data.customer.contacts || [].find((c) => c.is_primary === 1) || {});
-                        }
-
-                        if (selectedShipperCustomer?.id !== undefined &&
-                            selectedShipperCustomer.id > 0 &&
-                            selectedShipperCustomer.id === res.data.customer.id) {
-                            setSelectedShipperCustomer({
-                                ...selectedConsigneeCustomer,
-                                id: res.data.customer.id,
-                            });
-                            setSelectedShipperCustomerContact(res.data.customer.contacts || [].find((c) => c.is_primary === 1) || {});
-                        }
-
-                        props.setSelectedCustomer({
-                            ...res.data.customer,
-                            component_id: props.componentId,
-                        });
-
-                        props.setSelectedOrder({
-                            ...selectedOrder,
-                            pickups: selectedOrder.pickups.map((p, i) => {
-                                if (p.id === res.data.customer.id) {
-                                    p.customer = { ...res.data.customer };
-                                }
-                                return p;
-                            }),
-                            deliveries: selectedOrder.deliveries.map((d, i) => {
-                                if (d.id === res.data.customer.id) {
-                                    d.customer = { ...res.data.customer };
-                                }
-                                return d;
-                            }),
-                            component_id: props.componentId,
-                        });
-
-                        // validate postal code for calculating miles
-                        let doCalculateMiles = false;
-
-                        if ((selectedConsigneeCompanyInfo.zip_code || "") !== "" &&
-                            selectedConsigneeCompanyInfo.zip_code !==
-                            res.data.customer.zip_code) {
-                            (selectedOrder?.routing || []).map((route, index) => {
-                                if (route.type === "delivery") {
-                                    if (
-                                        selectedOrder?.deliveries ||
-                                        [].find((d) => d.customer.id === res.data.customer.id) !==
-                                        undefined
-                                    ) {
-                                        doCalculateMiles = true;
-                                    }
-                                }
-
-                                return false;
-                            });
-                        }
-
-                        if (doCalculateMiles) {
-                            let selected_order = selectedOrder || {};
-
-                            if ((selected_order?.id || 0) > 0) {
-                                selected_order.deliveries = (selected_order.deliveries || []).map((d, i) => {
-                                    if ((d.customer?.id || 0) === res.data.customer.id) {
-                                        d.customer = { ...res.data.customer };
-                                    }
-
-                                    return d;
-                                });
-
-                                let origin = null;
-                                let destination = null;
-
-                                let start = selected_order.routing[0];
-                                let waypoints = [];
-                                let end = selected_order.routing[selected_order.routing.length - 1];
-
-                                if (start.type === 'pickup') {
-                                    selected_order.pickups.map((p, i) => {
-                                        if (p.id === start.pickup_id) {
-                                            if ((p.customer?.zip_data || '') !== '') {
-                                                origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                } else {
-                                    selected_order.deliveries.map((d, i) => {
-                                        if (d.id === start.delivery_id) {
-                                            if ((d.customer?.zip_data || '') !== '') {
-                                                origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                }
-
-                                selected_order.routing.map((item, i) => {
-                                    if (i > 0 && i < (selected_order.routing.length - 1)) {
-                                        if (item.type === 'pickup') {
-                                            selected_order.pickups.map((p, i) => {
-                                                if (p.id === item.pickup_id) {
-                                                    if ((p.customer?.zip_data || '') !== '') {
-                                                        waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
-                                                    }
-                                                }
-                                                return false;
-                                            })
-                                        } else {
-                                            selected_order.deliveries.map((d, i) => {
-                                                if (d.id === item.delivery_id) {
-                                                    if ((d.customer?.zip_data || '') !== '') {
-                                                        waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
-                                                    }
-                                                }
-                                                return false;
-                                            })
-                                        }
-                                    }
-
-                                    return true;
-                                });
-
-                                if (end.type === 'pickup') {
-                                    selected_order.pickups.map((p, i) => {
-                                        if (p.id === end.pickup_id) {
-                                            if ((p.customer?.zip_data || '') !== '') {
-                                                destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                } else {
-                                    selected_order.deliveries.map((d, i) => {
-                                        if (d.id === end.delivery_id) {
-                                            if ((d.customer?.zip_data || '') !== '') {
-                                                destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                            }
-                                        }
-                                        return false;
-                                    })
-                                }
-
-                                let params = {
-                                    'routingMode': 'fast',
-                                    'transportMode': 'car',
-                                    'origin': origin,
-                                    'via': new H.service.Url.MultiValueQueryParameter(waypoints),
-                                    'destination': destination,
-                                    'return': 'summary'
-                                }
-
-                                if (routingService) {
-                                    routingService.calculateRoute(
-                                        params,
-                                        (result) => {
-                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                return a + b.summary.length;
-                                            }, 0) || 0;
-
-                                            selected_order.miles = miles;
-
-                                            setSelectedOrder(selected_order);
-                                            setMileageLoaderVisible(false);
-
-                                            if (!isCreatingTemplate && !isEditingTemplate) {
-                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings:
-                                                                res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings:
-                                                                res.data.order.order_carrier_ratings,
-                                                        });
-
-                                                        props.setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                            component_id: props.componentId,
-                                                        });
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error on saving order miles", e);
-                                                    setMileageLoaderVisible(false);
-                                                });
-                                            }
-                                        },
-                                        (error) => {
-                                            console.log("error getting mileage", error);
-                                            selected_order.miles = 0;
-
-                                            setSelectedOrder(selected_order);
-                                            setMileageLoaderVisible(false);
-
-                                            if (!isCreatingTemplate && !isEditingTemplate) {
-                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        });
-
-                                                        props.setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                            component_id: props.componentId,
-                                                        });
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error on saving order miles", e);
-                                                    setMileageLoaderVisible(false);
-                                                });
-                                            }
-                                        }
-                                    );
-                                }
-
-
-                            }
-                        }
-                    }
-
-                    setIsSavingConsigneeCompanyInfo(false);
-                }).catch((e) => {
-                    console.log("error saving customer", e);
-                    setIsSavingConsigneeCompanyInfo(false);
-                });
-            }
-        }
-    }, [isSavingConsigneeCompanyInfo]);
-
-    const validateConsigneeCompanyInfoForSaving = (e) => {
-        let key = e.keyCode || e.which;
-
-        if (key === 9) {
-            if (!isSavingConsigneeCompanyInfo) {
-                setIsSavingConsigneeCompanyInfo(true);
-            }
-        }
-    };
-
-    const validateConsigneeCompanyContactForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            e.preventDefault();
-            setIsShowingConsigneeSecondPage(true);
-        }
-    };
-
-    const validateCarrierInfoForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            clearTimeout(delayTimer);
-            delayTimer = null;
-
-            if ((selectedCarrier.id || 0) === 0) {
-                return;
-            }
-
-            delayTimer = window.setTimeout(() => {
-                let selectedDispatchCarrierInfoCarrier = selectedCarrier;
-
-                if (selectedDispatchCarrierInfoCarrier.id === undefined ||
-                    selectedDispatchCarrierInfoCarrier.id === -1
-                ) {
-                    selectedDispatchCarrierInfoCarrier.id = 0;
-                }
-
-                if ((selectedDispatchCarrierInfoCarrier.name || "").trim().replace(/\s/g, "").replace("&", "A") !== "" &&
-                    (selectedDispatchCarrierInfoCarrier.city || "").trim().replace(/\s/g, "") !== "" &&
-                    (selectedDispatchCarrierInfoCarrier.state || "").trim().replace(/\s/g, "") !== "" &&
-                    (selectedDispatchCarrierInfoCarrier.address1 || "").trim() !== "" &&
-                    (selectedDispatchCarrierInfoCarrier.zip || "").trim() !== "") {
-                    let parseCity = selectedDispatchCarrierInfoCarrier.city.trim().replace(/\s/g, "").substring(0, 3);
-
-                    if (parseCity.toLowerCase() === "ft.") {
-                        parseCity = "FO";
-                    }
-                    if (parseCity.toLowerCase() === "mt.") {
-                        parseCity = "MO";
-                    }
-                    if (parseCity.toLowerCase() === "st.") {
-                        parseCity = "SA";
-                    }
-
-                    let newCode = (selectedDispatchCarrierInfoCarrier.name || "").trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) +
-                        parseCity.substring(0, 2) +
-                        (selectedDispatchCarrierInfoCarrier.state || "").trim().replace(/\s/g, "").substring(0, 2);
-
-                    selectedDispatchCarrierInfoCarrier.code = newCode.toUpperCase();
-
-                    if (!isSavingCarrierInfo) {
-                        setIsSavingCarrierInfo(true);
-
-                        axios.post(props.serverUrl + "/saveCarrier",
-                            selectedDispatchCarrierInfoCarrier
-                        ).then((res) => {
-                            if (res.data.result === "OK") {
-                                if (selectedCarrier.id === undefined &&
-                                    (selectedCarrier.id || 0) === 0) {
-                                    setSelectedCarrier((selectedCarrier) => {
-                                        return { ...selectedCarrier, id: res.data.carrier.id };
-                                    });
-                                }
-
-                                setSelectedCarrierContact((res.data.carrier.contacts || []).find((c) => c.is_primary === 1) || {});
-
-                                props.setSelectedCarrier({
-                                    ...res.data.carrier,
-                                    component_id: props.componentId,
-                                });
-
-                                props.setSelectedCarrierContact({
-                                    ...((res.data.carrier.contacts || []).find((c) => c.is_primary === 1) || {}),
-                                    component_id: props.componentId
-                                });
-                            }
-
-                            setIsSavingCarrierInfo(false);
-                        }).catch((e) => {
-                            console.log("error saving carrier", e);
-                        });
-                    }
-                }
-            }, 300);
-        }
-    };
-
-    const validateCarrierContactForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            if ((selectedCarrier.id || 0) === 0) {
-                return;
-            }
-
-            if ((selectedCarrierContact.id || 0) === 0) {
-                return;
-            }
-
-            let contact = selectedCarrierContact;
-
-            if (contact.carrier_id === undefined || contact.carrier_id === 0) {
-                contact.carrier_id = selectedCarrier.id;
-            }
-
-            if (
-                (contact.first_name || "").trim() === "" ||
-                (contact.last_name || "").trim() === "" ||
-                (contact.phone_work || "").trim() === ""
-            ) {
-                return;
-            }
-
-            if (
-                (contact.address1 || "").trim() === "" &&
-                (contact.address2 || "").trim() === ""
-            ) {
-                contact.address1 = selectedCarrier.address1;
-                contact.address2 = selectedCarrier.address2;
-                contact.city = selectedCarrier.city;
-                contact.state = selectedCarrier.state;
-                contact.zip_code = selectedCarrier.zip;
-            }
-
-            if (!isSavingCarrierContact) {
-                setIsSavingCarrierContact(true);
-
-                axios.post(props.serverUrl + "/saveCarrierContact", contact).then(async (res) => {
-                    if (res.data.result === "OK") {
-                        await setSelectedCarrier({
-                            ...selectedCarrier,
-                            contacts: res.data.contacts,
-                        });
-                        await setSelectedCarrierContact(res.data.contact);
-                    }
-
-                    setIsSavingCarrierContact(false);
-                }).catch((e) => {
-                    console.log("error saving carrier contact", e);
-                });
-            }
-        }
-    };
-
-    const validateCarrierDriverForSaving = async (e) => {
-        let key = e.keyCode || e.which;
-
-        if (key === 9) {
-            if (!isSavingCarrierDriver) {
-                setIsSavingCarrierDriver(true);
-            }
-        }
-    };
-
-    useEffect(() => {
-        if (isSavingCarrierDriver) {
-            let driver = {
-                ...selectedCarrierDriver,
-                id: selectedCarrierDriver?.id || 0,
-                carrier_id: selectedCarrier.id,
-            };
-
-            if ((selectedCarrier?.id || 0) > 0) {
-                if ((driver.name || "").trim() !== "") {
-                    axios.post(props.serverUrl + "/saveCarrierDriver", driver).then((res) => {
-                        if (res.data.result === "OK") {
-                            setSelectedCarrier((selectedCarrier) => {
-                                return { ...selectedCarrier, drivers: res.data.drivers };
-                            });
-                            setSelectedCarrierDriver({ ...driver, id: res.data.driver.id });
-
-                            props.setSelectedCarrier({
-                                ...selectedCarrier,
-                                drivers: res.data.drivers,
-                                component_id: props.componentId,
-                            });
-
-                            props.setSelectedCarrierDriver({
-                                ...driver,
-                                component_id: props.componentId,
-                            });
-
-                            setSelectedOrder({
-                                ...selectedOrder,
-                                carrier_driver_id: res.data.driver.id
-                            })
-
-                            if (!isCreatingTemplate && !isEditingTemplate) {
-                                axios.post(props.serverUrl + "/saveOrder", {
-                                    ...selectedOrder,
-                                    carrier_driver_id: res.data.driver.id,
-                                }).then((res) => {
-                                    if (res.data.result === "OK") {
-                                        setSelectedOrder({
-                                            ...res.data.order,
-                                        });
-
-                                        props.setSelectedOrder({
-                                            ...res.data.order,
-                                            component_id: props.componentId,
-                                        });
-                                    } else {
-
-                                    }
-
-                                    setIsSavingOrder(false);
-                                }).catch((e) => {
-                                    console.log("error saving order", e);
-                                    setIsSavingOrder(false);
-                                });
-                            }
-                        }
-
-                        setIsSavingCarrierDriver(false);
-                    }).catch((e) => {
-                        console.log("error saving carrier driver", e);
-                        setIsSavingCarrierDriver(false);
-                    });
-                } else {
-                    setIsSavingCarrierDriver(false);
-                }
-            } else {
-                setIsSavingCarrierDriver(false);
-            }
-        }
-    }, [isSavingCarrierDriver]);
-
     const validateOrderForSaving = (e) => {
         let key = e.keyCode || e.which;
 
@@ -3726,23 +2566,13 @@ const Dispatch = (props) => {
                 selected_order.deliveries[0].id === 0 &&
                 (selected_order.deliveries[0].customer_id || 0) > 0
             ) {
-                selected_order.deliveries = (selected_order.deliveries || []).map(
-                    (delivery, i) => {
-                        delivery.delivery_date1 = getFormattedDates(
-                            delivery.delivery_date1 || ""
-                        );
-                        delivery.delivery_date2 = getFormattedDates(
-                            delivery.delivery_date2 || ""
-                        );
-                        delivery.delivery_time1 = getFormattedHours(
-                            delivery.delivery_time1 || ""
-                        );
-                        delivery.delivery_time2 = getFormattedHours(
-                            delivery.delivery_time2 || ""
-                        );
-                        return delivery;
-                    }
-                );
+                selected_order.deliveries = (selected_order.deliveries || []).map((delivery, i) => {
+                    delivery.delivery_date1 = getFormattedDates(delivery.delivery_date1 || "");
+                    delivery.delivery_date2 = getFormattedDates(delivery.delivery_date2 || "");
+                    delivery.delivery_time1 = getFormattedHours(delivery.delivery_time1 || "");
+                    delivery.delivery_time2 = getFormattedHours(delivery.delivery_time2 || "");
+                    return delivery;
+                });
             } else {
                 selected_order.deliveries = []; // se envia vacio para no tocarlo
             }
@@ -3761,10 +2591,12 @@ const Dispatch = (props) => {
                     if (res.data.result === "OK") {
                         setSelectedOrder({ ...res.data.order });
 
-                        props.setSelectedOrder({
-                            ...res.data.order,
-                            component_id: props.componentId,
-                        });
+                        if (!isEditingTemplate && !isCreatingTemplate) {
+                            props.setSelectedOrder({
+                                ...res.data.order,
+                                component_id: props.componentId,
+                            });
+                        }
 
                         if (toSavePickup) {
                             setSelectedShipperCustomer((selectedShipperCustomer) => {
@@ -3790,6 +2622,7 @@ const Dispatch = (props) => {
                     setIsLoading(false);
                 });
             }
+
         }
     }, [isSavingOrder]);
 
@@ -4173,274 +3006,275 @@ const Dispatch = (props) => {
             if ((selectedOrder?.id || 0) > 0) {
                 let delivery = (selectedOrder?.deliveries || []).find((d) => d.id === isSavingDeliveryId);
 
-                console.log(isSavingDeliveryId, selectedOrder?.deliveries || []);
-
                 if (delivery !== undefined) {
                     if ((delivery.customer?.id || 0) > 0) {
-                        axios.post(props.serverUrl + "/saveOrderDelivery", {
-                            id: isSavingDeliveryId,
-                            order_id: selectedOrder?.id || 0,
-                            customer_id: delivery.customer.id,
-                            contact_id: delivery.contact_id || null,
-                            contact_name: delivery.contact_name || "",
-                            contact_phone: delivery.contact_phone || "",
-                            contact_primary_phone: delivery.contact_primary_phone || "work",
-                            contact_phone_ext: delivery.contact_phone_ext || "",
-                            delivery_date1: delivery.delivery_date1 || "",
-                            delivery_date2: delivery.delivery_date2 || "",
-                            delivery_time1: delivery.delivery_time1 || "",
-                            delivery_time2: delivery.delivery_time2 || "",
-                            bol_numbers: delivery.bol_numbers || "",
-                            po_numbers: delivery.po_numbers || "",
-                            ref_numbers: delivery.ref_numbers || "",
-                            seal_number: delivery.seal_number || "",
-                            special_instructions: delivery.special_instructions || "",
-                            type: "delivery",
-                        }).then((res) => {
-                            if (res.data.result === "OK") {
-                                setSelectedOrder({
-                                    ...selectedOrder,
-                                    deliveries: (selectedOrder.deliveries || []).map((d, i) => {
-                                        if (d.id === isSavingDeliveryId) {
-                                            d = res.data.delivery;
+                        if (!isCreatingTemplate && !isEditingTemplate) {
+                            axios.post(props.serverUrl + "/saveOrderDelivery", {
+                                id: isSavingDeliveryId,
+                                order_id: selectedOrder?.id || 0,
+                                customer_id: delivery.customer.id,
+                                contact_id: delivery.contact_id || null,
+                                contact_name: delivery.contact_name || "",
+                                contact_phone: delivery.contact_phone || "",
+                                contact_primary_phone: delivery.contact_primary_phone || "work",
+                                contact_phone_ext: delivery.contact_phone_ext || "",
+                                delivery_date1: delivery.delivery_date1 || "",
+                                delivery_date2: delivery.delivery_date2 || "",
+                                delivery_time1: delivery.delivery_time1 || "",
+                                delivery_time2: delivery.delivery_time2 || "",
+                                bol_numbers: delivery.bol_numbers || "",
+                                po_numbers: delivery.po_numbers || "",
+                                ref_numbers: delivery.ref_numbers || "",
+                                seal_number: delivery.seal_number || "",
+                                special_instructions: delivery.special_instructions || "",
+                                type: "delivery",
+                            }).then((res) => {
+                                if (res.data.result === "OK") {
+                                    setSelectedOrder({
+                                        ...selectedOrder,
+                                        deliveries: (selectedOrder.deliveries || []).map((d, i) => {
+                                            if (d.id === isSavingDeliveryId) {
+                                                d = res.data.delivery;
 
-                                            setSelectedConsigneeCustomer({
-                                                ...selectedConsigneeCustomer,
-                                                delivery_id: res.data.delivery.id,
-                                            });
-                                        }
-                                        return d;
-                                    }),
-                                });
-
-                                if (
-                                    res.data.order.pickups.length === 1 &&
-                                    res.data.order.deliveries.length === 1
-                                ) {
-                                    if (!((selectedOrder?.routing || []).length >= 2 &&
-                                        selectedOrder.routing[0].pickup_id === res.data.order.pickups[0].id &&
-                                        selectedOrder.routing[1].delivery_id === res.data.order.deliveries[0].id)) {
-                                        let routing = [
-                                            {
-                                                id: 0,
-                                                pickup_id: res.data.order.pickups[0].id,
-                                                delivery_id: null,
-                                                type: "pickup",
-                                            },
-                                            {
-                                                id: 0,
-                                                pickup_id: null,
-                                                delivery_id: res.data.order.deliveries[0].id,
-                                                type: "delivery",
-                                            },
-                                        ];
-
-                                        let selected_order = selectedOrder;
-
-                                        axios.post(props.serverUrl + "/saveOrderRouting", {
-                                            order_id: selectedOrder?.id || 0,
-                                            routing: routing,
-                                        }).then((res) => {
-                                            if (res.data.result === "OK") {
-                                                selected_order = res.data.order;
-                                                setSelectedOrder(selected_order);
-
-                                                setMileageLoaderVisible(true);
-
-                                                let origin = null;
-                                                let destination = null;
-
-                                                let start = selected_order.routing[0];
-                                                let waypoints = [];
-                                                let end = selected_order.routing[selected_order.routing.length - 1];
-
-                                                if (start.type === 'pickup') {
-                                                    selected_order.pickups.map((p, i) => {
-                                                        if (p.id === start.pickup_id) {
-                                                            if ((p.customer?.zip_data || '') !== '') {
-                                                                origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                                            }
-                                                        }
-                                                        return false;
-                                                    })
-                                                } else {
-                                                    selected_order.deliveries.map((d, i) => {
-                                                        if (d.id === start.delivery_id) {
-                                                            if ((d.customer?.zip_data || '') !== '') {
-                                                                origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                                            }
-                                                        }
-                                                        return false;
-                                                    })
-                                                }
-
-                                                selected_order.routing.map((item, i) => {
-                                                    if (i > 0 && i < (selected_order.routing.length - 1)) {
-                                                        if (item.type === 'pickup') {
-                                                            selected_order.pickups.map((p, i) => {
-                                                                if (p.id === item.pickup_id) {
-                                                                    if ((p.customer?.zip_data || '') !== '') {
-                                                                        waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
-                                                                    }
-                                                                }
-                                                                return false;
-                                                            })
-                                                        } else {
-                                                            selected_order.deliveries.map((d, i) => {
-                                                                if (d.id === item.delivery_id) {
-                                                                    if ((d.customer?.zip_data || '') !== '') {
-                                                                        waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
-                                                                    }
-                                                                }
-                                                                return false;
-                                                            })
-                                                        }
-                                                    }
-
-                                                    return true;
-                                                });
-
-                                                if (end.type === 'pickup') {
-                                                    selected_order.pickups.map((p, i) => {
-                                                        if (p.id === end.pickup_id) {
-                                                            if ((p.customer?.zip_data || '') !== '') {
-                                                                destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                                            }
-                                                        }
-                                                        return false;
-                                                    })
-                                                } else {
-                                                    selected_order.deliveries.map((d, i) => {
-                                                        if (d.id === end.delivery_id) {
-                                                            if ((d.customer?.zip_data || '') !== '') {
-                                                                destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                                            }
-                                                        }
-                                                        return false;
-                                                    })
-                                                }
-
-                                                let params = {
-                                                    'routingMode': 'fast',
-                                                    'transportMode': 'car',
-                                                    'origin': origin,
-                                                    'via': new H.service.Url.MultiValueQueryParameter(waypoints),
-                                                    'destination': destination,
-                                                    'return': 'summary'
-                                                }
-
-                                                if (routingService) {
-                                                    routingService.calculateRoute(
-                                                        params,
-                                                        (result) => {
-                                                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                return a + b.summary.length;
-                                                            }, 0) || 0;
-
-                                                            selected_order.miles = miles;
-
-                                                            setSelectedOrder(selected_order);
-                                                            setMileageLoaderVisible(false);
-
-                                                            axios.post(
-                                                                props.serverUrl + "/saveOrder",
-                                                                selected_order
-                                                            ).then((res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    setSelectedOrder({
-                                                                        ...selected_order,
-                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    });
-
-                                                                    props.setSelectedOrder({
-                                                                        ...selected_order,
-                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                        component_id: props.componentId,
-                                                                    });
-                                                                }
-                                                            }).catch((e) => {
-                                                                console.log("error on saving order miles", e);
-                                                                setMileageLoaderVisible(false);
-                                                            });
-                                                        },
-                                                        (error) => {
-                                                            console.log("error getting mileage", error);
-                                                            selected_order.miles = 0;
-
-                                                            setSelectedOrder(selected_order);
-                                                            setMileageLoaderVisible(false);
-
-                                                            axios.post(
-                                                                props.serverUrl + "/saveOrder",
-                                                                selected_order
-                                                            ).then((res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    setSelectedOrder({
-                                                                        ...selected_order,
-                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                    });
-
-                                                                    props.setSelectedOrder({
-                                                                        ...selected_order,
-                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                                        component_id: props.componentId,
-                                                                    });
-                                                                }
-                                                            }).catch((e) => {
-                                                                console.log("error on saving order miles", e);
-                                                                setMileageLoaderVisible(false);
-                                                            });
-                                                        }
-                                                    );
-                                                }
-
-
-                                            } else {
-                                                selected_order.miles = 0;
-                                                setSelectedOrder(selected_order);
-                                                setMileageLoaderVisible(false);
-
-                                                axios.post(
-                                                    props.serverUrl + "/saveOrder",
-                                                    selected_order
-                                                ).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                        });
-
-                                                        props.setSelectedOrder({
-                                                            ...selected_order,
-                                                            order_customer_ratings: res.data.order.order_customer_ratings,
-                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                            component_id: props.componentId,
-                                                        });
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error on saving order miles", e);
-                                                    setMileageLoaderVisible(false);
+                                                setSelectedConsigneeCustomer({
+                                                    ...selectedConsigneeCustomer,
+                                                    delivery_id: res.data.delivery.id,
                                                 });
                                             }
-                                        }).catch((e) => {
-                                            console.log("error on saving order routing", e);
-                                            setMileageLoaderVisible(false);
-                                        });
-                                    }
-                                }
-                            } else {
+                                            return d;
+                                        }),
+                                    });
 
-                            }
-                            setIsSavingDeliveryId(-1);
-                        }).catch((e) => {
-                            console.log("error on saving delivery", e);
-                            setIsSavingDeliveryId(-1);
-                        });
+                                    if (
+                                        res.data.order.pickups.length === 1 &&
+                                        res.data.order.deliveries.length === 1
+                                    ) {
+                                        if (!((selectedOrder?.routing || []).length >= 2 &&
+                                            selectedOrder.routing[0].pickup_id === res.data.order.pickups[0].id &&
+                                            selectedOrder.routing[1].delivery_id === res.data.order.deliveries[0].id)) {
+                                            let routing = [
+                                                {
+                                                    id: 0,
+                                                    pickup_id: res.data.order.pickups[0].id,
+                                                    delivery_id: null,
+                                                    type: "pickup",
+                                                },
+                                                {
+                                                    id: 0,
+                                                    pickup_id: null,
+                                                    delivery_id: res.data.order.deliveries[0].id,
+                                                    type: "delivery",
+                                                },
+                                            ];
+
+                                            let selected_order = selectedOrder;
+
+                                            axios.post(props.serverUrl + "/saveOrderRouting", {
+                                                order_id: selectedOrder?.id || 0,
+                                                routing: routing,
+                                            }).then((res) => {
+                                                if (res.data.result === "OK") {
+                                                    selected_order = res.data.order;
+                                                    setSelectedOrder(selected_order);
+
+                                                    setMileageLoaderVisible(true);
+
+                                                    let origin = null;
+                                                    let destination = null;
+
+                                                    let start = selected_order.routing[0];
+                                                    let waypoints = [];
+                                                    let end = selected_order.routing[selected_order.routing.length - 1];
+
+                                                    if (start.type === 'pickup') {
+                                                        selected_order.pickups.map((p, i) => {
+                                                            if (p.id === start.pickup_id) {
+                                                                if ((p.customer?.zip_data || '') !== '') {
+                                                                    origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                                                }
+                                                            }
+                                                            return false;
+                                                        })
+                                                    } else {
+                                                        selected_order.deliveries.map((d, i) => {
+                                                            if (d.id === start.delivery_id) {
+                                                                if ((d.customer?.zip_data || '') !== '') {
+                                                                    origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                                                }
+                                                            }
+                                                            return false;
+                                                        })
+                                                    }
+
+                                                    selected_order.routing.map((item, i) => {
+                                                        if (i > 0 && i < (selected_order.routing.length - 1)) {
+                                                            if (item.type === 'pickup') {
+                                                                selected_order.pickups.map((p, i) => {
+                                                                    if (p.id === item.pickup_id) {
+                                                                        if ((p.customer?.zip_data || '') !== '') {
+                                                                            waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
+                                                                        }
+                                                                    }
+                                                                    return false;
+                                                                })
+                                                            } else {
+                                                                selected_order.deliveries.map((d, i) => {
+                                                                    if (d.id === item.delivery_id) {
+                                                                        if ((d.customer?.zip_data || '') !== '') {
+                                                                            waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
+                                                                        }
+                                                                    }
+                                                                    return false;
+                                                                })
+                                                            }
+                                                        }
+
+                                                        return true;
+                                                    });
+
+                                                    if (end.type === 'pickup') {
+                                                        selected_order.pickups.map((p, i) => {
+                                                            if (p.id === end.pickup_id) {
+                                                                if ((p.customer?.zip_data || '') !== '') {
+                                                                    destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                                                }
+                                                            }
+                                                            return false;
+                                                        })
+                                                    } else {
+                                                        selected_order.deliveries.map((d, i) => {
+                                                            if (d.id === end.delivery_id) {
+                                                                if ((d.customer?.zip_data || '') !== '') {
+                                                                    destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                                                }
+                                                            }
+                                                            return false;
+                                                        })
+                                                    }
+
+                                                    let params = {
+                                                        'routingMode': 'fast',
+                                                        'transportMode': 'car',
+                                                        'origin': origin,
+                                                        'via': new H.service.Url.MultiValueQueryParameter(waypoints),
+                                                        'destination': destination,
+                                                        'return': 'summary'
+                                                    }
+
+                                                    if (routingService) {
+                                                        routingService.calculateRoute(
+                                                            params,
+                                                            (result) => {
+                                                                let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                    return a + b.summary.length;
+                                                                }, 0) || 0;
+
+                                                                selected_order.miles = miles;
+
+                                                                setSelectedOrder(selected_order);
+                                                                setMileageLoaderVisible(false);
+
+                                                                axios.post(
+                                                                    props.serverUrl + "/saveOrder",
+                                                                    selected_order
+                                                                ).then((res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        setSelectedOrder({
+                                                                            ...selected_order,
+                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        });
+
+                                                                        props.setSelectedOrder({
+                                                                            ...selected_order,
+                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                            component_id: props.componentId,
+                                                                        });
+                                                                    }
+                                                                }).catch((e) => {
+                                                                    console.log("error on saving order miles", e);
+                                                                    setMileageLoaderVisible(false);
+                                                                });
+                                                            },
+                                                            (error) => {
+                                                                console.log("error getting mileage", error);
+                                                                selected_order.miles = 0;
+
+                                                                setSelectedOrder(selected_order);
+                                                                setMileageLoaderVisible(false);
+
+                                                                axios.post(
+                                                                    props.serverUrl + "/saveOrder",
+                                                                    selected_order
+                                                                ).then((res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        setSelectedOrder({
+                                                                            ...selected_order,
+                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                        });
+
+                                                                        props.setSelectedOrder({
+                                                                            ...selected_order,
+                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                            component_id: props.componentId,
+                                                                        });
+                                                                    }
+                                                                }).catch((e) => {
+                                                                    console.log("error on saving order miles", e);
+                                                                    setMileageLoaderVisible(false);
+                                                                });
+                                                            }
+                                                        );
+                                                    }
+
+
+                                                } else {
+                                                    selected_order.miles = 0;
+                                                    setSelectedOrder(selected_order);
+                                                    setMileageLoaderVisible(false);
+
+                                                    axios.post(
+                                                        props.serverUrl + "/saveOrder",
+                                                        selected_order
+                                                    ).then((res) => {
+                                                        if (res.data.result === "OK") {
+                                                            setSelectedOrder({
+                                                                ...selected_order,
+                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                            });
+
+                                                            props.setSelectedOrder({
+                                                                ...selected_order,
+                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                component_id: props.componentId,
+                                                            });
+                                                        }
+                                                    }).catch((e) => {
+                                                        console.log("error on saving order miles", e);
+                                                        setMileageLoaderVisible(false);
+                                                    });
+                                                }
+                                            }).catch((e) => {
+                                                console.log("error on saving order routing", e);
+                                                setMileageLoaderVisible(false);
+                                            });
+                                        }
+                                    }
+                                } else {
+
+                                }
+                                setIsSavingDeliveryId(-1);
+                            }).catch((e) => {
+                                console.log("error on saving delivery", e);
+                                setIsSavingDeliveryId(-1);
+                            });
+
+                        }
                     } else {
                         console.log("saving delivery customer undefined");
                         setIsSavingDeliveryId(-1);
@@ -4455,6 +3289,24 @@ const Dispatch = (props) => {
             }
         }
     }, [isSavingDeliveryId]);
+
+    const validateTemplateForSaving = (e) => {
+        let key = e.keyCode || e.which;
+
+        if (key === 9) {
+            if (!isSavingTemplate) {
+                setIsSavingTemplate(true);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (isSavingTemplate) {
+            let selectedTemplate = { ...selectedOrder };
+
+
+        }
+    }, [isSavingTemplate])
 
     const getOrderByOrderNumber = (e, action = null) => {
         let key = e.keyCode || e.which;
@@ -4479,7 +3331,6 @@ const Dispatch = (props) => {
                             }
                         });
                         // await setTempRouting(order.routing);
-
 
 
                         setSelectedBillToCustomer({ ...order.bill_to_company });
@@ -4741,12 +3592,6 @@ const Dispatch = (props) => {
                     });
             }
         }
-    };
-
-    const getRandomInt = (min, max) => {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
     const bolNumbersOnKeydown = async (e) => {
@@ -5185,6 +4030,112 @@ const Dispatch = (props) => {
         }
     }
 
+    const doUseTemplate = (template_id) => {
+        if (window.confirm('Are you sure you want to proceed?')) {
+            setIsLoading(true);
+
+            axios.post(props.serverUrl + '/useTemplate', { id: template_id, user_code_id: props.user.user_code.id }).then(res => {
+                if (res.data.result === 'OK') {
+                    let order = JSON.parse(JSON.stringify(res.data.order));
+                    setSelectedOrder({});
+                    setSelectedOrder(order);
+
+                    setSelectedBillToCustomer({ ...order.bill_to_company });
+                    setSelectedBillToCustomerContact({ ...(order.bill_to_company?.contacts || []).find((c) => c.is_primary === 1), });
+
+                    let pickup_id = (order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
+                    let pickup = { ...((order.pickups || []).find((p) => p.id === pickup_id) || (order.pickups || [])[0]), };
+
+                    setSelectedShipperCustomer(pickup.id === undefined
+                        ? {}
+                        : {
+                            ...pickup.customer,
+                            pickup_id: pickup.id,
+                            contact_id: pickup.contact_id,
+                            contact_name: pickup.contact_name,
+                            contact_phone: pickup.contact_phone,
+                            contact_primary_phone: pickup.contact_primary_phone,
+                            contact_phone_ext: pickup.contact_phone_ext,
+                            pu_date1: pickup.pu_date1,
+                            pu_date2: pickup.pu_date2,
+                            pu_time1: pickup.pu_time1,
+                            pu_time2: pickup.pu_time2,
+                            bol_numbers: pickup.bol_numbers,
+                            po_numbers: pickup.po_numbers,
+                            ref_numbers: pickup.ref_numbers,
+                            seal_number: pickup.seal_number,
+                            special_instructions: pickup.special_instructions,
+                            type: pickup.type,
+                        }
+                    );
+                    setSelectedShipperCustomerContact({
+                        ...(pickup.contacts || []).find((c) => c.is_primary === 1),
+                    });
+
+                    let delivery_id = (order.routing || []).find((r) => r.type === "delivery")?.delivery_id || 0;
+                    let delivery = {
+                        ...((order.deliveries || []).find((d) => d.id === delivery_id) ||
+                            (order.deliveries || [])[0]),
+                    };
+
+                    setSelectedConsigneeCustomer(
+                        delivery.id === undefined
+                            ? {}
+                            : {
+                                ...delivery.customer,
+                                delivery_id: delivery.id,
+                                contact_id: delivery.contact_id,
+                                contact_name: delivery.contact_name,
+                                contact_phone: delivery.contact_phone,
+                                contact_primary_phone: delivery.contact_primary_phone,
+                                contact_phone_ext: delivery.contact_phone_ext,
+                                delivery_date1: delivery.delivery_date1,
+                                delivery_date2: delivery.delivery_date2,
+                                delivery_time1: delivery.delivery_time1,
+                                delivery_time2: delivery.delivery_time2,
+                                contact_id: delivery.contact_id || "",
+                                contact_name: delivery.contact_name || "",
+                                contact_phone: delivery.contact_phone || "",
+                                contact_primary_phone: delivery.contact_primary_phone || "work",
+                                special_instructions: delivery.special_instructions,
+                                type: delivery.type,
+                            }
+                    );
+                    setSelectedConsigneeCustomerContact({
+                        ...(delivery.contacts || []).find((c) => c.is_primary === 1),
+                    });
+
+                    setSelectedCarrier({ ...order.carrier });
+                    setSelectedCarrierContact(order.carrier
+                        ? order.carrier_contact_id
+                            ? { ...((order.carrier?.contacts || []).find((c) => c.id === order.carrier_contact_id) || {}) }
+                            : { ...(order.carrier?.contacts || []).find((c) => c.is_primary === 1) }
+                        : {});
+                    setSelectedCarrierDriver({
+                        ...order.driver,
+                        name:
+                            (order.driver?.first_name || "") +
+                            ((order.driver?.last_name || "").trim() === ""
+                                ? ""
+                                : " " + (order.driver?.last_name || "")),
+                    });
+
+                    setIsLoading(false);
+
+                    if (refDispatchEvents?.current) {
+                        console.log(refDispatchEvents)
+                        refDispatchEvents.current.focus();
+                    }
+                } else {
+                    console.log(res.data.result);
+                    setIsLoading(false);
+                }
+            }).catch(e => {
+                console.log('error using template', e);
+            })
+        }
+    }
+
     return (
         <div
             className="dispatch-main-container"
@@ -5203,7 +4154,29 @@ const Dispatch = (props) => {
                 padding: props.isOnPanel ? "10px 0" : 10,
                 position: props.isOnPanel ? "unset" : "relative",
             }}
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 9) {
+                    if (e.target.type === undefined) {
+                        e.preventDefault();
+                        refOrderNumber.current.focus();
+                    }
+                }
+            }}
         >
+            {
+                showModalTemplate &&
+                <ModalTemplate
+                    name={selectedTemplate?.name || ''}
+                    is_new_template={isEditingTemplate ? 0 : 1}
+                    cb={(data) => {
+                        setShowModalTemplate(false)
+                    }}
+                />
+            }
+
             <div className="fields-container-row">
                 <div
                     className="fields-container-col"
@@ -5261,7 +4234,7 @@ const Dispatch = (props) => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         cursor: 'pointer',
-                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        pointerEvents: (isEditingTemplate || isCreatingTemplate) || ((selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5) ? 'none' : 'all',
                                         color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? '#4096ee' : 'rgba(0,0,0,0.3)'
                                     }} onClick={() => {
                                         getOrderByOrderNumber({ keyCode: 9 }, 'previous');
@@ -5290,6 +4263,7 @@ const Dispatch = (props) => {
                                             tabIndex={1 + props.tabTimes}
                                             type="text"
                                             ref={refOrderNumber}
+                                            readOnly={isEditingTemplate || isCreatingTemplate}
                                             onKeyDown={getOrderByOrderNumber}
                                             onChange={(e) => {
                                                 setSelectedOrder({
@@ -5307,7 +4281,7 @@ const Dispatch = (props) => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         cursor: 'pointer',
-                                        pointerEvents: (selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5 ? 'none' : 'all',
+                                        pointerEvents: (isCreatingTemplate || isEditingTemplate) || ((selectedOrder?.id || 0) === 0 || (selectedOrder?.order_number || '').toString().length < 5) ? 'none' : 'all',
                                         color: (selectedOrder?.id || 0) > 0 && (selectedOrder?.order_number || '').toString().length >= 5 ? '#4096ee' : 'rgba(0,0,0,0.3)'
                                     }} onClick={() => {
                                         getOrderByOrderNumber({ keyCode: 9 }, 'next');
@@ -5336,6 +4310,7 @@ const Dispatch = (props) => {
                                             style={{ textAlign: "right", fontWeight: "bold" }}
                                             tabIndex={2 + props.tabTimes}
                                             type="text"
+                                            readOnly={isCreatingTemplate || isEditingTemplate}
                                             onKeyDown={getOrderByTripNumber}
                                             onChange={(e) => {
                                                 setSelectedOrder({
@@ -5713,7 +4688,8 @@ const Dispatch = (props) => {
                                                         }}
                                                         ref={refDivisionDropDown}
                                                     >
-                                                        <div className="mochi-contextual-popup vertical below" style={{ height: 150 }} >
+                                                        <div className="mochi-contextual-popup vertical below"
+                                                            style={{ height: 150 }}>
                                                             <div className="mochi-contextual-popup-content">
                                                                 <div className="mochi-contextual-popup-wrapper">
                                                                     {divisionItems.map((item, index) => {
@@ -6258,12 +5234,16 @@ const Dispatch = (props) => {
                                         )}
                                     </div>
                                     <div className="form-h-sep"></div>
-                                    <div className="select-box-container" style={{ flexGrow: 1 }}>
+                                    <div className="select-box-container" style={{
+                                        flexGrow: 1,
+                                        pointerEvents: ((selectedOrder?.id || 0) > 0 || (selectedOrder?.order_number || 0) > 0) ? 'none' : 'all'
+                                    }}>
                                         <div className="select-box-wrapper">
                                             <input
                                                 type="text"
                                                 tabIndex={5 + props.tabTimes}
                                                 placeholder="Template"
+                                                style={{ textTransform: 'capitalize' }}
                                                 ref={refTemplate}
                                                 readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                 onKeyDown={async (e) => {
@@ -6442,28 +5422,13 @@ const Dispatch = (props) => {
                                                                 break;
 
                                                             case 13: // enter
-                                                                if (
-                                                                    templateItems.length > 0 &&
-                                                                    templateItems.findIndex(
-                                                                        (item) => item.selected
-                                                                    ) > -1
-                                                                ) {
-                                                                    await setSelectedOrder({
+                                                                if (templateItems.length > 0 && templateItems.findIndex((item) => item.selected) > -1) {
+                                                                    setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        template:
-                                                                            templateItems[
-                                                                            templateItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        template_id:
-                                                                            templateItems[
-                                                                                templateItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                            ].id,
+                                                                        template: templateItems[templateItems.findIndex((item) => item.selected)],
+                                                                        template_id: templateItems[templateItems.findIndex((item) => item.selected)].id,
                                                                     });
-                                                                    validateOrderForSaving({ keyCode: 9 });
+
                                                                     setTemplateItems([]);
                                                                     refTemplate.current.focus();
                                                                 }
@@ -6472,24 +5437,21 @@ const Dispatch = (props) => {
                                                             case 9: // tab
                                                                 if (templateItems.length > 0) {
                                                                     e.preventDefault();
-                                                                    await setSelectedOrder({
-                                                                        ...selectedOrder,
-                                                                        template:
-                                                                            templateItems[
-                                                                            templateItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        template_id:
-                                                                            templateItems[
-                                                                                templateItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                            ].id,
+                                                                    setSelectedOrder(prev => {
+                                                                        return {
+                                                                            ...prev,
+                                                                            template: templateItems[templateItems.findIndex((item) => item.selected)],
+                                                                            template_id: templateItems[templateItems.findIndex((item) => item.selected)].id,
+                                                                        }
                                                                     });
-                                                                    validateOrderForSaving({ keyCode: 9 });
+                                                                    
+                                                                    setTimeout(() => { doUseTemplate(templateItems[templateItems.findIndex((item) => item.selected)].id) }, 100);
                                                                     setTemplateItems([]);
                                                                     refTemplate.current.focus();
+                                                                }else{
+                                                                    if ((selectedOrder?.template_id || 0) > 0){
+                                                                        setTimeout(() => { doUseTemplate(templateItems[templateItems.findIndex((item) => item.selected)].id) }, 100);
+                                                                    }
                                                                 }
                                                                 break;
 
@@ -6554,7 +5516,7 @@ const Dispatch = (props) => {
                                                         template_id: template.id,
                                                     });
                                                 }}
-                                                value={selectedOrder?.template?.name || ""}
+                                                value={((selectedOrder?.id || 0) === 0 && (selectedOrder?.order_number || 0) === 0) ? (selectedOrder?.template?.name || "") : ''}
                                             />
                                             {
                                                 (selectedOrder?.is_cancelled || 0) === 0 &&
@@ -6680,6 +5642,7 @@ const Dispatch = (props) => {
                                                                                 key={index}
                                                                                 className={mochiItemClasses}
                                                                                 id={item.id}
+                                                                                style={{ textTransform: 'capitalize' }}
                                                                                 onClick={() => {
                                                                                     setSelectedOrder({
                                                                                         ...selectedOrder,
@@ -6736,351 +5699,430 @@ const Dispatch = (props) => {
                                 flexDirection: "row",
                                 justifyContent: "flex-start",
                             }}>
-                                <div className="mochi-button" onClick={() => {
-                                    setIsCreatingTemplate(true);
-                                }}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">New Template</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-
-                                <div className="mochi-button" style={{ marginLeft: 5 }} onClick={() => {
-                                    if ((selectedOrder?.id || 0) === 0) {
-                                        window.alert("You must create or load an order first!");
-                                        return;
-                                    }
-
-                                    if (window.confirm("Do you wish to replicate this order?")) {
-                                        setIsLoading(true);
-
-                                        let selected_order = JSON.parse(
-                                            JSON.stringify(selectedOrder)
-                                        );
-
-                                        selected_order.id = 0;
-                                        selected_order.order_number = 0;
-                                        selected_order.trip_number = 0;
-                                        selected_order.carrier = {};
-                                        selected_order.carrier_id = null;
-                                        selected_order.carrier_driver_id = null;
-                                        selected_order.equipment_id = null;
-                                        selected_order.equipment = {};
-                                        selected_order.user_code_id = props.user.user_code.id;
-                                        selected_order.customer_check_number = null;
-                                        selected_order.customer_date_received = null;
-                                        selected_order.invoice_received_date = null;
-                                        selected_order.invoice_number = null;
-                                        selected_order.term_id = null;
-                                        selected_order.invoice_date_paid = null;
-                                        selected_order.carrier_check_number = null;
-                                        selected_order.invoice_customer_reviewed = 0;
-                                        selected_order.order_invoiced = 0;
-                                        selected_order.invoice_carrier_previewed = 0;
-                                        selected_order.invoice_carrier_received = 0;
-                                        selected_order.invoice_bol_received = 0;
-                                        selected_order.invoice_rate_conf_received = 0;
-                                        selected_order.invoice_carrier_approved = 0;
-                                        selected_order.is_imported = 0;
-
-                                        axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
-                                            if (res.data.result === "OK") {
-                                                await setSelectedOrder({ ...res.data.order });
-                                                await props.setSelectedOrder({
-                                                    ...res.data.order,
-                                                    component_id: props.componentId,
-                                                });
-                                                await setSelectedCarrier({});
-                                                await setSelectedCarrierContact({});
-                                                await setSelectedCarrierDriver({});
-
-                                                new Promise((resolve, reject) => {
-                                                    if ((selected_order?.internal_notes || []).length > 0) {
-                                                        (selected_order?.internal_notes || []).map(
-                                                            async (note, index) => {
-                                                                await axios.post(props.serverUrl + "/saveInternalNotes",
-                                                                    {
-                                                                        order_id: res.data.order.id,
-                                                                        text: note.text,
-                                                                        user_code_id: props.user.user_code.id,
-                                                                    }
-                                                                ).then((res) => {
-                                                                    if (index === selected_order.internal_notes.length - 1) {
-                                                                        resolve("done");
-                                                                    }
-                                                                });
-
-                                                                return false;
-                                                            }
-                                                        );
-                                                    } else {
-                                                        resolve("done");
-                                                    }
-                                                }).then((response) => {
-                                                    new Promise((resolve, reject) => {
-                                                        if ((selected_order?.notes_for_carrier || []).length > 0) {
-                                                            (selected_order?.notes_for_carrier || []).map(
-                                                                async (note, index) => {
-                                                                    await axios.post(props.serverUrl + "/saveNotesForCarrier",
-                                                                        {
-                                                                            order_id: res.data.order.id,
-                                                                            text: note.text,
-                                                                            user_code_id: props.user.user_code.id,
-                                                                        }
-                                                                    ).then((res) => {
-                                                                        if (index === selected_order.notes_for_carrier.length - 1) {
-                                                                            resolve("done");
-                                                                        }
-                                                                    });
-
-                                                                    return false;
+                                {
+                                    (selectedOrder?.id || 0) === 0 && (selectedOrder?.template_id || 0) === 0 &&
+                                    <div className="mochi-button" onClick={() => {
+                                        let panel = {
+                                            panelName: `${props.panelName}-templates`,
+                                            component: (
+                                                <Template
+                                                    title="Template"
+                                                    tabTimes={897456 + props.tabTimes}
+                                                    panelName={`${props.panelName}-templates`}
+                                                    origin={props.origin}
+                                                    componentId={moment().format("x")}
+                                                    deleteCallback={(id) => {
+                                                        if ((selectedOrder?.template_id || 0) === id) {
+                                                            setSelectedOrder(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    template_id: null,
+                                                                    template: null
                                                                 }
-                                                            );
-                                                        } else {
-                                                            resolve("done");
+                                                            })
                                                         }
-                                                    }).then((response) => {
-                                                        new Promise((resolve, reject) => {
-                                                            if ((selected_order?.order_customer_ratings || []).length > 0) {
-                                                                (selected_order?.order_customer_ratings || []).map(async (rating, index) => {
-                                                                    await axios.post(props.serverUrl + "/saveOrderCustomerRating",
-                                                                        {
-                                                                            order_id: res.data.order.id,
-                                                                            rate_type: rating.rate_type,
-                                                                            description: rating.description,
-                                                                            rate_subtype: rating.rate_subtype,
-                                                                            pieces: rating.pieces,
-                                                                            pieces_unit: rating.pieces_unit,
-                                                                            weight: rating.weight,
-                                                                            weight_unit: rating.weight_unit,
-                                                                            feet_required: rating.feet_required,
-                                                                            feet_required_unit:
-                                                                                rating.feet_required_unit,
-                                                                            rate: rating.rate,
-                                                                            percentage: rating.percentage,
-                                                                            days: rating.days,
-                                                                            hours: rating.hours,
-                                                                            total_charges: rating.total_charges,
-                                                                        }
-                                                                    ).then((res) => {
-                                                                        if (index === selected_order.order_customer_ratings.length - 1) {
-                                                                            resolve("done");
-                                                                        }
-                                                                    });
+                                                    }}
+                                                />
+                                            ),
+                                        };
 
-                                                                    return false;
-                                                                });
-                                                            } else {
-                                                                resolve("done");
-                                                            }
-                                                        }).then((response) => {
-                                                            new Promise((resolve, reject) => {
-                                                                if ((selected_order?.pickups || []).length > 0) {
-                                                                    (selected_order?.pickups || []).map(async (pickup, index) => {
-                                                                        await axios.post(props.serverUrl + "/saveOrderPickup",
+                                        openPanel(panel, props.origin);
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">New Template</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+
+                                {
+                                    (selectedOrder?.id || 0) === 0 && (selectedOrder?.template_id || 0) > 0 &&
+                                    <div className="mochi-button" onClick={() => {
+                                        doUseTemplate(selectedOrder.template_id);
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Use Template</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+
+                                {
+                                    (selectedOrder?.id || 0) === 0 && (selectedOrder?.template_id || 0) > 0 &&
+                                    <div className="mochi-button" onClick={() => {
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-templates`,
+                                            component: (
+                                                <Template
+                                                    title="Template"
+                                                    tabTimes={897456 + props.tabTimes}
+                                                    panelName={`${props.panelName}-templates`}
+                                                    origin={props.origin}
+                                                    id={selectedOrder?.template_id}
+                                                    componentId={moment().format("x")}
+                                                    deleteCallback={(id) => {
+                                                        if ((selectedOrder?.template_id || 0) === id) {
+                                                            setSelectedOrder(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    template_id: null,
+                                                                    template: null
+                                                                }
+                                                            })
+                                                        }
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Edit Template</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
+
+                                {
+                                    ((selectedOrder?.id || 0) > 0 && (selectedOrder?.template_id || 0) === 0) &&
+                                    <div className={`mochi-button ${(selectedOrder?.id || 0) === 0 ? 'disabled' : ''}`}
+                                        style={{ marginLeft: 5 }} onClick={() => {
+                                            if ((selectedOrder?.id || 0) === 0) {
+                                                window.alert("You must create or load an order first!");
+                                                return;
+                                            }
+
+                                            if (window.confirm("Do you wish to replicate this order?")) {
+                                                setIsLoading(true);
+
+                                                let selected_order = JSON.parse(
+                                                    JSON.stringify(selectedOrder)
+                                                );
+
+                                                selected_order.id = 0;
+                                                selected_order.order_number = 0;
+                                                selected_order.trip_number = 0;
+                                                selected_order.carrier = {};
+                                                selected_order.carrier_id = null;
+                                                selected_order.carrier_driver_id = null;
+                                                selected_order.equipment_id = null;
+                                                selected_order.equipment = {};
+                                                selected_order.user_code_id = props.user.user_code.id;
+                                                selected_order.customer_check_number = null;
+                                                selected_order.customer_date_received = null;
+                                                selected_order.invoice_received_date = null;
+                                                selected_order.invoice_number = null;
+                                                selected_order.term_id = null;
+                                                selected_order.invoice_date_paid = null;
+                                                selected_order.carrier_check_number = null;
+                                                selected_order.invoice_customer_reviewed = 0;
+                                                selected_order.order_invoiced = 0;
+                                                selected_order.invoice_carrier_previewed = 0;
+                                                selected_order.invoice_carrier_received = 0;
+                                                selected_order.invoice_bol_received = 0;
+                                                selected_order.invoice_rate_conf_received = 0;
+                                                selected_order.invoice_carrier_approved = 0;
+                                                selected_order.is_imported = 0;
+
+                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                    if (res.data.result === "OK") {
+                                                        await setSelectedOrder({ ...res.data.order });
+                                                        await props.setSelectedOrder({
+                                                            ...res.data.order,
+                                                            component_id: props.componentId,
+                                                        });
+                                                        await setSelectedCarrier({});
+                                                        await setSelectedCarrierContact({});
+                                                        await setSelectedCarrierDriver({});
+
+                                                        new Promise((resolve, reject) => {
+                                                            if ((selected_order?.internal_notes || []).length > 0) {
+                                                                (selected_order?.internal_notes || []).map(
+                                                                    async (note, index) => {
+                                                                        await axios.post(props.serverUrl + "/saveInternalNotes",
                                                                             {
-                                                                                id: 0,
                                                                                 order_id: res.data.order.id,
-                                                                                customer_id: pickup.customer.id,
-                                                                                contact_id: null,
-                                                                                contact_name: "",
-                                                                                contact_phone: "",
-                                                                                contact_primary_phone: "work",
-                                                                                contact_phone_ext: "",
-                                                                                pu_date1: "",
-                                                                                pu_date2: "",
-                                                                                pu_time1: "",
-                                                                                pu_time2: "",
-                                                                                bol_numbers: pickup.bol_numbers || "",
-                                                                                po_numbers: pickup.po_numbers || "",
-                                                                                ref_numbers: pickup.ref_numbers || "",
-                                                                                seal_number: pickup.seal_number || "",
-                                                                                special_instructions: pickup.special_instructions || "",
-                                                                                type: "pickup",
+                                                                                text: note.text,
+                                                                                user_code_id: props.user.user_code.id,
                                                                             }
                                                                         ).then((res) => {
-                                                                            if (index === selected_order.pickups.length - 1) {
+                                                                            if (index === selected_order.internal_notes.length - 1) {
                                                                                 resolve("done");
                                                                             }
                                                                         });
 
                                                                         return false;
                                                                     }
+                                                                );
+                                                            } else {
+                                                                resolve("done");
+                                                            }
+                                                        }).then((response) => {
+                                                            new Promise((resolve, reject) => {
+                                                                if ((selected_order?.notes_for_carrier || []).length > 0) {
+                                                                    (selected_order?.notes_for_carrier || []).map(
+                                                                        async (note, index) => {
+                                                                            await axios.post(props.serverUrl + "/saveNotesForCarrier",
+                                                                                {
+                                                                                    order_id: res.data.order.id,
+                                                                                    text: note.text,
+                                                                                    user_code_id: props.user.user_code.id,
+                                                                                }
+                                                                            ).then((res) => {
+                                                                                if (index === selected_order.notes_for_carrier.length - 1) {
+                                                                                    resolve("done");
+                                                                                }
+                                                                            });
+
+                                                                            return false;
+                                                                        }
                                                                     );
                                                                 } else {
                                                                     resolve("done");
                                                                 }
                                                             }).then((response) => {
                                                                 new Promise((resolve, reject) => {
-                                                                    if ((selected_order?.deliveries || []).length > 0) {
-                                                                        (selected_order?.deliveries || []).map(
-                                                                            async (delivery, index) => {
-                                                                                await axios.post(props.serverUrl + "/saveOrderDelivery",
+                                                                    if ((selected_order?.order_customer_ratings || []).length > 0) {
+                                                                        (selected_order?.order_customer_ratings || []).map(async (rating, index) => {
+                                                                            await axios.post(props.serverUrl + "/saveOrderCustomerRating",
+                                                                                {
+                                                                                    order_id: res.data.order.id,
+                                                                                    rate_type: rating.rate_type,
+                                                                                    description: rating.description,
+                                                                                    rate_subtype: rating.rate_subtype,
+                                                                                    pieces: rating.pieces,
+                                                                                    pieces_unit: rating.pieces_unit,
+                                                                                    weight: rating.weight,
+                                                                                    weight_unit: rating.weight_unit,
+                                                                                    feet_required: rating.feet_required,
+                                                                                    feet_required_unit:
+                                                                                        rating.feet_required_unit,
+                                                                                    rate: rating.rate,
+                                                                                    percentage: rating.percentage,
+                                                                                    days: rating.days,
+                                                                                    hours: rating.hours,
+                                                                                    total_charges: rating.total_charges,
+                                                                                }
+                                                                            ).then((res) => {
+                                                                                if (index === selected_order.order_customer_ratings.length - 1) {
+                                                                                    resolve("done");
+                                                                                }
+                                                                            });
+
+                                                                            return false;
+                                                                        });
+                                                                    } else {
+                                                                        resolve("done");
+                                                                    }
+                                                                }).then((response) => {
+                                                                    new Promise((resolve, reject) => {
+                                                                        if ((selected_order?.pickups || []).length > 0) {
+                                                                            (selected_order?.pickups || []).map(async (pickup, index) => {
+                                                                                await axios.post(props.serverUrl + "/saveOrderPickup",
                                                                                     {
                                                                                         id: 0,
                                                                                         order_id: res.data.order.id,
-                                                                                        customer_id: delivery.customer.id,
+                                                                                        customer_id: pickup.customer.id,
                                                                                         contact_id: null,
                                                                                         contact_name: "",
                                                                                         contact_phone: "",
                                                                                         contact_primary_phone: "work",
                                                                                         contact_phone_ext: "",
-                                                                                        delivery_date1: "",
-                                                                                        delivery_date2: "",
-                                                                                        delivery_time1: "",
-                                                                                        delivery_time2: "",
-                                                                                        bol_numbers: delivery.bol_numbers || "",
-                                                                                        po_numbers: delivery.po_numbers || "",
-                                                                                        ref_numbers: delivery.ref_numbers || "",
-                                                                                        seal_number: delivery.seal_number || "",
-                                                                                        special_instructions: delivery.special_instructions || "",
-                                                                                        type: "delivery",
+                                                                                        pu_date1: "",
+                                                                                        pu_date2: "",
+                                                                                        pu_time1: "",
+                                                                                        pu_time2: "",
+                                                                                        bol_numbers: pickup.bol_numbers || "",
+                                                                                        po_numbers: pickup.po_numbers || "",
+                                                                                        ref_numbers: pickup.ref_numbers || "",
+                                                                                        seal_number: pickup.seal_number || "",
+                                                                                        special_instructions: pickup.special_instructions || "",
+                                                                                        type: "pickup",
                                                                                     }
                                                                                 ).then((res) => {
-                                                                                    if (index === selected_order.deliveries.length - 1) {
+                                                                                    if (index === selected_order.pickups.length - 1) {
                                                                                         resolve("done");
                                                                                     }
                                                                                 });
 
                                                                                 return false;
                                                                             }
-                                                                        );
-                                                                    } else {
-                                                                        resolve("done");
-                                                                    }
-                                                                }).then(async (response) => {
-                                                                    await axios.post(props.serverUrl + "/getOrderByOrderNumber",
-                                                                        {
-                                                                            order_number: res.data.order.order_number,
+                                                                            );
+                                                                        } else {
+                                                                            resolve("done");
                                                                         }
-                                                                    ).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            let oldPickups = selected_order.pickups || [];
-                                                                            let oldDeliveries = selected_order.deliveries || [];
-                                                                            let oldRouting = selected_order.routing || [];
-                                                                            let newPickups = res.data.order.pickups;
-                                                                            let newDeliveries = res.data.order.deliveries;
-                                                                            let newRouting = [];
+                                                                    }).then((response) => {
+                                                                        new Promise((resolve, reject) => {
+                                                                            if ((selected_order?.deliveries || []).length > 0) {
+                                                                                (selected_order?.deliveries || []).map(
+                                                                                    async (delivery, index) => {
+                                                                                        await axios.post(props.serverUrl + "/saveOrderDelivery",
+                                                                                            {
+                                                                                                id: 0,
+                                                                                                order_id: res.data.order.id,
+                                                                                                customer_id: delivery.customer.id,
+                                                                                                contact_id: null,
+                                                                                                contact_name: "",
+                                                                                                contact_phone: "",
+                                                                                                contact_primary_phone: "work",
+                                                                                                contact_phone_ext: "",
+                                                                                                delivery_date1: "",
+                                                                                                delivery_date2: "",
+                                                                                                delivery_time1: "",
+                                                                                                delivery_time2: "",
+                                                                                                bol_numbers: delivery.bol_numbers || "",
+                                                                                                po_numbers: delivery.po_numbers || "",
+                                                                                                ref_numbers: delivery.ref_numbers || "",
+                                                                                                seal_number: delivery.seal_number || "",
+                                                                                                special_instructions: delivery.special_instructions || "",
+                                                                                                type: "delivery",
+                                                                                            }
+                                                                                        ).then((res) => {
+                                                                                            if (index === selected_order.deliveries.length - 1) {
+                                                                                                resolve("done");
+                                                                                            }
+                                                                                        });
 
-                                                                            oldRouting.map((route) => {
-                                                                                if (route.type === "pickup") {
-                                                                                    let pickupIndex = oldPickups.findIndex((p) => p.id === route.pickup_id);
-
-                                                                                    newRouting.push({
-                                                                                        ...route,
-                                                                                        pickup_id: newPickups[pickupIndex].id,
-                                                                                    });
-                                                                                } else {
-                                                                                    let deliveryIndex = oldDeliveries.findIndex((d) => d.id === route.delivery_id);
-
-                                                                                    newRouting.push({
-                                                                                        ...route,
-                                                                                        delivery_id: newDeliveries[deliveryIndex].id,
-                                                                                    });
-                                                                                }
-
-                                                                                return false;
-                                                                            });
-
-                                                                            await axios.post(props.serverUrl + "/saveOrderRouting",
+                                                                                        return false;
+                                                                                    }
+                                                                                );
+                                                                            } else {
+                                                                                resolve("done");
+                                                                            }
+                                                                        }).then(async (response) => {
+                                                                            await axios.post(props.serverUrl + "/getOrderByOrderNumber",
                                                                                 {
-                                                                                    order_id: res.data.order.id,
-                                                                                    routing: newRouting,
+                                                                                    order_number: res.data.order.order_number,
                                                                                 }
-                                                                            ).then((res) => {
+                                                                            ).then(async (res) => {
                                                                                 if (res.data.result === "OK") {
-                                                                                    axios.post(props.serverUrl + "/getOrderByOrderNumber",
+                                                                                    let oldPickups = selected_order.pickups || [];
+                                                                                    let oldDeliveries = selected_order.deliveries || [];
+                                                                                    let oldRouting = selected_order.routing || [];
+                                                                                    let newPickups = res.data.order.pickups;
+                                                                                    let newDeliveries = res.data.order.deliveries;
+                                                                                    let newRouting = [];
+
+                                                                                    oldRouting.map((route) => {
+                                                                                        if (route.type === "pickup") {
+                                                                                            let pickupIndex = oldPickups.findIndex((p) => p.id === route.pickup_id);
+
+                                                                                            newRouting.push({
+                                                                                                ...route,
+                                                                                                pickup_id: newPickups[pickupIndex].id,
+                                                                                            });
+                                                                                        } else {
+                                                                                            let deliveryIndex = oldDeliveries.findIndex((d) => d.id === route.delivery_id);
+
+                                                                                            newRouting.push({
+                                                                                                ...route,
+                                                                                                delivery_id: newDeliveries[deliveryIndex].id,
+                                                                                            });
+                                                                                        }
+
+                                                                                        return false;
+                                                                                    });
+
+                                                                                    await axios.post(props.serverUrl + "/saveOrderRouting",
                                                                                         {
-                                                                                            order_number: res.data.order.order_number,
+                                                                                            order_id: res.data.order.id,
+                                                                                            routing: newRouting,
                                                                                         }
                                                                                     ).then((res) => {
                                                                                         if (res.data.result === "OK") {
-                                                                                            setSelectedOrder(res.data.order);
-
-                                                                                            let pickup_id = (res.data.order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
-                                                                                            let pickup = {
-                                                                                                ...((res.data.order.pickups || []).find((p) => p.id === pickup_id) || (res.data.order.pickups || [])[0]),
-                                                                                            };
-
-                                                                                            setSelectedShipperCustomer(
-                                                                                                pickup.id === undefined
-                                                                                                    ? {}
-                                                                                                    : {
-                                                                                                        ...pickup.customer,
-                                                                                                        pickup_id: pickup.id,
-                                                                                                        pu_date1: pickup.pu_date1,
-                                                                                                        pu_date2: pickup.pu_date2,
-                                                                                                        pu_time1: pickup.pu_time1,
-                                                                                                        pu_time2: pickup.pu_time2,
-                                                                                                        bol_numbers: pickup.bol_numbers,
-                                                                                                        po_numbers: pickup.po_numbers,
-                                                                                                        ref_numbers: pickup.ref_numbers,
-                                                                                                        seal_number: pickup.seal_number,
-                                                                                                        special_instructions: pickup.special_instructions,
-                                                                                                        type: pickup.type,
-                                                                                                    }
-                                                                                            );
-                                                                                            setSelectedShipperCustomerContact(
+                                                                                            axios.post(props.serverUrl + "/getOrderByOrderNumber",
                                                                                                 {
-                                                                                                    ...(pickup.contacts || []).find((c) => c.is_primary === 1),
+                                                                                                    order_number: res.data.order.order_number,
                                                                                                 }
-                                                                                            );
+                                                                                            ).then((res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder(res.data.order);
 
-                                                                                            let delivery_id = (res.data.order.routing || []).find((r) => r.type === "delivery")?.delivery_id || 0;
-                                                                                            let delivery = {
-                                                                                                ...((res.data.order.deliveries || []).find((d) => d.id === delivery_id) || (res.data.order.deliveries || [])[0]),
-                                                                                            };
+                                                                                                    let pickup_id = (res.data.order.routing || []).find((r) => r.type === "pickup")?.pickup_id || 0;
+                                                                                                    let pickup = {
+                                                                                                        ...((res.data.order.pickups || []).find((p) => p.id === pickup_id) || (res.data.order.pickups || [])[0]),
+                                                                                                    };
 
-                                                                                            setSelectedConsigneeCustomer(
-                                                                                                delivery.id === undefined
-                                                                                                    ? {}
-                                                                                                    : {
-                                                                                                        ...delivery.customer,
-                                                                                                        delivery_id: delivery.id,
-                                                                                                        delivery_date1: delivery.delivery_date1,
-                                                                                                        delivery_date2: delivery.delivery_date2,
-                                                                                                        delivery_time1: delivery.delivery_time1,
-                                                                                                        delivery_time2: delivery.delivery_time2,
-                                                                                                        special_instructions: delivery.special_instructions,
-                                                                                                        type: delivery.type,
-                                                                                                    }
-                                                                                            );
-                                                                                            setSelectedConsigneeCustomerContact(
-                                                                                                {
-                                                                                                    ...(delivery.contacts || []).find((c) => c.is_primary === 1),
+                                                                                                    setSelectedShipperCustomer(
+                                                                                                        pickup.id === undefined
+                                                                                                            ? {}
+                                                                                                            : {
+                                                                                                                ...pickup.customer,
+                                                                                                                pickup_id: pickup.id,
+                                                                                                                pu_date1: pickup.pu_date1,
+                                                                                                                pu_date2: pickup.pu_date2,
+                                                                                                                pu_time1: pickup.pu_time1,
+                                                                                                                pu_time2: pickup.pu_time2,
+                                                                                                                bol_numbers: pickup.bol_numbers,
+                                                                                                                po_numbers: pickup.po_numbers,
+                                                                                                                ref_numbers: pickup.ref_numbers,
+                                                                                                                seal_number: pickup.seal_number,
+                                                                                                                special_instructions: pickup.special_instructions,
+                                                                                                                type: pickup.type,
+                                                                                                            }
+                                                                                                    );
+                                                                                                    setSelectedShipperCustomerContact(
+                                                                                                        {
+                                                                                                            ...(pickup.contacts || []).find((c) => c.is_primary === 1),
+                                                                                                        }
+                                                                                                    );
+
+                                                                                                    let delivery_id = (res.data.order.routing || []).find((r) => r.type === "delivery")?.delivery_id || 0;
+                                                                                                    let delivery = {
+                                                                                                        ...((res.data.order.deliveries || []).find((d) => d.id === delivery_id) || (res.data.order.deliveries || [])[0]),
+                                                                                                    };
+
+                                                                                                    setSelectedConsigneeCustomer(
+                                                                                                        delivery.id === undefined
+                                                                                                            ? {}
+                                                                                                            : {
+                                                                                                                ...delivery.customer,
+                                                                                                                delivery_id: delivery.id,
+                                                                                                                delivery_date1: delivery.delivery_date1,
+                                                                                                                delivery_date2: delivery.delivery_date2,
+                                                                                                                delivery_time1: delivery.delivery_time1,
+                                                                                                                delivery_time2: delivery.delivery_time2,
+                                                                                                                special_instructions: delivery.special_instructions,
+                                                                                                                type: delivery.type,
+                                                                                                            }
+                                                                                                    );
+                                                                                                    setSelectedConsigneeCustomerContact(
+                                                                                                        {
+                                                                                                            ...(delivery.contacts || []).find((c) => c.is_primary === 1),
+                                                                                                        }
+                                                                                                    );
                                                                                                 }
-                                                                                            );
+                                                                                            }).catch((e) => {
+                                                                                                console.log("error saving order miles", e);
+                                                                                            }).then(() => {
+                                                                                                setIsLoading(false);
+                                                                                                refCarrierCode.current.focus();
+                                                                                            });
                                                                                         }
                                                                                     }).catch((e) => {
                                                                                         console.log("error saving order miles", e);
-                                                                                    }).then(() => {
-                                                                                        setIsLoading(false);
-                                                                                        refCarrierCode.current.focus();
                                                                                     });
                                                                                 }
                                                                             }).catch((e) => {
                                                                                 console.log("error saving order miles", e);
                                                                             });
-                                                                        }
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order miles", e);
+                                                                        });
                                                                     });
                                                                 });
                                                             });
                                                         });
-                                                    });
-                                                });
-                                            } else {
+                                                    } else {
 
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error saving order", e);
+                                                });
                                             }
-                                        }).catch((e) => {
-                                            console.log("error saving order", e);
-                                        });
-                                    }
-                                }}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Replicate Order</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
+                                        }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Replicate Order</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                }
 
                                 {
                                     (props.user?.user_code?.is_admin || 0) === 1 &&
@@ -7206,15 +6248,17 @@ const Dispatch = (props) => {
                                                 }
                                             })
 
-                                            axios.post(props.serverUrl + '/saveOrder', {
-                                                ...order,
-                                                bill_to_customer_id: null,
-                                                bill_to_company: {}
-                                            }).then(res => {
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + '/saveOrder', {
+                                                    ...order,
+                                                    bill_to_customer_id: null,
+                                                    bill_to_company: {}
+                                                }).then(res => {
 
-                                            }).catch(e => {
-                                                console.log('error clearing bill to company')
-                                            })
+                                                }).catch(e => {
+                                                    console.log('error clearing bill to company')
+                                                })
+                                            }
                                         }
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -7238,8 +6282,7 @@ const Dispatch = (props) => {
                                             if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                 getBillToCompanyByCode(e)
                                             }
-                                        }
-                                        }
+                                        }}
                                         onInput={(e) => {
                                             setSelectedBillToCustomer({
                                                 ...selectedBillToCustomer,
@@ -7529,7 +6572,8 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div className="form-bordered-box" style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10, gap: 2 }}>
+                        <div className="form-bordered-box"
+                            style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10, gap: 2 }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
                                 <div className="form-title">{
@@ -7622,11 +6666,13 @@ const Dispatch = (props) => {
                                                 }
                                             })
 
-                                            axios.post(props.serverUrl + '/saveOrder', order).then(res => {
+                                            if (!isCreatingTemplate && !isEditingTemplate) {
+                                                axios.post(props.serverUrl + '/saveOrder', order).then(res => {
 
-                                            }).catch(e => {
-                                                console.log('error clearing carrier')
-                                            })
+                                                }).catch(e => {
+                                                    console.log('error clearing carrier')
+                                                })
+                                            }
                                         }
 
                                     }}>
@@ -7876,27 +6922,29 @@ const Dispatch = (props) => {
                                                                 if (carrierContactNameItems[carrierContactNameItems.findIndex((item) => item.selected)].id === null) {
                                                                     await setSelectedCarrierContact({ name: "" });
 
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_contact_id: null,
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
+                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_contact_id: null,
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
 
-                                                                        }
+                                                                            }
 
-                                                                        setIsSavingOrder(false);
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                        setIsSavingOrder(false);
-                                                                    });
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
+                                                                        });
+                                                                    }
 
                                                                     refCarrierContactName.current.focus();
                                                                 } else {
@@ -7918,39 +6966,41 @@ const Dispatch = (props) => {
                                                                                             ''
                                                                     });
 
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_contact_id: carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].id,
-                                                                        carrier_contact_primary_phone: (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                            ? 'work'
-                                                                            : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                                ? 'fax'
-                                                                                : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                    ? 'mobile'
-                                                                                    : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                        ? 'direct'
-                                                                                        : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                            ? 'other' :
-                                                                                            'work'
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
+                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_contact_id: carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].id,
+                                                                            carrier_contact_primary_phone: (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                ? 'work'
+                                                                                : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                    ? 'fax'
+                                                                                    : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                        ? 'mobile'
+                                                                                        : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                            ? 'direct'
+                                                                                            : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                ? 'other' :
+                                                                                                'work'
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
 
-                                                                        }
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                    }).finally(() => {
-                                                                        setShowCarrierContactNames(false);
-                                                                        setIsSavingOrder(false);
-                                                                        refCarrierContactName.current.focus();
-                                                                    });
+                                                                            }
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                        }).finally(() => {
+                                                                            setShowCarrierContactNames(false);
+                                                                            setIsSavingOrder(false);
+                                                                            refCarrierContactName.current.focus();
+                                                                        });
+                                                                    }
                                                                 }
                                                             }
                                                             break;
@@ -7961,27 +7011,29 @@ const Dispatch = (props) => {
                                                                 if (carrierContactNameItems[carrierContactNameItems.findIndex((item) => item.selected)].id === null) {
                                                                     await setSelectedCarrierContact({ name: "" });
 
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_contact_id: null,
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
+                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_contact_id: null,
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
 
-                                                                        }
+                                                                            }
 
-                                                                        setIsSavingOrder(false);
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                        setIsSavingOrder(false);
-                                                                    });
+                                                                            setIsSavingOrder(false);
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                            setIsSavingOrder(false);
+                                                                        });
+                                                                    }
 
                                                                     refCarrierContactName.current.focus();
                                                                 } else {
@@ -8003,39 +7055,41 @@ const Dispatch = (props) => {
                                                                                             ''
                                                                     });
 
-                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                        ...selectedOrder,
-                                                                        carrier_contact_id: carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].id,
-                                                                        carrier_contact_primary_phone: (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
-                                                                            ? 'work'
-                                                                            : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
-                                                                                ? 'fax'
-                                                                                : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
-                                                                                    ? 'mobile'
-                                                                                    : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
-                                                                                        ? 'direct'
-                                                                                        : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
-                                                                                            ? 'other' :
-                                                                                            'work'
-                                                                    }).then(async (res) => {
-                                                                        if (res.data.result === "OK") {
-                                                                            await setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                            });
-                                                                            await props.setSelectedOrder({
-                                                                                ...res.data.order,
-                                                                                component_id: props.componentId,
-                                                                            });
-                                                                        } else {
+                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                            ...selectedOrder,
+                                                                            carrier_contact_id: carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].id,
+                                                                            carrier_contact_primary_phone: (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work || '') !== ''
+                                                                                ? 'work'
+                                                                                : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_work_fax || '') !== ''
+                                                                                    ? 'fax'
+                                                                                    : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_mobile || '') !== ''
+                                                                                        ? 'mobile'
+                                                                                        : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_direct || '') !== ''
+                                                                                            ? 'direct'
+                                                                                            : (carrierContactNameItems[carrierContactNameItems.findIndex(item => item.selected)].phone_other || '') !== ''
+                                                                                                ? 'other' :
+                                                                                                'work'
+                                                                        }).then(async (res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                await setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                });
+                                                                                await props.setSelectedOrder({
+                                                                                    ...res.data.order,
+                                                                                    component_id: props.componentId,
+                                                                                });
+                                                                            } else {
 
-                                                                        }
-                                                                    }).catch((e) => {
-                                                                        console.log("error saving order", e);
-                                                                    }).finally(() => {
-                                                                        setShowCarrierContactNames(false);
-                                                                        setIsSavingOrder(false);
-                                                                        refCarrierContactName.current.focus();
-                                                                    });
+                                                                            }
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order", e);
+                                                                        }).finally(() => {
+                                                                            setShowCarrierContactNames(false);
+                                                                            setIsSavingOrder(false);
+                                                                        });
+                                                                    }
+                                                                    refCarrierContactName.current.focus();
                                                                 }
                                                             } else {
                                                                 // validateCarrierContactForSaving({ keyCode: 9 });
@@ -8047,8 +7101,10 @@ const Dispatch = (props) => {
                                                     }
                                                 }
                                             }}
-                                            onInput={(e) => { }}
-                                            onChange={(e) => { }}
+                                            onInput={(e) => {
+                                            }}
+                                            onChange={(e) => {
+                                            }}
                                             value={((selectedCarrierContact?.first_name || '') + ' ' + (selectedCarrierContact?.last_name || '')).trim()}
                                         />
 
@@ -8133,39 +7189,42 @@ const Dispatch = (props) => {
                                                                                                         ''
                                                                                 });
 
-                                                                                axios.post(props.serverUrl + "/saveOrder", {
-                                                                                    ...selectedOrder,
-                                                                                    carrier_contact_id: item.id,
-                                                                                    carrier_contact_primary_phone: (item.phone_work || '') !== ''
-                                                                                        ? 'work'
-                                                                                        : (item.phone_work_fax || '') !== ''
-                                                                                            ? 'fax'
-                                                                                            : (item.phone_mobile || '') !== ''
-                                                                                                ? 'mobile'
-                                                                                                : (item.phone_direct || '') !== ''
-                                                                                                    ? 'direct'
-                                                                                                    : (item.phone_other || '') !== ''
-                                                                                                        ? 'other' :
-                                                                                                        'work'
-                                                                                }).then(async (res) => {
-                                                                                    if (res.data.result === "OK") {
-                                                                                        await setSelectedOrder({
-                                                                                            ...res.data.order,
-                                                                                        });
-                                                                                        await props.setSelectedOrder({
-                                                                                            ...res.data.order,
-                                                                                            component_id: props.componentId,
-                                                                                        });
-                                                                                    } else {
+                                                                                if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                                    axios.post(props.serverUrl + "/saveOrder", {
+                                                                                        ...selectedOrder,
+                                                                                        carrier_contact_id: item.id,
+                                                                                        carrier_contact_primary_phone: (item.phone_work || '') !== ''
+                                                                                            ? 'work'
+                                                                                            : (item.phone_work_fax || '') !== ''
+                                                                                                ? 'fax'
+                                                                                                : (item.phone_mobile || '') !== ''
+                                                                                                    ? 'mobile'
+                                                                                                    : (item.phone_direct || '') !== ''
+                                                                                                        ? 'direct'
+                                                                                                        : (item.phone_other || '') !== ''
+                                                                                                            ? 'other' :
+                                                                                                            'work'
+                                                                                    }).then(async (res) => {
+                                                                                        if (res.data.result === "OK") {
+                                                                                            await setSelectedOrder({
+                                                                                                ...res.data.order,
+                                                                                            });
+                                                                                            await props.setSelectedOrder({
+                                                                                                ...res.data.order,
+                                                                                                component_id: props.componentId,
+                                                                                            });
+                                                                                        } else {
 
-                                                                                    }
-                                                                                }).catch((e) => {
-                                                                                    console.log("error saving order", e);
-                                                                                }).finally(() => {
-                                                                                    setShowCarrierContactNames(false);
-                                                                                    setIsSavingOrder(false);
-                                                                                    refCarrierContactName.current.focus();
-                                                                                });
+                                                                                        }
+                                                                                    }).catch((e) => {
+                                                                                        console.log("error saving order", e);
+                                                                                    }).finally(() => {
+                                                                                        setShowCarrierContactNames(false);
+                                                                                        setIsSavingOrder(false);
+                                                                                    });
+                                                                                }
+
+                                                                                refCarrierContactName.current.focus();
                                                                             }}
                                                                             ref={ref => refCarrierContactNamePopupItems.current.push(ref)}
                                                                         >
@@ -8326,28 +7385,30 @@ const Dispatch = (props) => {
                                                                     carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
                                                                 })
 
-                                                                axios.post(props.serverUrl + "/saveOrder", {
-                                                                    ...selectedOrder,
-                                                                    carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                                }).then(async (res) => {
-                                                                    if (res.data.result === "OK") {
-                                                                        await setSelectedOrder({
-                                                                            ...res.data.order,
-                                                                        });
-                                                                        await props.setSelectedOrder({
-                                                                            ...res.data.order,
-                                                                            component_id: props.componentId,
-                                                                        });
-                                                                    } else {
+                                                                if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                    axios.post(props.serverUrl + "/saveOrder", {
+                                                                        ...selectedOrder,
+                                                                        carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                    }).then(async (res) => {
+                                                                        if (res.data.result === "OK") {
+                                                                            await setSelectedOrder({
+                                                                                ...res.data.order,
+                                                                            });
+                                                                            await props.setSelectedOrder({
+                                                                                ...res.data.order,
+                                                                                component_id: props.componentId,
+                                                                            });
+                                                                        } else {
 
-                                                                    }
-                                                                }).catch((e) => {
-                                                                    console.log("error saving order", e);
-                                                                }).finally(() => {
-                                                                    setShowCarrierContactPhones(false);
-                                                                    refCarrierContactPhone.current.inputElement.focus();
-                                                                    setIsSavingOrder(false);
-                                                                });
+                                                                        }
+                                                                    }).catch((e) => {
+                                                                        console.log("error saving order", e);
+                                                                    }).finally(() => {
+                                                                        setShowCarrierContactPhones(false);
+                                                                        setIsSavingOrder(false);
+                                                                    });
+                                                                }
+                                                                refCarrierContactPhone.current.inputElement.focus();
 
                                                             }
                                                             break;
@@ -8360,28 +7421,30 @@ const Dispatch = (props) => {
                                                                     carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
                                                                 })
 
-                                                                axios.post(props.serverUrl + "/saveOrder", {
-                                                                    ...selectedOrder,
-                                                                    carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
-                                                                }).then(async (res) => {
-                                                                    if (res.data.result === "OK") {
-                                                                        await setSelectedOrder({
-                                                                            ...res.data.order,
-                                                                        });
-                                                                        await props.setSelectedOrder({
-                                                                            ...res.data.order,
-                                                                            component_id: props.componentId,
-                                                                        });
-                                                                    } else {
+                                                                if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                    axios.post(props.serverUrl + "/saveOrder", {
+                                                                        ...selectedOrder,
+                                                                        carrier_contact_primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type
+                                                                    }).then(async (res) => {
+                                                                        if (res.data.result === "OK") {
+                                                                            await setSelectedOrder({
+                                                                                ...res.data.order,
+                                                                            });
+                                                                            await props.setSelectedOrder({
+                                                                                ...res.data.order,
+                                                                                component_id: props.componentId,
+                                                                            });
+                                                                        } else {
 
-                                                                    }
-                                                                }).catch((e) => {
-                                                                    console.log("error saving order", e);
-                                                                }).finally(() => {
-                                                                    setShowCarrierContactPhones(false);
-                                                                    refCarrierContactPhone.current.inputElement.focus();
-                                                                    setIsSavingOrder(false);
-                                                                });
+                                                                        }
+                                                                    }).catch((e) => {
+                                                                        console.log("error saving order", e);
+                                                                    }).finally(() => {
+                                                                        setShowCarrierContactPhones(false);
+                                                                        setIsSavingOrder(false);
+                                                                    });
+                                                                }
+                                                                refCarrierContactPhone.current.inputElement.focus();
                                                             } else {
                                                                 // validateCarrierAddressForSaving({ keyCode: 9 });
                                                             }
@@ -8392,8 +7455,10 @@ const Dispatch = (props) => {
                                                     }
                                                 }
                                             }}
-                                            onInput={(e) => { }}
-                                            onChange={(e) => { }}
+                                            onInput={(e) => {
+                                            }}
+                                            onChange={(e) => {
+                                            }}
                                             value={
                                                 (selectedOrder?.carrier_contact_primary_phone || '') === 'work'
                                                     ? (selectedCarrierContact?.phone_work || '')
@@ -8488,28 +7553,30 @@ const Dispatch = (props) => {
                                                                                     carrier_contact_primary_phone: item.type
                                                                                 });
 
-                                                                                axios.post(props.serverUrl + "/saveOrder", {
-                                                                                    ...selectedOrder,
-                                                                                    carrier_contact_primary_phone: item.type
-                                                                                }).then(async (res) => {
-                                                                                    if (res.data.result === "OK") {
-                                                                                        await setSelectedOrder({
-                                                                                            ...res.data.order,
-                                                                                        });
-                                                                                        await props.setSelectedOrder({
-                                                                                            ...res.data.order,
-                                                                                            component_id: props.componentId,
-                                                                                        });
-                                                                                    } else {
+                                                                                if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                                    axios.post(props.serverUrl + "/saveOrder", {
+                                                                                        ...selectedOrder,
+                                                                                        carrier_contact_primary_phone: item.type
+                                                                                    }).then(async (res) => {
+                                                                                        if (res.data.result === "OK") {
+                                                                                            await setSelectedOrder({
+                                                                                                ...res.data.order,
+                                                                                            });
+                                                                                            await props.setSelectedOrder({
+                                                                                                ...res.data.order,
+                                                                                                component_id: props.componentId,
+                                                                                            });
+                                                                                        } else {
 
-                                                                                    }
-                                                                                }).catch((e) => {
-                                                                                    console.log("error saving order", e);
-                                                                                }).finally(() => {
-                                                                                    setShowCarrierContactPhones(false);
-                                                                                    refCarrierContactPhone.current.inputElement.focus();
-                                                                                    setIsSavingOrder(false);
-                                                                                });
+                                                                                        }
+                                                                                    }).catch((e) => {
+                                                                                        console.log("error saving order", e);
+                                                                                    }).finally(() => {
+                                                                                        setShowCarrierContactPhones(false);
+                                                                                        setIsSavingOrder(false);
+                                                                                    });
+                                                                                }
+                                                                                refCarrierContactPhone.current.inputElement.focus();
                                                                             }}
                                                                             ref={ref => refCarrierContactPhonePopupItems.current.push(ref)}
                                                                         >
@@ -8750,7 +7817,8 @@ const Dispatch = (props) => {
                                                                     validateOrderForSaving({ keyCode: 9 });
                                                                     setEquipmentItems([]);
                                                                     refDriverName.current.focus();
-                                                                }).catch((e) => { });
+                                                                }).catch((e) => {
+                                                                });
                                                             }
                                                             break;
 
@@ -8772,7 +7840,8 @@ const Dispatch = (props) => {
                                                                     validateOrderForSaving({ keyCode: 9 });
                                                                     setEquipmentItems([]);
                                                                     refDriverName.current.focus();
-                                                                }).catch((e) => { });
+                                                                }).catch((e) => {
+                                                                });
                                                             }
                                                             break;
                                                         default:
@@ -8956,7 +8025,8 @@ const Dispatch = (props) => {
                                                                                     validateOrderForSaving({ keyCode: 9 });
                                                                                     setEquipmentItems([]);
                                                                                     refDriverName.current.focus();
-                                                                                }).catch((e) => { });
+                                                                                }).catch((e) => {
+                                                                                });
                                                                             }}
                                                                             ref={(ref) =>
                                                                                 refEquipmentPopupItems.current.push(ref)
@@ -9202,27 +8272,29 @@ const Dispatch = (props) => {
                                                                     if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
                                                                         await setSelectedCarrierDriver({ name: "" });
 
-                                                                        axios.post(props.serverUrl + "/saveOrder", {
-                                                                            ...selectedOrder,
-                                                                            carrier_driver_id: null,
-                                                                        }).then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                });
-                                                                                await props.setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                    component_id: props.componentId,
-                                                                                });
-                                                                            } else {
+                                                                        if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                            axios.post(props.serverUrl + "/saveOrder", {
+                                                                                ...selectedOrder,
+                                                                                carrier_driver_id: null,
+                                                                            }).then(async (res) => {
+                                                                                if (res.data.result === "OK") {
+                                                                                    await setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                    });
+                                                                                    await props.setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                        component_id: props.componentId,
+                                                                                    });
+                                                                                } else {
 
-                                                                            }
+                                                                                }
 
-                                                                            setIsSavingOrder(false);
-                                                                        }).catch((e) => {
-                                                                            console.log("error saving order", e);
-                                                                            setIsSavingOrder(false);
-                                                                        });
+                                                                                setIsSavingOrder(false);
+                                                                            }).catch((e) => {
+                                                                                console.log("error saving order", e);
+                                                                                setIsSavingOrder(false);
+                                                                            });
+                                                                        }
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     } else {
@@ -9234,26 +8306,28 @@ const Dispatch = (props) => {
                                                                             equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
                                                                         })
 
-                                                                        axios.post(props.serverUrl + "/saveOrder", {
-                                                                            ...selectedOrder,
-                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
-                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
-                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
-                                                                        }).then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await props.setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                    component_id: props.componentId,
-                                                                                });
-                                                                            } else {
+                                                                        if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                            axios.post(props.serverUrl + "/saveOrder", {
+                                                                                ...selectedOrder,
+                                                                                carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                                equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                                equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                            }).then(async (res) => {
+                                                                                if (res.data.result === "OK") {
+                                                                                    await props.setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                        component_id: props.componentId,
+                                                                                    });
+                                                                                } else {
 
-                                                                            }
+                                                                                }
 
-                                                                            setIsSavingOrder(false);
-                                                                        }).catch((e) => {
-                                                                            console.log("error saving order", e);
-                                                                            setIsSavingOrder(false);
-                                                                        });
+                                                                                setIsSavingOrder(false);
+                                                                            }).catch((e) => {
+                                                                                console.log("error saving order", e);
+                                                                                setIsSavingOrder(false);
+                                                                            });
+                                                                        }
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     }
@@ -9268,28 +8342,30 @@ const Dispatch = (props) => {
                                                                     if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
                                                                         await setSelectedCarrierDriver({ name: "" });
 
-                                                                        axios.post(props.serverUrl + "/saveOrder", {
-                                                                            ...selectedOrder,
-                                                                            carrier_driver_id: null,
-                                                                        }).then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                });
+                                                                        if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                            axios.post(props.serverUrl + "/saveOrder", {
+                                                                                ...selectedOrder,
+                                                                                carrier_driver_id: null,
+                                                                            }).then(async (res) => {
+                                                                                if (res.data.result === "OK") {
+                                                                                    await setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                    });
 
-                                                                                await props.setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                    component_id: props.componentId,
-                                                                                });
-                                                                            } else {
+                                                                                    await props.setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                        component_id: props.componentId,
+                                                                                    });
+                                                                                } else {
 
-                                                                            }
+                                                                                }
 
-                                                                            setIsSavingOrder(false);
-                                                                        }).catch((e) => {
-                                                                            console.log("error saving order", e);
-                                                                            setIsSavingOrder(false);
-                                                                        });
+                                                                                setIsSavingOrder(false);
+                                                                            }).catch((e) => {
+                                                                                console.log("error saving order", e);
+                                                                                setIsSavingOrder(false);
+                                                                            });
+                                                                        }
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     } else {
@@ -9302,26 +8378,28 @@ const Dispatch = (props) => {
                                                                             equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
                                                                         })
 
-                                                                        axios.post(props.serverUrl + "/saveOrder", {
-                                                                            ...selectedOrder,
-                                                                            carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
-                                                                            equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
-                                                                            equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
-                                                                        }).then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await props.setSelectedOrder({
-                                                                                    ...res.data.order,
-                                                                                    component_id: props.componentId,
-                                                                                });
-                                                                            } else {
+                                                                        if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                            axios.post(props.serverUrl + "/saveOrder", {
+                                                                                ...selectedOrder,
+                                                                                carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
+                                                                                equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
+                                                                                equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
+                                                                            }).then(async (res) => {
+                                                                                if (res.data.result === "OK") {
+                                                                                    await props.setSelectedOrder({
+                                                                                        ...res.data.order,
+                                                                                        component_id: props.componentId,
+                                                                                    });
+                                                                                } else {
 
-                                                                            }
+                                                                                }
 
-                                                                            setIsSavingOrder(false);
-                                                                        }).catch((e) => {
-                                                                            console.log("error saving order", e);
-                                                                            setIsSavingOrder(false);
-                                                                        });
+                                                                                setIsSavingOrder(false);
+                                                                            }).catch((e) => {
+                                                                                console.log("error saving order", e);
+                                                                                setIsSavingOrder(false);
+                                                                            });
+                                                                        }
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     }
@@ -9332,7 +8410,8 @@ const Dispatch = (props) => {
 
                                                             default:
                                                                 break;
-                                                        };
+                                                        }
+                                                        ;
                                                     }
                                                 }
                                             }}
@@ -9527,29 +8606,31 @@ const Dispatch = (props) => {
                                                                                         name: "",
                                                                                     });
 
-                                                                                    axios.post(props.serverUrl + "/saveOrder",
-                                                                                        {
-                                                                                            ...selectedOrder,
-                                                                                            carrier_driver_id: null,
-                                                                                        }
-                                                                                    ).then((res) => {
-                                                                                        if (res.data.result === "OK") {
-                                                                                            setSelectedOrder({
-                                                                                                ...res.data.order,
-                                                                                            });
-                                                                                            props.setSelectedOrder({
-                                                                                                ...res.data.order,
-                                                                                                component_id: props.componentId,
-                                                                                            });
-                                                                                        } else {
+                                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                                        axios.post(props.serverUrl + "/saveOrder",
+                                                                                            {
+                                                                                                ...selectedOrder,
+                                                                                                carrier_driver_id: null,
+                                                                                            }
+                                                                                        ).then((res) => {
+                                                                                            if (res.data.result === "OK") {
+                                                                                                setSelectedOrder({
+                                                                                                    ...res.data.order,
+                                                                                                });
+                                                                                                props.setSelectedOrder({
+                                                                                                    ...res.data.order,
+                                                                                                    component_id: props.componentId,
+                                                                                                });
+                                                                                            } else {
 
-                                                                                        }
+                                                                                            }
 
-                                                                                        setIsSavingOrder(false);
-                                                                                    }).catch((e) => {
-                                                                                        console.log("error saving order", e);
-                                                                                        setIsSavingOrder(false);
-                                                                                    });
+                                                                                            setIsSavingOrder(false);
+                                                                                        }).catch((e) => {
+                                                                                            console.log("error saving order", e);
+                                                                                            setIsSavingOrder(false);
+                                                                                        });
+                                                                                    }
 
                                                                                     refDriverPhone.current.inputElement.focus();
                                                                                 } else {
@@ -9562,26 +8643,28 @@ const Dispatch = (props) => {
                                                                                         equipment_id: item?.tractor?.type_id
                                                                                     })
 
-                                                                                    axios.post(props.serverUrl + "/saveOrder", {
-                                                                                        ...selectedOrder,
-                                                                                        carrier_driver_id: item.id,
-                                                                                        equipment: item?.tractor?.type,
-                                                                                        equipment_id: item?.tractor?.type_id
-                                                                                    }).then(async (res) => {
-                                                                                        if (res.data.result === "OK") {
-                                                                                            await props.setSelectedOrder({
-                                                                                                ...res.data.order,
-                                                                                                component_id: props.componentId,
-                                                                                            });
-                                                                                        } else {
+                                                                                    if (!isCreatingTemplate && !isEditingTemplate) {
+                                                                                        axios.post(props.serverUrl + "/saveOrder", {
+                                                                                            ...selectedOrder,
+                                                                                            carrier_driver_id: item.id,
+                                                                                            equipment: item?.tractor?.type,
+                                                                                            equipment_id: item?.tractor?.type_id
+                                                                                        }).then(async (res) => {
+                                                                                            if (res.data.result === "OK") {
+                                                                                                await props.setSelectedOrder({
+                                                                                                    ...res.data.order,
+                                                                                                    component_id: props.componentId,
+                                                                                                });
+                                                                                            } else {
 
-                                                                                        }
+                                                                                            }
 
-                                                                                        setIsSavingOrder(false);
-                                                                                    }).catch((e) => {
-                                                                                        console.log("error saving order", e);
-                                                                                        setIsSavingOrder(false);
-                                                                                    });
+                                                                                            setIsSavingOrder(false);
+                                                                                        }).catch((e) => {
+                                                                                            console.log("error saving order", e);
+                                                                                            setIsSavingOrder(false);
+                                                                                        });
+                                                                                    }
 
                                                                                     refDriverPhone.current.inputElement.focus();
                                                                                 }
@@ -9682,7 +8765,7 @@ const Dispatch = (props) => {
                                         onKeyDown={(e) => {
                                             if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                 e.preventDefault();
-                                                validateCarrierInfoForSaving({ keyCode: 9 });
+                                                // validateCarrierInfoForSaving({ keyCode: 9 });
 
                                                 if ((selectedOrder?.id || 0) === 0) {
                                                     // window.alert('You must create or load an order first!');
@@ -9826,7 +8909,8 @@ const Dispatch = (props) => {
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base" style={{
                                         color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                    }}>Change Carrier</div>
+                                    }}>Change Carrier
+                                    </div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div
@@ -9847,7 +8931,8 @@ const Dispatch = (props) => {
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base" style={{
                                         color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                    }}>Notes for Driver</div>
+                                    }}>Notes for Driver
+                                    </div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                             </div>
@@ -9942,7 +9027,8 @@ const Dispatch = (props) => {
                                                 </div>
                                                 <div className="mochi-button-base" style={{
                                                     color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                                }}>Add note</div>
+                                                }}>Add note
+                                                </div>
                                                 <div className="mochi-button-decorator mochi-button-decorator-right">
                                                     )
                                                 </div>
@@ -10319,11 +9405,7 @@ const Dispatch = (props) => {
                                                     type: pickup.type,
                                                 });
 
-                                                setSelectedShipperCustomerContact(
-                                                    (pickup.customer?.contacts || []).find(
-                                                        (c) => c.is_primary === 1
-                                                    ) || {}
-                                                );
+                                                setSelectedShipperCustomerContact((pickup.customer?.contacts || []).find((c) => c.is_primary === 1) || {});
 
                                                 refShipperCompanyCode.current.focus();
                                             }}
@@ -10337,9 +9419,7 @@ const Dispatch = (props) => {
                                                     onClick={async (e) => {
                                                         e.stopPropagation();
 
-                                                        let selected_order = JSON.parse(
-                                                            JSON.stringify(selectedOrder)
-                                                        );
+                                                        let selected_order = JSON.parse(JSON.stringify(selectedOrder));
 
                                                         selected_order.pickups = (selected_order?.pickups || []).filter((pu, i) => {
                                                             return pu.id !== pickup.id;
@@ -10365,278 +9445,40 @@ const Dispatch = (props) => {
                                                             await setSelectedShipperCustomerContact({});
                                                         }
 
-                                                        await axios
-                                                            .post(props.serverUrl + "/removeOrderPickup", {
-                                                                id: pickup.id,
-                                                                order_id: selected_order?.id || 0,
-                                                            })
-                                                            .then((res) => {
-                                                                if (res.data.result === "OK") {
-                                                                    selected_order = res.data.order;
+                                                        await axios.post(props.serverUrl + "/removeOrderPickup", {
+                                                            id: pickup.id,
+                                                            order_id: selected_order?.id || 0,
+                                                        }).then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                selected_order = res.data.order;
 
-                                                                    // validar routing
-                                                                    // 1. VALIDAR PICKUPS AND DELIVERIES = 1
-                                                                    if (
-                                                                        (selected_order?.pickups || []).length > 0 &&
-                                                                        selected_order.deliveries.length > 0
-                                                                    ) {
-                                                                        if (
-                                                                            selected_order.pickups.length === 1 &&
-                                                                            selected_order.deliveries.length === 1
-                                                                        ) {
-                                                                            let routing = [
-                                                                                {
-                                                                                    order_id: selected_order?.id || 0,
-                                                                                    pickup_id: selected_order.pickups[0].id,
-                                                                                    delivery_id: null,
-                                                                                    type: "pickup",
-                                                                                },
-                                                                                {
-                                                                                    order_id: selected_order?.id || 0,
-                                                                                    pickup_id: null,
-                                                                                    delivery_id:
-                                                                                        selected_order.deliveries[0].id,
-                                                                                    type: "delivery",
-                                                                                },
-                                                                            ];
+                                                                // validar routing
+                                                                // 1. VALIDAR PICKUPS AND DELIVERIES = 1a111
+                                                                if ((selected_order?.pickups || []).length > 0 && selected_order.deliveries.length > 0) {
+                                                                    if (selected_order.pickups.length === 1 && selected_order.deliveries.length === 1) {
+                                                                        let routing = [
+                                                                            {
+                                                                                order_id: selected_order?.id || 0,
+                                                                                pickup_id: selected_order.pickups[0].id,
+                                                                                delivery_id: null,
+                                                                                type: "pickup",
+                                                                            },
+                                                                            {
+                                                                                order_id: selected_order?.id || 0,
+                                                                                pickup_id: null,
+                                                                                delivery_id: selected_order.deliveries[0].id,
+                                                                                type: "delivery",
+                                                                            },
+                                                                        ];
 
-                                                                            axios
-                                                                                .post(
-                                                                                    props.serverUrl + "/saveOrderRouting",
-                                                                                    {
-                                                                                        order_id: selected_order?.id || 0,
-                                                                                        routing: routing,
-                                                                                    }
-                                                                                )
-                                                                                .then((res) => {
-                                                                                    if (res.data.result === "OK") {
-                                                                                        selected_order = res.data.order;
-                                                                                        setSelectedOrder(selected_order);
+                                                                        axios.post(props.serverUrl + "/saveOrderRouting", {
+                                                                            order_id: selected_order?.id || 0,
+                                                                            routing: routing,
+                                                                        }).then((res) => {
+                                                                            if (res.data.result === "OK") {
+                                                                                selected_order = res.data.order;
+                                                                                setSelectedOrder(selected_order);
 
-                                                                                        setMileageLoaderVisible(true);
-
-                                                                                        let origin = null;
-                                                                                        let destination = null;
-
-                                                                                        let start = selected_order.routing[0];
-                                                                                        let waypoints = [];
-                                                                                        let end = selected_order.routing[selected_order.routing.length - 1];
-
-                                                                                        if (start.type === 'pickup') {
-                                                                                            selected_order.pickups.map((p, i) => {
-                                                                                                if (p.id === start.pickup_id) {
-                                                                                                    if ((p.customer?.zip_data || '') !== '') {
-                                                                                                        origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                                                                                    }
-                                                                                                }
-                                                                                                return false;
-                                                                                            })
-                                                                                        } else {
-                                                                                            selected_order.deliveries.map((d, i) => {
-                                                                                                if (d.id === start.delivery_id) {
-                                                                                                    if ((d.customer?.zip_data || '') !== '') {
-                                                                                                        origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                                                                                    }
-                                                                                                }
-                                                                                                return false;
-                                                                                            })
-                                                                                        }
-
-                                                                                        selected_order.routing.map((item, i) => {
-                                                                                            if (i > 0 && i < (selected_order.routing.length - 1)) {
-                                                                                                if (item.type === 'pickup') {
-                                                                                                    selected_order.pickups.map((p, i) => {
-                                                                                                        if (p.id === item.pickup_id) {
-                                                                                                            if ((p.customer?.zip_data || '') !== '') {
-                                                                                                                waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
-                                                                                                            }
-                                                                                                        }
-                                                                                                        return false;
-                                                                                                    })
-                                                                                                } else {
-                                                                                                    selected_order.deliveries.map((d, i) => {
-                                                                                                        if (d.id === item.delivery_id) {
-                                                                                                            if ((d.customer?.zip_data || '') !== '') {
-                                                                                                                waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
-                                                                                                            }
-                                                                                                        }
-                                                                                                        return false;
-                                                                                                    })
-                                                                                                }
-                                                                                            }
-
-                                                                                            return true;
-                                                                                        });
-
-                                                                                        if (end.type === 'pickup') {
-                                                                                            selected_order.pickups.map((p, i) => {
-                                                                                                if (p.id === end.pickup_id) {
-                                                                                                    if ((p.customer?.zip_data || '') !== '') {
-                                                                                                        destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                                                                                    }
-                                                                                                }
-                                                                                                return false;
-                                                                                            })
-                                                                                        } else {
-                                                                                            selected_order.deliveries.map((d, i) => {
-                                                                                                if (d.id === end.delivery_id) {
-                                                                                                    if ((d.customer?.zip_data || '') !== '') {
-                                                                                                        destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                                                                                    }
-                                                                                                }
-                                                                                                return false;
-                                                                                            })
-                                                                                        }
-
-                                                                                        let params = {
-                                                                                            'routingMode': 'fast',
-                                                                                            'transportMode': 'car',
-                                                                                            'origin': origin,
-                                                                                            'via': new H.service.Url.MultiValueQueryParameter(waypoints),
-                                                                                            'destination': destination,
-                                                                                            'return': 'summary'
-                                                                                        }
-
-                                                                                        if (routingService) {
-                                                                                            routingService.calculateRoute(
-                                                                                                params,
-                                                                                                (result) => {
-                                                                                                    let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                                                                                        return a + b.summary.length;
-                                                                                                    }, 0) || 0;
-
-                                                                                                    selected_order.miles = miles;
-
-                                                                                                    setSelectedOrder(selected_order);
-                                                                                                    setMileageLoaderVisible(false);
-
-                                                                                                    axios
-                                                                                                        .post(
-                                                                                                            props.serverUrl + "/saveOrder",
-                                                                                                            selected_order
-                                                                                                        )
-                                                                                                        .then(async (res) => {
-                                                                                                            if (res.data.result === "OK") {
-                                                                                                                setSelectedOrder({
-                                                                                                                    ...selected_order,
-                                                                                                                    order_customer_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_customer_ratings,
-                                                                                                                    order_carrier_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_carrier_ratings,
-                                                                                                                });
-
-                                                                                                                props.setSelectedOrder({
-                                                                                                                    ...selected_order,
-                                                                                                                    order_customer_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_customer_ratings,
-                                                                                                                    order_carrier_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_carrier_ratings,
-                                                                                                                    component_id:
-                                                                                                                        props.componentId,
-                                                                                                                });
-                                                                                                            }
-                                                                                                        })
-                                                                                                        .catch((e) => {
-                                                                                                            console.log("error on saving order miles", e);
-                                                                                                            setMileageLoaderVisible(false);
-                                                                                                        });
-                                                                                                },
-                                                                                                (error) => {
-                                                                                                    console.log("error getting mileage", error);
-                                                                                                    selected_order.miles = 0;
-
-                                                                                                    setSelectedOrder(selected_order);
-                                                                                                    setMileageLoaderVisible(false);
-
-                                                                                                    axios
-                                                                                                        .post(
-                                                                                                            props.serverUrl + "/saveOrder",
-                                                                                                            selected_order
-                                                                                                        )
-                                                                                                        .then(async (res) => {
-                                                                                                            if (res.data.result === "OK") {
-                                                                                                                setSelectedOrder({
-                                                                                                                    ...selected_order,
-                                                                                                                    order_customer_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_customer_ratings,
-                                                                                                                    order_carrier_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_carrier_ratings,
-                                                                                                                });
-
-                                                                                                                props.setSelectedOrder({
-                                                                                                                    ...selected_order,
-                                                                                                                    order_customer_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_customer_ratings,
-                                                                                                                    order_carrier_ratings:
-                                                                                                                        res.data.order
-                                                                                                                            .order_carrier_ratings,
-                                                                                                                    component_id:
-                                                                                                                        props.componentId,
-                                                                                                                });
-                                                                                                            }
-                                                                                                        })
-                                                                                                        .catch((e) => {
-                                                                                                            console.log("error on saving order miles", e);
-                                                                                                            setMileageLoaderVisible(false);
-                                                                                                        });
-                                                                                                }
-                                                                                            );
-                                                                                        }
-
-
-                                                                                    } else {
-                                                                                        selected_order.miles = 0;
-                                                                                        setSelectedOrder(selected_order);
-                                                                                        setMileageLoaderVisible(false);
-
-                                                                                        axios
-                                                                                            .post(
-                                                                                                props.serverUrl + "/saveOrder",
-                                                                                                selected_order
-                                                                                            )
-                                                                                            .then(async (res) => {
-                                                                                                if (res.data.result === "OK") {
-                                                                                                    setSelectedOrder({
-                                                                                                        ...selected_order,
-                                                                                                        order_customer_ratings:
-                                                                                                            res.data.order
-                                                                                                                .order_customer_ratings,
-                                                                                                        order_carrier_ratings:
-                                                                                                            res.data.order
-                                                                                                                .order_carrier_ratings,
-                                                                                                    });
-
-                                                                                                    props.setSelectedOrder({
-                                                                                                        ...selected_order,
-                                                                                                        order_customer_ratings:
-                                                                                                            res.data.order
-                                                                                                                .order_customer_ratings,
-                                                                                                        order_carrier_ratings:
-                                                                                                            res.data.order
-                                                                                                                .order_carrier_ratings,
-                                                                                                        component_id: props.componentId,
-                                                                                                    });
-                                                                                                }
-                                                                                            })
-                                                                                            .catch((e) => {
-                                                                                                console.log("error on saving order miles", e);
-                                                                                                setMileageLoaderVisible(false);
-                                                                                            });
-                                                                                    }
-                                                                                })
-                                                                                .catch((e) => {
-                                                                                    console.log("error saving order miles", e);
-                                                                                    setMileageLoaderVisible(false);
-                                                                                });
-                                                                        } else {
-                                                                            if (selected_order.routing.length >= 2) {
                                                                                 setMileageLoaderVisible(true);
 
                                                                                 let origin = null;
@@ -10734,168 +9576,290 @@ const Dispatch = (props) => {
                                                                                             setSelectedOrder(selected_order);
                                                                                             setMileageLoaderVisible(false);
 
-                                                                                            axios
-                                                                                                .post(
-                                                                                                    props.serverUrl + "/saveOrder",
-                                                                                                    selected_order
-                                                                                                )
-                                                                                                .then(async (res) => {
-                                                                                                    if (res.data.result === "OK") {
-                                                                                                        setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                        });
+                                                                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                    });
 
-                                                                                                        props.setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                            component_id: props.componentId,
-                                                                                                        });
-                                                                                                    }
-                                                                                                })
-                                                                                                .catch((e) => {
-                                                                                                    setMileageLoaderVisible(false);
-                                                                                                    console.log("error on saving order miles", e);
-                                                                                                });
+                                                                                                    props.setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                        component_id: props.componentId,
+                                                                                                    });
+                                                                                                }
+                                                                                            }).catch((e) => {
+                                                                                                console.log("error on saving order miles", e);
+                                                                                                setMileageLoaderVisible(false);
+                                                                                            });
                                                                                         },
                                                                                         (error) => {
                                                                                             console.log("error getting mileage", error);
                                                                                             selected_order.miles = 0;
+
                                                                                             setSelectedOrder(selected_order);
                                                                                             setMileageLoaderVisible(false);
 
-                                                                                            axios
-                                                                                                .post(
-                                                                                                    props.serverUrl + "/saveOrder",
-                                                                                                    selected_order
-                                                                                                )
-                                                                                                .then(async (res) => {
-                                                                                                    if (res.data.result === "OK") {
-                                                                                                        setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                        });
+                                                                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                                                if (res.data.result === "OK") {
+                                                                                                    setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                    });
 
-                                                                                                        props.setSelectedOrder({
-                                                                                                            ...selected_order,
-                                                                                                            order_customer_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_customer_ratings,
-                                                                                                            order_carrier_ratings:
-                                                                                                                res.data.order
-                                                                                                                    .order_carrier_ratings,
-                                                                                                            component_id: props.componentId,
-                                                                                                        });
-                                                                                                    }
-                                                                                                })
-                                                                                                .catch((e) => {
-                                                                                                    setMileageLoaderVisible(false);
-                                                                                                    console.log("error on saving order miles", e);
-                                                                                                });
+                                                                                                    props.setSelectedOrder({
+                                                                                                        ...selected_order,
+                                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                        component_id: props.componentId,
+                                                                                                    });
+                                                                                                }
+                                                                                            }).catch((e) => {
+                                                                                                console.log("error on saving order miles", e);
+                                                                                                setMileageLoaderVisible(false);
+                                                                                            });
                                                                                         }
                                                                                     );
                                                                                 }
-
-
                                                                             } else {
                                                                                 selected_order.miles = 0;
                                                                                 setSelectedOrder(selected_order);
                                                                                 setMileageLoaderVisible(false);
 
-                                                                                axios
-                                                                                    .post(
-                                                                                        props.serverUrl + "/saveOrder",
-                                                                                        selected_order
-                                                                                    )
-                                                                                    .then(async (res) => {
-                                                                                        if (res.data.result === "OK") {
-                                                                                            setSelectedOrder({
-                                                                                                ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
-                                                                                            });
+                                                                                axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                                    if (res.data.result === "OK") {
+                                                                                        setSelectedOrder({
+                                                                                            ...selected_order,
+                                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                        });
 
-                                                                                            props.setSelectedOrder({
-                                                                                                ...selected_order,
-                                                                                                order_customer_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_customer_ratings,
-                                                                                                order_carrier_ratings:
-                                                                                                    res.data.order
-                                                                                                        .order_carrier_ratings,
-                                                                                                component_id: props.componentId,
-                                                                                            });
-                                                                                        }
-                                                                                    })
-                                                                                    .catch((e) => {
-                                                                                        setMileageLoaderVisible(false);
-                                                                                        console.log("error on saving order miles", e);
-                                                                                    });
+                                                                                        props.setSelectedOrder({
+                                                                                            ...selected_order,
+                                                                                            order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                            order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                            component_id: props.componentId,
+                                                                                        });
+                                                                                    }
+                                                                                }).catch((e) => {
+                                                                                    console.log("error on saving order miles", e);
+                                                                                    setMileageLoaderVisible(false);
+                                                                                });
                                                                             }
-                                                                        }
+                                                                        }).catch((e) => {
+                                                                            console.log("error saving order miles", e);
+                                                                            setMileageLoaderVisible(false);
+                                                                        });
                                                                     } else {
-                                                                        // GUARDAR ORDEN CON MILES = 0;
-                                                                        selected_order.miles = 0;
-                                                                        setSelectedOrder(selected_order);
-                                                                        setMileageLoaderVisible(false);
+                                                                        if (selected_order.routing.length >= 2) {
+                                                                            setMileageLoaderVisible(true);
 
-                                                                        axios
-                                                                            .post(
-                                                                                props.serverUrl + "/saveOrder",
-                                                                                selected_order
-                                                                            )
-                                                                            .then(async (res) => {
+                                                                            let origin = null;
+                                                                            let destination = null;
+
+                                                                            let start = selected_order.routing[0];
+                                                                            let waypoints = [];
+                                                                            let end = selected_order.routing[selected_order.routing.length - 1];
+
+                                                                            if (start.type === 'pickup') {
+                                                                                selected_order.pickups.map((p, i) => {
+                                                                                    if (p.id === start.pickup_id) {
+                                                                                        if ((p.customer?.zip_data || '') !== '') {
+                                                                                            origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                                                                        }
+                                                                                    }
+                                                                                    return false;
+                                                                                })
+                                                                            } else {
+                                                                                selected_order.deliveries.map((d, i) => {
+                                                                                    if (d.id === start.delivery_id) {
+                                                                                        if ((d.customer?.zip_data || '') !== '') {
+                                                                                            origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                                                                        }
+                                                                                    }
+                                                                                    return false;
+                                                                                })
+                                                                            }
+
+                                                                            selected_order.routing.map((item, i) => {
+                                                                                if (i > 0 && i < (selected_order.routing.length - 1)) {
+                                                                                    if (item.type === 'pickup') {
+                                                                                        selected_order.pickups.map((p, i) => {
+                                                                                            if (p.id === item.pickup_id) {
+                                                                                                if ((p.customer?.zip_data || '') !== '') {
+                                                                                                    waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
+                                                                                                }
+                                                                                            }
+                                                                                            return false;
+                                                                                        })
+                                                                                    } else {
+                                                                                        selected_order.deliveries.map((d, i) => {
+                                                                                            if (d.id === item.delivery_id) {
+                                                                                                if ((d.customer?.zip_data || '') !== '') {
+                                                                                                    waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
+                                                                                                }
+                                                                                            }
+                                                                                            return false;
+                                                                                        })
+                                                                                    }
+                                                                                }
+
+                                                                                return true;
+                                                                            });
+
+                                                                            if (end.type === 'pickup') {
+                                                                                selected_order.pickups.map((p, i) => {
+                                                                                    if (p.id === end.pickup_id) {
+                                                                                        if ((p.customer?.zip_data || '') !== '') {
+                                                                                            destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
+                                                                                        }
+                                                                                    }
+                                                                                    return false;
+                                                                                })
+                                                                            } else {
+                                                                                selected_order.deliveries.map((d, i) => {
+                                                                                    if (d.id === end.delivery_id) {
+                                                                                        if ((d.customer?.zip_data || '') !== '') {
+                                                                                            destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
+                                                                                        }
+                                                                                    }
+                                                                                    return false;
+                                                                                })
+                                                                            }
+
+                                                                            let params = {
+                                                                                'routingMode': 'fast',
+                                                                                'transportMode': 'car',
+                                                                                'origin': origin,
+                                                                                'via': new H.service.Url.MultiValueQueryParameter(waypoints),
+                                                                                'destination': destination,
+                                                                                'return': 'summary'
+                                                                            }
+
+                                                                            if (routingService) {
+                                                                                routingService.calculateRoute(
+                                                                                    params,
+                                                                                    (result) => {
+                                                                                        let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                                                                            return a + b.summary.length;
+                                                                                        }, 0) || 0;
+
+                                                                                        selected_order.miles = miles;
+
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
+
+                                                                                        axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                                            if (res.data.result === "OK") {
+                                                                                                setSelectedOrder({
+                                                                                                    ...selected_order,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                });
+
+                                                                                                props.setSelectedOrder({
+                                                                                                    ...selected_order,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                    component_id: props.componentId,
+                                                                                                });
+                                                                                            }
+                                                                                        }).catch((e) => {
+                                                                                            setMileageLoaderVisible(false);
+                                                                                            console.log("error on saving order miles", e);
+                                                                                        });
+                                                                                    },
+                                                                                    (error) => {
+                                                                                        console.log("error getting mileage", error);
+                                                                                        selected_order.miles = 0;
+                                                                                        setSelectedOrder(selected_order);
+                                                                                        setMileageLoaderVisible(false);
+
+                                                                                        axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                                            if (res.data.result === "OK") {
+                                                                                                setSelectedOrder({
+                                                                                                    ...selected_order,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                });
+
+                                                                                                props.setSelectedOrder({
+                                                                                                    ...selected_order,
+                                                                                                    order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                                    order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                                    component_id: props.componentId,
+                                                                                                });
+                                                                                            }
+                                                                                        }).catch((e) => {
+                                                                                            setMileageLoaderVisible(false);
+                                                                                            console.log("error on saving order miles", e);
+                                                                                        });
+                                                                                    }
+                                                                                );
+                                                                            }
+                                                                        } else {
+                                                                            selected_order.miles = 0;
+                                                                            setSelectedOrder(selected_order);
+                                                                            setMileageLoaderVisible(false);
+
+                                                                            axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
                                                                                 if (res.data.result === "OK") {
                                                                                     setSelectedOrder({
                                                                                         ...selected_order,
-                                                                                        order_customer_ratings:
-                                                                                            res.data.order.order_customer_ratings,
-                                                                                        order_carrier_ratings:
-                                                                                            res.data.order.order_carrier_ratings,
+                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                     });
 
                                                                                     props.setSelectedOrder({
                                                                                         ...selected_order,
-                                                                                        order_customer_ratings:
-                                                                                            res.data.order.order_customer_ratings,
-                                                                                        order_carrier_ratings:
-                                                                                            res.data.order.order_carrier_ratings,
+                                                                                        order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
                                                                                         component_id: props.componentId,
                                                                                     });
                                                                                 }
-                                                                            })
-                                                                            .catch((e) => {
+                                                                            }).catch((e) => {
                                                                                 setMileageLoaderVisible(false);
                                                                                 console.log("error on saving order miles", e);
                                                                             });
+                                                                        }
                                                                     }
                                                                 } else {
+                                                                    // GUARDAR ORDEN CON MILES = 0;
+                                                                    selected_order.miles = 0;
+                                                                    setSelectedOrder(selected_order);
                                                                     setMileageLoaderVisible(false);
+
+                                                                    axios.post(props.serverUrl + "/saveOrder", selected_order).then(async (res) => {
+                                                                        if (res.data.result === "OK") {
+                                                                            setSelectedOrder({
+                                                                                ...selected_order,
+                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                            });
+
+                                                                            props.setSelectedOrder({
+                                                                                ...selected_order,
+                                                                                order_customer_ratings: res.data.order.order_customer_ratings,
+                                                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
+                                                                                component_id: props.componentId,
+                                                                            });
+                                                                        }
+                                                                    }).catch((e) => {
+                                                                        setMileageLoaderVisible(false);
+                                                                        console.log("error on saving order miles", e);
+                                                                    });
                                                                 }
-                                                            })
-                                                            .catch((e) => {
+                                                            } else {
                                                                 setMileageLoaderVisible(false);
-                                                                console.log("error on removing order pickup", e);
-                                                            });
+                                                            }
+                                                        }).catch((e) => {
+                                                            setMileageLoaderVisible(false);
+                                                            console.log("error on removing order pickup", e);
+                                                        });
                                                     }}
                                                 >
                                                     <span className="fas fa-times"></span>
@@ -11634,7 +10598,8 @@ const Dispatch = (props) => {
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                             : (selectedOrder?.is_cancelled || 0) === 1
-                                ? <div className="order-cancelled-btn" onClick={() => { }}>Cancelled</div>
+                                ? <div className="order-cancelled-btn" onClick={() => {
+                                }}>Cancelled</div>
                                 : ''
                     : ''
                 }
@@ -11682,7 +10647,8 @@ const Dispatch = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base" style={{
                                             color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                        }}>Search</div>
+                                        }}>Search
+                                        </div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
 
@@ -11721,14 +10687,18 @@ const Dispatch = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                     {isShowingShipperSecondPage && (
-                                        <div className="mochi-button" onClick={() => { setIsShowingShipperSecondPage(false) }}>
+                                        <div className="mochi-button" onClick={() => {
+                                            setIsShowingShipperSecondPage(false)
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">1st Page</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
                                     )}
                                     {!isShowingShipperSecondPage && (
-                                        <div className="mochi-button" onClick={() => { setIsShowingShipperSecondPage(true) }}>
+                                        <div className="mochi-button" onClick={() => {
+                                            setIsShowingShipperSecondPage(true)
+                                        }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">2nd Page</div>
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -13496,7 +12466,8 @@ const Dispatch = (props) => {
                                                         }
                                                     </div>
                                                     <div className="form-h-sep"></div>
-                                                    <div className="select-box-container input-phone" style={{ width: '10.3rem' }}>
+                                                    <div className="select-box-container input-phone"
+                                                        style={{ width: '10.3rem' }}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={24 + props.tabTimes}
@@ -14989,7 +13960,8 @@ const Dispatch = (props) => {
                                                                             ></span>
                                                                         }
 
-                                                                        <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                                                        <span className="automatic-email-inputted"
+                                                                            style={{ whiteSpace: "nowrap" }}>{item}</span>
                                                                     </div>
                                                                 );
                                                             } else {
@@ -15063,7 +14035,8 @@ const Dispatch = (props) => {
                                                                             ></span>
                                                                         }
 
-                                                                        <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                                                        <span className="automatic-email-inputted"
+                                                                            style={{ whiteSpace: "nowrap" }}>{item}</span>
                                                                     </div>
                                                                 );
                                                             } else {
@@ -15256,7 +14229,8 @@ const Dispatch = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base" style={{
                                             color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                        }}>Search</div>
+                                        }}>Search
+                                        </div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                     <div className="mochi-button" onClick={() => {
@@ -17100,7 +16074,8 @@ const Dispatch = (props) => {
                                                         }
                                                     </div>
                                                     <div className="form-h-sep"></div>
-                                                    <div className="select-box-container input-phone" style={{ width: '10.3rem' }}>
+                                                    <div className="select-box-container input-phone"
+                                                        style={{ width: '10.3rem' }}>
                                                         <div className="select-box-wrapper">
                                                             <MaskedInput
                                                                 tabIndex={43 + props.tabTimes}
@@ -18529,7 +17504,8 @@ const Dispatch = (props) => {
                                                                                 ></span>
                                                                             }
 
-                                                                            <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: "nowrap" }}>{item}</span>
                                                                         </div>
                                                                     );
                                                                 } else {
@@ -18606,7 +17582,8 @@ const Dispatch = (props) => {
                                                                             }}
                                                                             ></span>
                                                                         }
-                                                                        <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                                                        <span className="automatic-email-inputted"
+                                                                            style={{ whiteSpace: "nowrap" }}>{item}</span>
                                                                     </div>
                                                                 );
                                                             } else {
@@ -18679,7 +17656,8 @@ const Dispatch = (props) => {
                                                                                 }}
                                                                             ></span>
                                                                         }
-                                                                        <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                                                        <span className="automatic-email-inputted"
+                                                                            style={{ whiteSpace: "nowrap" }}>{item}</span>
                                                                     </div>
                                                                 );
                                                             } else {
@@ -18827,7 +17805,8 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div className="form-borderless-box" style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                        <div className="form-borderless-box"
+                            style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
                             <div className="form-row" style={{ flexGrow: 1, display: "flex" }}>
                                 <div className="form-bordered-box">
                                     <div className="form-header">
@@ -18845,11 +17824,14 @@ const Dispatch = (props) => {
                                                 setSelectedInternalNote({ id: 0 });
                                             }}
                                             >
-                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                <div className="mochi-button-decorator mochi-button-decorator-left">(
+                                                </div>
                                                 <div className="mochi-button-base" style={{
                                                     color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                                }}>Add note</div>
-                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                                }}>Add note
+                                                </div>
+                                                <div className="mochi-button-decorator mochi-button-decorator-right">)
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="top-border top-border-right"></div>
@@ -18908,7 +17890,14 @@ const Dispatch = (props) => {
                             <input type="text" placeholder="Salesman Code" readOnly={true} />
                         </div>
                         <div className="input-box-container grow">
-                            <input type="text" placeholder="Salesman Commission" readOnly={true} />
+                            <input type="text" placeholder="Salesman Commission" readOnly={true} onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    e.preventDefault();
+                                    refOrderNumber.current.focus();
+                                }
+                            }} />
                         </div>
                     </div>
                 </div>
@@ -19425,7 +18414,7 @@ const Dispatch = (props) => {
                                                             setDispatchEvent(item);
                                                             setDispatchEventLocation("");
                                                             setDispatchEventNotes("");
-                                                            setDispatchEventItems([]);                                                            
+                                                            setDispatchEventItems([]);
                                                             refDispatchEventLocation.current.focus();
                                                         }
                                                     }
@@ -19693,7 +18682,7 @@ const Dispatch = (props) => {
                                                                 setDispatchEvent(item);
                                                                 setDispatchEventLocation("");
                                                                 setDispatchEventNotes("");
-                                                                setDispatchEventItems([]);                                                                
+                                                                setDispatchEventItems([]);
                                                                 refDispatchEventLocation.current.focus();
                                                             }
                                                         }
@@ -20092,7 +19081,7 @@ const Dispatch = (props) => {
                                                                                     setDispatchEvent(item);
                                                                                     setDispatchEventLocation("");
                                                                                     setDispatchEventNotes("");
-                                                                                    setDispatchEventItems([]);                                                                                    
+                                                                                    setDispatchEventItems([]);
                                                                                     refDispatchEventLocation.current.focus();
                                                                                 }
                                                                             }}
@@ -20821,6 +19810,7 @@ const Dispatch = (props) => {
                             )}
                         </div>
                     </div>
+
                     <div
                         style={{
                             fontSize: "0.8rem",
@@ -20831,6 +19821,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
+
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <div
                             style={{
@@ -20908,6 +19899,7 @@ const Dispatch = (props) => {
                             />
                         </div>
                     </div>
+
                     <div
                         style={{
                             fontSize: "0.8rem",
@@ -20918,6 +19910,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
+
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <div
                             style={{
@@ -20995,6 +19988,7 @@ const Dispatch = (props) => {
                             />
                         </div>
                     </div>
+
                     <div
                         style={{
                             fontSize: "0.8rem",
@@ -21005,6 +19999,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
+
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <div
                             style={{
@@ -21148,6 +20143,7 @@ const Dispatch = (props) => {
                             />
                         </div>
                     </div>
+
                     <div
                         style={{
                             fontSize: "0.8rem",
@@ -21158,6 +20154,7 @@ const Dispatch = (props) => {
                     >
                         |
                     </div>
+
                     <div style={{ display: "flex", flexDirection: "column" }}>
                         <div
                             style={{
@@ -21620,7 +20617,7 @@ const Dispatch = (props) => {
                         <div className="top-border top-border-right"></div>
                     </div>
 
-                    <div className="order-events-container">
+                    <div className="order-events-container" tabIndex={-1}>
                         {(selectedOrder?.events || []).length > 0 && (
                             <div className="order-events-item">
                                 <div className="event-date">Date</div>
@@ -21634,7 +20631,7 @@ const Dispatch = (props) => {
                             </div>
                         )}
 
-                        <div className="order-events-wrapper">
+                        <div className="order-events-wrapper" tabIndex={-1}>
                             {(selectedOrder?.events || []).map((item, index) => (
                                 <div className="order-events-item" key={index}>
                                     <div className="event-date">{item.date}</div>

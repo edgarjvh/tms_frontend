@@ -1,0 +1,57 @@
+.modal-template-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+.modal-template-container .modal-template-wrapper {
+  position: absolute;
+  width: 90%;
+  max-width: 400px;
+  background-color: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-template-container .modal-template-wrapper .modal-title {
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 5px 20px;
+}
+.modal-template-container .modal-template-wrapper .modal-title .mochi-button {
+  font-size: 1rem;
+}
+.modal-template-container .modal-template-wrapper .modal-body {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px;
+}
+.modal-template-container .modal-template-wrapper .modal-body .input-box-container input {
+  text-transform: capitalize;
+  font-size: 0.8rem;
+}
+.modal-template-container .modal-template-wrapper .modal-body .modal-prompt {
+  font-size: 1rem;
+  margin: 1rem 0;
+  font-weight: bold;
+  flex-grow: 1;
+  color: darkred;
+  text-align: center;
+}
+.modal-template-container .modal-template-wrapper .modal-body .modal-button-container {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}

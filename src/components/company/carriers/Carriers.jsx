@@ -2528,6 +2528,17 @@ const Carriers = props => {
                 padding: props.isOnPanel ? "10px 0" : 10,
                 position: props.isOnPanel ? "unset" : "relative",
             }}
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 9){                    
+                    if (e.target.type === undefined){
+                        e.preventDefault();
+                        refCarrierCode.current.focus();
+                    }
+                }
+            }}
         >
             {loadingTransition(
                 (style, item) =>
@@ -3108,7 +3119,7 @@ const Carriers = props => {
                             />
                         </div>
                         <div className={insuranceStatusClasses()} style={{ width: "100%" }}>
-                            <input type="text" placeholder="Insurance" readOnly={true} />
+                            <input type="text" placeholder="Insurance" readOnly={true} tabIndex={-1} />
                         </div>
                     </div>
                 </div>
@@ -4336,6 +4347,15 @@ const Carriers = props => {
                                                 style={{ textTransform: "lowercase" }}
                                                 onFocus={() => {
                                                     setShowingContactList(false);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
+
+                                                    if (key === 9){
+                                                        e.preventDefault();
+                                                        refInsuranceType.current.focus();
+                                                        setShowingContactList(true);
+                                                    }
                                                 }}
                                                 onChange={e =>
                                                     setContactSearch({

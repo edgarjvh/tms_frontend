@@ -321,8 +321,8 @@ export default class CustomerConfirmation extends Component {
                                                         Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(pickup.bol_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(pickup.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>
@@ -334,8 +334,8 @@ export default class CustomerConfirmation extends Component {
                                                     <div style={{ ...this.styleFieldName, width: '6.5rem' }}>PO Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(pickup.po_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(pickup.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>
@@ -348,8 +348,8 @@ export default class CustomerConfirmation extends Component {
                                                         Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(pickup.ref_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(pickup.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>
@@ -374,8 +374,8 @@ export default class CustomerConfirmation extends Component {
                                                         Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(delivery.bol_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(delivery.bol_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>
@@ -387,8 +387,8 @@ export default class CustomerConfirmation extends Component {
                                                     <div style={{ ...this.styleFieldName, width: '6.5rem' }}>PO Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(delivery.po_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(delivery.po_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>
@@ -401,8 +401,8 @@ export default class CustomerConfirmation extends Component {
                                                         Numbers:
                                                     </div>
                                                     <div style={{ ...this.styleFieldData }}>
-                                                        {(delivery.ref_numbers || '').split('|').map((item, index) => {
-                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred' }}>{item} </span>)
+                                                        {(delivery.ref_numbers || '').split('|').filter(x => (x || '').trim() !== '').map((item, index) => {
+                                                            return (<span style={{ color: index % 2 === 0 ? 'red' : 'darkred', marginLeft: index === 0 ? '0px' : '5px' }}>{item} </span>)
                                                         })}
                                                     </div>
                                                 </div>

@@ -1102,7 +1102,7 @@ const Documents = (props) => {
                                     id: 0,
                                     user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                                     date_entered: moment().format('MM/DD/YYYY'),
-                                    title: 'Invoice',
+                                    title: 'Carrier Invoice',
                                     subject: 'Carrier Invoice',
                                     tags: 'Carrier|Invoice'
                                 });

@@ -1,18 +1,21 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import classnames from 'classnames';
 import './OrderHistory.css';
 import MaskedInput from 'react-text-mask';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
-import {useTransition, useSpring, animated, Transition, config} from 'react-spring';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCaretDown, faCaretRight, faCalendarAlt, faCaretUp} from '@fortawesome/free-solid-svg-icons';
-import {useDetectClickOutside} from "react-detect-click-outside";
-import {CalendarPopup, Calendar} from './../../panels';
+import { useTransition, useSpring, animated, Transition, config } from 'react-spring';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretRight, faCalendarAlt, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import { useDetectClickOutside } from "react-detect-click-outside";
+import { CalendarPopup, Calendar } from './../../panels';
 import moment from 'moment';
 import axios from 'axios';
 import NumberFormat from 'react-number-format';
+import * as XLSX from 'xlsx';
+import ToPrint from './ToPrint';
+
 import {
     setAdminHomePanels,
     setCompanyHomePanels,
@@ -35,6 +38,7 @@ import {
 import {
     Dispatch
 } from './../../../company';
+import { useReactToPrint } from 'react-to-print';
 
 const OrderHistory = (props) => {
     const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
@@ -57,12 +61,14 @@ const OrderHistory = (props) => {
         }
     });
 
+    const refPrintOrderHistory = useRef();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0, display: 'block'},
-        enter: {opacity: 1, display: 'block'},
-        leave: {opacity: 0, display: 'none'},
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
     });
 
@@ -206,10 +212,10 @@ const OrderHistory = (props) => {
                         let groupedOrders = [];
                         let currentDateGroup = [];
                         let currentOrderGroup = [];
-                        
+
                         // newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
                         newOrders.sort((a, b) => (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
-                        
+
                         newOrders.map((order, index) => {
                             currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                             currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
@@ -217,7 +223,7 @@ const OrderHistory = (props) => {
                             if (customer_code === '') {
                                 order.isOnBillTo = false;
                                 order.isOnShipper = false;
-                                order.isOnConsignee = false; 
+                                order.isOnConsignee = false;
                             } else {
                                 order.isOnBillTo = ((order.bill_to_customer?.code || '') + ((order.bill_to_customer?.code_number || 0) === 0 ? '' : order.bill_to_customer.code_number)) === customer_code.toUpperCase();
                                 order.isOnShipper = order.pickups.find(x => (x.customer?.code || '') + ((x.customer?.code_number || 0) === 0 ? '' : x.customer.code_number) === customer_code.toUpperCase()) !== undefined;
@@ -404,19 +410,19 @@ const OrderHistory = (props) => {
     }, [])
 
     const dateStartTransition = useTransition(isDateStartCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isDateStartCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     })
 
     const dateEndTransition = useTransition(isDateEndCalendarShown, {
-        from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-        enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-        leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
         reverse: isDateEndCalendarShown,
-        config: {duration: 100}
+        config: { duration: 100 }
     })
 
     const doSearch = () => {
@@ -792,6 +798,209 @@ const OrderHistory = (props) => {
         }
     }
 
+    const handlePrint = useReactToPrint({
+        pageStyle: () => {
+            return `
+                @media print {
+                    @page {
+                        size: 8.5in 11in !important; 
+                        margin: 7mm;                        
+                    }
+                    .page-block {
+                        page-break-after: auto !important;
+                        page-break-beforer: auto !important; 
+                        page-break-inside: avoid !important;
+                    } 
+                    .no-print{
+                        display:none !important;
+                    } 
+                    .container-sheet{
+                        box-shadow: initial !important;
+                        margin: 0 !important
+                    }
+                }
+            `
+        },
+        content: () => refPrintOrderHistory.current,
+    });
+
+    const handleExport = () => {
+        if (orders.length > 0) {
+            const startingRowData = 3;
+            let rowCount = 0;
+            let merges = [];
+            let title = [
+                {
+                    A: 'Revenue Information'
+                },
+                {}
+            ]
+
+            let table = [
+                {
+                    A: 'Order Date',
+                    B: 'Order Number',
+                    C: 'Customer Charges',
+                    D: 'Carrier Costs',
+                    E: 'Profit',
+                    F: 'Percentage'
+                }
+            ]
+
+            merges.push(XLSX.utils.decode_range('A1:F1'));
+            merges.push(XLSX.utils.decode_range('A2:F2'));
+
+            (orders || []).map(item1 => {
+                const { months } = item1;
+                rowCount++;
+
+                merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+                table.push({
+                    A: item1.year
+                });
+
+                (months || []).map(item2 => {
+                    const { orders } = item2;
+                    rowCount++;
+
+                    merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+                    table.push({
+                        A: item2.month
+                    });
+
+                    (orders || []).map(order => {
+                        rowCount++;
+                        merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+                        table.push({
+                            A: order.isOnBillTo ? 'Bill To' : (order.isOnShipper ? 'Shipper' : (order.isOnConsignee ? 'Consignee' : ''))
+                        });
+                        rowCount++;
+
+                        table.push({
+                            A: moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY'),
+                            B: order.order_number,
+                            C: `$${new Intl.NumberFormat('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }).format(
+                                order.total_customer_rating
+                            )}`,
+                            D: `$${new Intl.NumberFormat('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }).format(
+                                order.total_carrier_rating
+                            )}`,
+                            E: `$${new Intl.NumberFormat('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }).format(
+                                order.total_customer_rating - order.total_carrier_rating
+                            )}`,
+                            F: `${((order.total_customer_rating > 0 || order.total_carrier_rating > 0)
+                                ?
+                                ((order.total_customer_rating - order.total_carrier_rating) * 100)
+                                /
+                                (
+                                    order.total_customer_rating > 0
+                                        ? order.total_customer_rating
+                                        : order.total_carrier_rating
+                                )
+                                : 0).toFixed(2)}%`
+                        })
+                        return true;
+                    })
+                    return true;
+                })
+                return true;
+            })
+
+            rowCount++;
+
+            table.push({
+                A: 'Totals',
+                B: `Orders: ${orders.reduce((a, b) => {
+                    return a + b.totals.orderCount
+                }, 0)}`,
+                C: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0)
+                )}`,
+                D: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)
+                )}`,
+                E: `$${new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(
+                    orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0) - orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)
+                )}`,
+                F: `${((orders.reduce((a, b) => {
+                    return a + b.totals.customerCharges
+                }, 0) > 0 || orders.reduce((a, b) => {
+                    return a + b.totals.carrierCosts
+                }, 0) > 0)
+                    ? ((orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                    }, 0) - orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                    }, 0)) * 100)
+                    /
+                    (
+                        orders.reduce((a, b) => {
+                            return a + b.totals.customerCharges
+                        }, 0) > 0
+                            ? orders.reduce((a, b) => {
+                                return a + b.totals.customerCharges
+                            }, 0)
+                            : orders.reduce((a, b) => {
+                                return a + b.totals.carrierCosts
+                            }, 0)
+                    )
+                    : 0).toFixed(2)}%`
+            });
+
+            const finalData = [...title, ...table];
+
+            const book = XLSX.utils.book_new();
+            const sheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
+            sheet['!merges'] = merges;
+
+            const colLengths = [
+                20, 20, 20, 20, 20, 20
+            ]
+
+            let properties = [];
+
+            colLengths.forEach((col) => {
+                properties.push({
+                    width: col
+                });
+            });
+
+            sheet['!cols'] = properties;            
+ 
+            XLSX.utils.book_append_sheet(book, sheet, 'Order History');            
+
+            XLSX.writeFile(book, 'Order History.xlsx');
+        }
+    }
+
     return (
         <div className="panel-content">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -801,10 +1010,21 @@ const OrderHistory = (props) => {
             </div>
 
             {
+                (orders || []).length > 0 &&
+                <div style={{ display: 'none' }}>
+                    <ToPrint
+                        ref={refPrintOrderHistory}
+                        orders={orders}
+                    />
+                </div>
+
+            }
+
+            {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
                         <div className="loading-container-wrapper">
-                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item}/>
+                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
                         </div>
                     </animated.div>
                 )
@@ -813,9 +1033,9 @@ const OrderHistory = (props) => {
             <div className="order-fields-container">
 
                 <div className="search-fields">
-                    <div className="select-box-container date" style={{position: 'relative', marginRight: 2}}>
+                    <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Date
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date
                                 Start
                             </div>
                             <MaskedInput
@@ -914,7 +1134,7 @@ const OrderHistory = (props) => {
 
                                     refDateStart.current.inputElement.focus();
                                 }
-                            }}/>
+                            }} />
                         </div>
 
                         {
@@ -928,7 +1148,7 @@ const OrderHistory = (props) => {
                                     }}
                                     ref={refDateStartCalendarDropDown}
                                 >
-                                    <div className="mochi-contextual-popup vertical below right" style={{height: 275}}>
+                                    <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
                                         <div className="mochi-contextual-popup-content">
                                             <div className="mochi-contextual-popup-wrapper">
                                                 <Calendar
@@ -954,89 +1174,89 @@ const OrderHistory = (props) => {
                         }
                     </div>
                     <div className="input-box-container city">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>City Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City Origin
                         </div>
                         <input type="text"
-                               tabIndex={3 + props.tabTimes}
-                               onInput={(e) => {
-                                   setCityOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCityOrigin(e.target.value)
-                               }}
-                               value={cityOrigin || ''}
+                            tabIndex={3 + props.tabTimes}
+                            onInput={(e) => {
+                                setCityOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCityOrigin(e.target.value)
+                            }}
+                            value={cityOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container state">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>State Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State Origin
                         </div>
                         <input type="text"
-                               tabIndex={5 + props.tabTimes}
-                               style={{textTransform: 'uppercase'}}
-                               maxLength={2}
-                               onInput={(e) => {
-                                   setStateOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setStateOrigin(e.target.value)
-                               }}
-                               value={stateOrigin || ''}
+                            tabIndex={5 + props.tabTimes}
+                            style={{ textTransform: 'uppercase' }}
+                            maxLength={2}
+                            onInput={(e) => {
+                                setStateOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setStateOrigin(e.target.value)
+                            }}
+                            value={stateOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container zip">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Zip Origin
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip Origin
                         </div>
                         <input type="text"
-                               tabIndex={7 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={(e) => {
-                                   let key = e.keyCode || e.which;
+                            tabIndex={7 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                   if (
-                                       key === 9 || // TAB
-                                       (key >= 48 && key <= 57) || // NUMBER
-                                       (key >= 96 && key <= 105) || // NUMBER
-                                       (key === 8 || key === 46) || // BACKSPACE - DELETE
-                                       (key >= 37 && key <= 40) // ARROW KEYS
-                                   ) {
-                                   } else {
-                                       e.preventDefault();
-                                   }
-                               }}
-                               onInput={(e) => {
-                                   setZipOrigin(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setZipOrigin(e.target.value)
-                               }}
-                               value={zipOrigin || ''}
+                                if (
+                                    key === 9 || // TAB
+                                    (key >= 48 && key <= 57) || // NUMBER
+                                    (key >= 96 && key <= 105) || // NUMBER
+                                    (key === 8 || key === 46) || // BACKSPACE - DELETE
+                                    (key >= 37 && key <= 40) // ARROW KEYS
+                                ) {
+                                } else {
+                                    e.preventDefault();
+                                }
+                            }}
+                            onInput={(e) => {
+                                setZipOrigin(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setZipOrigin(e.target.value)
+                            }}
+                            value={zipOrigin || ''}
                         />
                     </div>
                     <div className="input-box-container">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Bill-To Code
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Bill-To Code
                         </div>
                         <input type="text"
-                               tabIndex={9 + props.tabTimes}
-                               maxLength={10}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setBillToCode(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setBillToCode(e.target.value)
-                               }}
-                               value={billToCode || ''}
+                            tabIndex={9 + props.tabTimes}
+                            maxLength={10}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setBillToCode(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setBillToCode(e.target.value)
+                            }}
+                            value={billToCode || ''}
                         />
                     </div>
-                    <div className="input-toggle-container" style={{minWidth: '7.5rem', maxWidth: '7.5rem'}}>
+                    <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
                         <input type="checkbox"
-                               id={props.panelName + '-cbox-order-history-show-year-totals-btn'}
-                               onChange={(e) => {
-                                   setShowYearTotals(e.target.checked);
-                               }}
-                               checked={showYearTotals}/>
+                            id={props.panelName + '-cbox-order-history-show-year-totals-btn'}
+                            onChange={(e) => {
+                                setShowYearTotals(e.target.checked);
+                            }}
+                            checked={showYearTotals} />
                         <label htmlFor={props.panelName + '-cbox-order-history-show-year-totals-btn'}
-                               style={{fontSize: '0.7rem'}}>
+                            style={{ fontSize: '0.7rem' }}>
                             <div className="label-text">Show Year Totals</div>
                             <div className="input-toggle-btn"></div>
                         </label>
@@ -1066,9 +1286,9 @@ const OrderHistory = (props) => {
                         </div>
                     </div>
 
-                    <div className="select-box-container date" style={{position: 'relative', marginRight: 2}}>
+                    <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
                         <div className="select-box-wrapper">
-                            <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Date End
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date End
                             </div>
                             <MaskedInput
                                 tabIndex={2 + props.tabTimes}
@@ -1164,16 +1384,16 @@ const OrderHistory = (props) => {
 
                                     refDateEnd.current.inputElement.focus();
                                 }
-                            }}/>
+                            }} />
                         </div>
 
                         {
                             useTransition(isDateEndCalendarShown, {
-                                from: {opacity: 0, display: 'block', top: 'calc(100% + 7px)'},
-                                enter: {opacity: 1, display: 'block', top: 'calc(100% + 12px)'},
-                                leave: {opacity: 0, display: 'none', top: 'calc(100% + 7px)'},
+                                from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+                                enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+                                leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
                                 reverse: isDateEndCalendarShown,
-                                config: {duration: 100}
+                                config: { duration: 100 }
                             })((style, item) => item &&
                                 (<animated.div
                                     className="mochi-contextual-container"
@@ -1184,7 +1404,7 @@ const OrderHistory = (props) => {
                                     }}
                                     ref={refDateEndCalendarDropDown}
                                 >
-                                    <div className="mochi-contextual-popup vertical below right" style={{height: 275}}>
+                                    <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
                                         <div className="mochi-contextual-popup-content">
                                             <div className="mochi-contextual-popup-wrapper">
                                                 <Calendar
@@ -1210,104 +1430,104 @@ const OrderHistory = (props) => {
                         }
                     </div>
                     <div className="input-box-container city">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>City
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={4 + props.tabTimes}
-                               onInput={(e) => {
-                                   setCityDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCityDestination(e.target.value)
-                               }}
-                               value={cityDestination || ''}
+                            tabIndex={4 + props.tabTimes}
+                            onInput={(e) => {
+                                setCityDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCityDestination(e.target.value)
+                            }}
+                            value={cityDestination || ''}
                         />
                     </div>
                     <div className="input-box-container state">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>State
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={6 + props.tabTimes}
-                               maxLength={2}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setStateDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setStateDestination(e.target.value)
-                               }}
-                               value={stateDestination || ''}
+                            tabIndex={6 + props.tabTimes}
+                            maxLength={2}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setStateDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setStateDestination(e.target.value)
+                            }}
+                            value={stateDestination || ''}
                         />
                     </div>
                     <div className="input-box-container zip">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>Zip
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip
                             Destination
                         </div>
                         <input type="text"
-                               tabIndex={8 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={(e) => {
-                                   let key = e.keyCode || e.which;
+                            tabIndex={8 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                   if (
-                                       key === 9 || // TAB
-                                       (key >= 48 && key <= 57) || // NUMBER
-                                       (key >= 96 && key <= 105) || // NUMBER
-                                       (key === 8 || key === 46) || // BACKSPACE - DELETE
-                                       (key >= 37 && key <= 40) // ARROW KEYS
-                                   ) {
-                                   } else {
-                                       e.preventDefault();
-                                   }
-                               }}
-                               onInput={(e) => {
-                                   setZipDestination(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setZipDestination(e.target.value)
-                               }}
-                               value={zipDestination || ''}
+                                if (
+                                    key === 9 || // TAB
+                                    (key >= 48 && key <= 57) || // NUMBER
+                                    (key >= 96 && key <= 105) || // NUMBER
+                                    (key === 8 || key === 46) || // BACKSPACE - DELETE
+                                    (key >= 37 && key <= 40) // ARROW KEYS
+                                ) {
+                                } else {
+                                    e.preventDefault();
+                                }
+                            }}
+                            onInput={(e) => {
+                                setZipDestination(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setZipDestination(e.target.value)
+                            }}
+                            value={zipDestination || ''}
                         />
                     </div>
                     <div className="input-box-container">
-                        <div style={{fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap'}}>
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>
                             {props.suborigin === 'customer' ? 'Customer Code' : 'Carrier Code'}
                         </div>
                         <input type="text"
-                               readOnly={(props.selectedCustomer?.id || 0) > 0}
-                               tabIndex={10 + props.tabTimes}
-                               maxLength={10}
-                               onKeyDown={e => {
-                                   let key = e.keyCode || e.which;
+                            readOnly={(props.selectedCustomer?.id || 0) > 0}
+                            tabIndex={10 + props.tabTimes}
+                            maxLength={10}
+                            onKeyDown={e => {
+                                let key = e.keyCode || e.which;
 
-                                   if (key === 9) {
-                                       e.preventDefault();
-                                       refDateStart.current.inputElement.focus();
+                                if (key === 9) {
+                                    e.preventDefault();
+                                    refDateStart.current.inputElement.focus();
 
-                                       doSearch();
-                                   }
-                               }}
-                               style={{textTransform: 'uppercase'}}
-                               onInput={(e) => {
-                                   setCustomerCode(e.target.value)
-                               }}
-                               onChange={(e) => {
-                                   setCustomerCode(e.target.value)
-                               }}
-                               value={customerCode || ''}
+                                    doSearch();
+                                }
+                            }}
+                            style={{ textTransform: 'uppercase' }}
+                            onInput={(e) => {
+                                setCustomerCode(e.target.value)
+                            }}
+                            onChange={(e) => {
+                                setCustomerCode(e.target.value)
+                            }}
+                            value={customerCode || ''}
                         />
                     </div>
-                    <div className="input-toggle-container" style={{minWidth: '7.5rem', maxWidth: '7.5rem'}}>
+                    <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
                         <input type="checkbox"
-                               id={props.panelName + '-cbox-order-history-show-month-totals-btn'}
-                               onChange={(e) => {
-                                   setShowMonthTotals(e.target.checked);
-                               }}
-                               checked={showMonthTotals}/>
+                            id={props.panelName + '-cbox-order-history-show-month-totals-btn'}
+                            onChange={(e) => {
+                                setShowMonthTotals(e.target.checked);
+                            }}
+                            checked={showMonthTotals} />
                         <label htmlFor={props.panelName + '-cbox-order-history-show-month-totals-btn'}
-                               style={{fontSize: '0.7rem'}}>
+                            style={{ fontSize: '0.7rem' }}>
                             <div className="label-text">Show Month Totals</div>
                             <div className="input-toggle-btn"></div>
                         </label>
@@ -1331,8 +1551,18 @@ const OrderHistory = (props) => {
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="top-border top-border-middle"></div>
-                        <div className="form-buttons">
-                            <div className="mochi-button">
+                        <div className="form-buttons" >
+                            <div className="mochi-button" onClick={() => {
+                                handleExport();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Export</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+
+                            <div className="mochi-button" onClick={() => {
+                                handlePrint();
+                            }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Print</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1364,7 +1594,7 @@ const OrderHistory = (props) => {
                         <div className="order-info-wrapper">
                             {
                                 (orders || []).map((yearGroup, index2) => {
-                                    const {months} = yearGroup;
+                                    const { months } = yearGroup;
                                     const yearOrdersClasses = classnames({
                                         'year-orders': true,
                                         'hidden': !yearGroup.showYearGroup
@@ -1384,20 +1614,20 @@ const OrderHistory = (props) => {
                                                         cursor: "pointer",
                                                         marginLeft: 10
                                                     }} onClick={() => {
-                                                    setOrders(_orders => _orders.map((year, i) => {
-                                                        if (index2 === i) {
-                                                            year.showYearGroup = !year.showYearGroup;
-                                                        }
+                                                        setOrders(_orders => _orders.map((year, i) => {
+                                                            if (index2 === i) {
+                                                                year.showYearGroup = !year.showYearGroup;
+                                                            }
 
-                                                        return year;
-                                                    }))
-                                                }}/>
+                                                            return year;
+                                                        }))
+                                                    }} />
                                             </div>
 
                                             <div className={yearOrdersClasses}>
                                                 {
                                                     (months || []).map((group, index3) => {
-                                                        const {orders} = group;
+                                                        const { orders } = group;
                                                         const monthOrdersClasses = classnames({
                                                             'month-orders': true,
                                                             'hidden': !group.showMonthGroup
@@ -1405,7 +1635,7 @@ const OrderHistory = (props) => {
 
                                                         return (
                                                             <div className="month-container"
-                                                                 key={index3}>
+                                                                key={index3}>
                                                                 <div className="month-info">
                                                                     <div className="order-info-col order-date" style={{
                                                                         display: 'flex',
@@ -1422,20 +1652,20 @@ const OrderHistory = (props) => {
                                                                                 cursor: "pointer",
                                                                                 marginLeft: 10
                                                                             }} onClick={() => {
-                                                                            setOrders(_orders => _orders.map((year, i) => {
-                                                                                if (index2 === i) {
-                                                                                    year.months.map((month, y) => {
-                                                                                        if (index3 === y) {
-                                                                                            month.showMonthGroup = !month.showMonthGroup;
-                                                                                        }
+                                                                                setOrders(_orders => _orders.map((year, i) => {
+                                                                                    if (index2 === i) {
+                                                                                        year.months.map((month, y) => {
+                                                                                            if (index3 === y) {
+                                                                                                month.showMonthGroup = !month.showMonthGroup;
+                                                                                            }
 
-                                                                                        return month;
-                                                                                    })
-                                                                                }
+                                                                                            return month;
+                                                                                        })
+                                                                                    }
 
-                                                                                return year;
-                                                                            }))
-                                                                        }}/>
+                                                                                    return year;
+                                                                                }))
+                                                                            }} />
                                                                     </div>
                                                                     <div className="order-info-col order-number"></div>
                                                                     <div
@@ -1479,7 +1709,7 @@ const OrderHistory = (props) => {
                                                                                         </div>
                                                                                     }
                                                                                     <div
-                                                                                        className="date-group-order-item"                                                                                        
+                                                                                        className="date-group-order-item"
                                                                                         onClick={() => {
                                                                                             let panel = {
                                                                                                 panelName: `${props.panelName}-dispatch`,
@@ -1615,16 +1845,16 @@ const OrderHistory = (props) => {
                                                                         <div
                                                                             className="order-info-col order-number">
                                                                             Total <span
-                                                                            style={{fontWeight: 'bold'}}>{group.month}</span>
+                                                                                style={{ fontWeight: 'bold' }}>{group.month}</span>
                                                                         </div>
                                                                         <div
                                                                             className="order-info-col order-totals">
-                                                    <span style={{
-                                                        fontWeight: 'bold',
-                                                        color: 'rgba(0, 0, 0, 0.7)',
-                                                        marginRight: 10
-                                                    }}>
-                                                        Orders:</span>
+                                                                            <span style={{
+                                                                                fontWeight: 'bold',
+                                                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                                                marginRight: 10
+                                                                            }}>
+                                                                                Orders:</span>
                                                                             {group.totals.orderCount}
                                                                         </div>
                                                                         <div
@@ -1738,15 +1968,15 @@ const OrderHistory = (props) => {
                                                 <div className="year-totals">
                                                     <div className="order-info-col order-number">
                                                         Total <span
-                                                        style={{fontWeight: 'bold'}}>{yearGroup.year}</span>
+                                                            style={{ fontWeight: 'bold' }}>{yearGroup.year}</span>
                                                     </div>
                                                     <div className="order-info-col order-totals">
-                                                    <span style={{
-                                                        fontWeight: 'bold',
-                                                        color: 'rgba(0, 0, 0, 0.7)',
-                                                        marginRight: 10
-                                                    }}>
-                                                        Orders:</span>
+                                                        <span style={{
+                                                            fontWeight: 'bold',
+                                                            color: 'rgba(0, 0, 0, 0.7)',
+                                                            marginRight: 10
+                                                        }}>
+                                                            Orders:</span>
                                                         {yearGroup.totals.orderCount}
                                                     </div>
                                                     <div
@@ -1855,7 +2085,7 @@ const OrderHistory = (props) => {
 
 
                     {
-                        (orders || []).length > 0 && <div style={{flexGrow: 1}}></div>
+                        (orders || []).length > 0 && <div style={{ flexGrow: 1 }}></div>
                     }
                     {
                         (orders || []).length > 0 &&

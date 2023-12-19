@@ -1,0 +1,290 @@
+.template-main-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+.template-main-container .mochi-button .mochi-button-base {
+  user-select: none;
+}
+.template-main-container .form-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.template-main-container .notes-for-carrier-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.template-main-container .notes-for-carrier-container .notes-for-carrier-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.template-main-container .notes-for-carrier-container .notes-for-carrier-wrapper .notes-for-carrier-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.template-main-container .notes-for-carrier-container .notes-for-carrier-wrapper .notes-for-carrier-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.template-main-container .internal-notes-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.template-main-container .internal-notes-container .internal-notes-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+.template-main-container .internal-notes-container .internal-notes-wrapper .internal-notes-item {
+  font-size: 0.7rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: ease 0.3s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.template-main-container .internal-notes-container .internal-notes-wrapper .internal-notes-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.template-main-container .template-row {
+  display: flex;
+  flex-grow: 1;
+  gap: 10px;
+}
+.template-main-container .template-row .template-column {
+  display: flex;
+  flex-basis: 100%;
+  gap: 5px;
+}
+.template-main-container .template-row .template-column.first {
+  min-width: 37%;
+}
+.template-main-container .template-row .template-column.second {
+  min-width: 37%;
+}
+.template-main-container .template-row .template-column.third {
+  flex-grow: 1;
+}
+.template-main-container .template-row .template-column.third .row-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.template-main-container .template-row .template-column .form-bordered-box .form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.template-main-container .template-row .template-column .form-bordered-box .form-row {
+  gap: 2px;
+}
+.template-main-container .template-row.first .template-column.third {
+  justify-content: flex-end;
+}
+.template-main-container .template-row.second .template-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.template-main-container .template-row.second .template-column.third {
+  display: flex;
+}
+.template-main-container .template-row.third {
+  overflow: hidden;
+  min-height: 26px;
+}
+.template-main-container .template-row.third .template-column.first {
+  min-width: calc(74% + 10px) !important;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container {
+  flex-grow: 1;
+  flex-basis: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-pickup-next-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-pickup-next-btn,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-pickup-prev-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-pickup-prev-btn,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-delivery-next-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-delivery-next-btn,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-delivery-prev-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-delivery-prev-btn {
+  font-size: 1.1rem;
+  color: #4096ee;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-pickup-next-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-pickup-next-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-pickup-prev-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-pickup-prev-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-delivery-next-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-delivery-next-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-delivery-prev-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-delivery-prev-btn:hover {
+  color: #095bac;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-button-disabled,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-button-disabled {
+  pointer-events: none;
+  color: rgba(0, 0, 0, 0.3);
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container {
+  width: 100%;
+  padding: 2px 1px;
+  z-index: 0;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery {
+  position: relative;
+  background-color: white;
+  border-radius: 15px;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  height: 25px !important;
+  padding: 5px;
+  font-size: 0.7rem;
+  margin-right: 3px;
+  border: solid 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: ease 0.3s;
+  display: flex;
+  align-items: center;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup .routing-item-label,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup .routing-item-label,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery .routing-item-label,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery .routing-item-label {
+  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup .routing-item-label span:last-child,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup .routing-item-label span:last-child,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery .routing-item-label span:last-child,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery .routing-item-label span:last-child {
+  font-weight: bold;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery .routing-remove-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  font-size: 0.7rem;
+  cursor: pointer;
+  background-color: transparent;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: ease 0.3s;
+  transform: translateY(-50%);
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup .routing-remove-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup .routing-remove-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery .routing-remove-btn:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery .routing-remove-btn:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup:hover,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery:hover,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup:hover .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup:hover .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery:hover .routing-remove-btn,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery:hover .routing-remove-btn {
+  display: flex;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup.selected,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup.selected,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery.selected,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery.selected {
+  box-shadow: 0 0 2px 1px #4096ee;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup.adding,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup.adding,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery.adding,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery.adding {
+  background-color: rgba(0, 0, 0, 0.3);
+  min-width: 22px !important;
+  max-width: 22px !important;
+  height: 22px !important;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup.adding span,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup.adding span,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery.adding span,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery.adding span {
+  color: white;
+  font-size: 1rem;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup.active,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup.active,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery.active,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery.active {
+  background-color: lightgreen;
+}
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-pickup.unsaved,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-pickup.unsaved,
+.template-main-container .template-row.third .template-column.first .routing-pickups-container .swiper-container .template-delivery.unsaved,
+.template-main-container .template-row.third .template-column.first .routing-deliveries-container .swiper-container .template-delivery.unsaved {
+  background-color: lightgray !important;
+}
+.template-main-container .template-row.third .template-column.other {
+  position: relative;
+  overflow: hidden;
+  flex-grow: 1;
+  display: flex;
+}
+.template-main-container .template-row.third .template-column.other .column-wrapper {
+  position: absolute;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 0 2px;
+}
+.template-main-container .template-row.fourth .template-column.first {
+  width: 37%;
+}
+.template-main-container .template-row.fourth .template-column.second {
+  width: 37%;
+}
+.template-main-container .template-row.fourth .template-column.third {
+  flex-grow: 1;
+}

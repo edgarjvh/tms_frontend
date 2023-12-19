@@ -1,0 +1,306 @@
+.template-main-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  .mochi-button {
+    .mochi-button-base {
+      user-select: none;
+    }
+  }
+
+  .form-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .notes-for-carrier-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .notes-for-carrier-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+
+      .notes-for-carrier-item {
+        font-size: 0.7rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        cursor: pointer;
+        transition: ease 0.3s;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .notes-for-carrier-item:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .internal-notes-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .internal-notes-wrapper {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+
+      .internal-notes-item {
+        font-size: 0.7rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 5px 0;
+        cursor: pointer;
+        transition: ease 0.3s;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .internal-notes-item:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .template-row {
+    display: flex;
+    flex-grow: 1;
+    gap: 10px;
+
+    .template-column {
+      display: flex;
+      flex-basis: 100%;
+      gap: 5px;
+
+      &.first {
+        min-width: 37%;
+      }
+
+      &.second {
+        min-width: 37%;
+      }
+
+      &.third {
+        flex-grow: 1;
+
+        .row-buttons {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+      }
+
+      .form-bordered-box {
+        .form-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .form-row {
+          gap: 2px;
+        }
+      }
+    }
+
+    &.first {
+      .template-column {
+        &.third {
+          justify-content: flex-end;
+        }
+      }
+    }
+
+    &.second {
+      .template-column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        &.third {
+          display: flex;
+        }
+      }
+
+
+    }
+
+    &.third {
+      overflow: hidden;
+      min-height: 26px;
+
+      .template-column {
+        &.first {
+          min-width: calc(74% + 10px) !important;
+
+          .routing-pickups-container,
+          .routing-deliveries-container {
+            flex-grow: 1;
+            flex-basis: 50%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+
+            .swiper-pickup-next-btn,
+            .swiper-pickup-prev-btn,
+            .swiper-delivery-next-btn,
+            .swiper-delivery-prev-btn {
+              font-size: 1.1rem;
+              color: #4096ee;
+              cursor: pointer;
+              transition: ease 0.3s;
+
+              &:hover {
+                color: #095bac;
+              }
+            }
+
+            .swiper-button-disabled {
+              pointer-events: none;
+              color: rgba(0, 0, 0, 0.3)
+            }
+
+            .swiper-container {
+              width: 100%;
+              padding: 2px 1px;
+              z-index: 0;
+
+              .template-pickup,
+              .template-delivery {
+                position: relative;
+                background-color: white;
+                border-radius: 15px;
+                min-width: 80px !important;
+                max-width: 80px !important;
+                height: 25px !important;
+                padding: 5px;
+                font-size: 0.7rem;
+                margin-right: 3px;
+                border: solid 1px rgba(0, 0, 0, 0.5);
+                cursor: pointer;
+                transition: ease 0.3s;
+                display: flex;
+                align-items: center;
+
+                .routing-item-label {
+                  font-size: 0.65rem;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  width: 100%;
+
+                  span:last-child {
+                    font-weight: bold;
+                  }
+                }
+
+                .routing-remove-btn {
+                  position: absolute;
+                  right: 4px;
+                  top: 50%;
+                  font-size: 0.7rem;
+                  cursor: pointer;
+                  background-color: transparent;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  display: none;
+                  align-items: center;
+                  justify-content: center;
+                  transition: ease 0.3s;
+                  transform: translateY(-50%);
+
+                  &:hover {
+                    background-color: rgba(0, 0, 0, 0.3);
+                  }
+                }
+
+                &:hover {
+                  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+
+                  .routing-remove-btn {
+                    display: flex;
+                  }
+                }
+
+                &.selected {
+                  box-shadow: 0 0 2px 1px #4096ee;
+                }
+
+                &.adding {
+                  background-color: rgba(0, 0, 0, 0.3);
+                  min-width: 22px !important;
+                  max-width: 22px !important;
+                  height: 22px !important;
+                  border-radius: 50%;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+
+                  span {
+                    color: white;
+                    font-size: 1rem;
+                  }
+                }
+
+                &.active {
+                  background-color: lightgreen;
+                }
+
+                &.unsaved {
+                  background-color: lightgray !important;
+                }
+              }
+            }
+
+          }
+        }
+
+        &.other {
+          position: relative;
+          overflow: hidden;
+          flex-grow: 1;
+          display: flex;
+
+          .column-wrapper {
+            position: absolute;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 0 2px;
+          }
+        }
+      }
+    }
+
+    &.fourth {
+      .template-column {
+        &.first {
+          width: 37%;
+        }
+
+        &.second {
+          width: 37%;
+        }
+
+        &.third {
+          flex-grow: 1;
+        }
+      }
+    }
+  }
+}

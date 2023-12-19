@@ -1,84 +1,143 @@
 .invoice-main-container {
-  width                                             : 100%;
-  height                                            : 100%;
-  position                                          : relative;  
-  font-size                                         : 24px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  font-size: 24px;
   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#efefef+0,c8c8c8+100 */
-  background                                        : rgb(250, 250, 250);
+  background: rgb(250, 250, 250);
   /* Old browsers */
-  background                                        : -moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  background: -moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
   /* FF3.6-15 */
-  background                                        : -webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
   /* Chrome10-25,Safari5.1-6 */
-  background                                        : radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
+  background: radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%);
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter                                            : progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-  transition                                        : all ease 0.7s;
-  overflow                                          : hidden;
-  padding                                           : 10px;
+  transition: all ease 0.7s;
+  overflow: hidden;
+  padding: 10px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto 0.9fr;
   grid-gap: 0.5rem;
 
-  .mochi-button{
-    &.active{
+  .mochi-button {
+    &.active {
       // .mochi-button-decorator{
       //   color:green;
       // }
 
-      .mochi-button-base{
+      .mochi-button-base {
         color: green;
       }
     }
   }
 
-  .order-pickup{
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    padding: 1px 15px;
-    font-size: 0.9rem;    
+  .swiper-wrapper {
+    align-items: center;
+  }
+
+  .swiper-invoice-prev-btn {
+    font-size: 1.1rem;
+    color: #4096ee;
     cursor: pointer;
     transition: ease 0.3s;
-    white-space: nowrap;
+    margin-right: 7px;
 
-    &:not(:last-child){
-      margin-right: 5px;
+    &.swiper-button-disabled {
+      cursor: no-drop;
+      color: rgba(0, 0, 0, 0.3);
+      pointer-events: none;
     }
 
-    &.selected{
-      background-color: lightgreen;
-    }
-
-    &:hover{
-      box-shadow: inset 0 0 2px green;
+    &:hover {
+      color: #095bac;
     }
   }
 
-  .selected-pickup-number{
+  .swiper-invoice-next-btn {
+    font-size: 1.1rem;
+    color: #4096ee;
+    cursor: pointer;
+    transition: ease 0.3s;
+    margin-left: 7px;
+
+    &.swiper-button-disabled {
+      cursor: no-drop;
+      color: rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    }
+
+    &:hover {
+      color: #095bac;
+    }
+  }
+
+  .swiper-container{
+    width: 100%;
+    z-index: 0;
+  }
+
+  .order-pickup {
+    overflow: hidden;
+    padding: 0 2.5px;
+
+    .slide-wrapper {
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1px 15px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: ease 0.3s;
+      white-space: nowrap;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      &:hover {
+        box-shadow: inset 0 0 2px green;
+      }
+    }
+
+    &.selected {
+      .slide-wrapper{
+        background-color: lightgreen;
+      }
+    }
+
+    
+
+
+  }
+
+  .selected-pickup-number {
     font-size: 0.7rem;
 
-    span:first-child{
+    span:first-child {
       font-weight: bold;
       margin-right: 5px;
     }
 
-    span:not(:first-child){
-        margin-right: 5px;
-        &:nth-child(odd){
-            color: blue;
-        }
+    span:not(:first-child) {
+      margin-right: 5px;
+
+      &:nth-child(odd) {
+        color: blue;
+      }
     }
   }
 
   .selected-customer-contact-primary-phone {
-    position      : absolute;
-    right         : 5px;
-    top           : 50%;
-    transform     : translateY(-50%);
-    font-size     : 0.7rem;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
     text-transform: capitalize;
-    font-weight   : bold;
+    font-weight: bold;
 
     &.pushed {
       right: 20px;
@@ -86,13 +145,13 @@
   }
 
   .selected-customer-contact-primary-email {
-    position      : absolute;
-    right         : 5px;
-    top           : 50%;
-    transform     : translateY(-50%);
-    font-size     : 0.7rem;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
     text-transform: capitalize;
-    font-weight   : bold;
+    font-weight: bold;
 
     &.pushed {
       right: 20px;
@@ -100,13 +159,13 @@
   }
 
   .selected-carrier-contact-primary-phone {
-    position      : absolute;
-    right         : 5px;
-    top           : 50%;
-    transform     : translateY(-50%);
-    font-size     : 0.7rem;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
     text-transform: capitalize;
-    font-weight   : bold;
+    font-weight: bold;
 
     &.pushed {
       right: 20px;
@@ -114,13 +173,13 @@
   }
 
   .selected-carrier-contact-primary-email {
-    position      : absolute;
-    right         : 5px;
-    top           : 50%;
-    transform     : translateY(-50%);
-    font-size     : 0.7rem;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
     text-transform: capitalize;
-    font-weight   : bold;
+    font-weight: bold;
 
     &.pushed {
       right: 20px;
@@ -128,21 +187,21 @@
   }
 
   .fields-container-col {
-    display       : flex;
+    display: flex;
     flex-direction: column;
   }
 
   .form-portal {
-    flex-grow    : 1;
-    border       : 1px solid rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 5px;
   }
 
-  input.disabled{
-    color: rgba(0,0,0,0.5);
+  input.disabled {
+    color: rgba(0, 0, 0, 0.5);
 
-    &::placeholder{
-      color: rgba(0,0,0,0.3);
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.3);
     }
   }
 
@@ -168,25 +227,25 @@
 
   .form-wrapper {
     position: absolute;
-    width   : 100%;
-    height  : 100%;
-    top     : 0;
-    left    : 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding : 10px;
+    padding: 10px;
 
     .documents-list-item,
     .documents-notes-list-item {
-      display        : flex;
-      flex-direction : row;
+      display: flex;
+      flex-direction: row;
       justify-content: space-between;
-      font-size      : 0.7rem;
+      font-size: 0.7rem;
       // font-weight: bold;
-      border-bottom  : 1px solid rgba(0, 0, 0, 0.1);
-      padding        : 5px 0;
-      cursor         : pointer;
-      transition     : ease 0.3s;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 5px 0;
+      cursor: pointer;
+      transition: ease 0.3s;
 
       span {
         margin-right: 10px;
@@ -197,7 +256,7 @@
       }
 
       .item-btn:hover {
-        color    : rgba(0, 0, 0, 0.8);
+        color: rgba(0, 0, 0, 0.8);
         transform: scale(1.2);
       }
     }
@@ -213,25 +272,25 @@
   }
 
   .internal-notes-container {
-    width   : 100%;
-    height  : 100%;
+    width: 100%;
+    height: 100%;
     position: relative;
 
     .internal-notes-wrapper {
-      position  : absolute;
-      width     : 100%;
-      height    : 100%;
+      position: absolute;
+      width: 100%;
+      height: 100%;
       overflow-y: auto;
 
       .internal-notes-item {
-        font-size    : 0.7rem;
+        font-size: 0.7rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        padding      : 5px 0;
-        cursor       : pointer;
-        transition   : ease 0.3s;
+        padding: 5px 0;
+        cursor: pointer;
+        transition: ease 0.3s;
         text-overflow: ellipsis;
-        white-space  : nowrap;
-        overflow     : hidden;
+        white-space: nowrap;
+        overflow: hidden;
       }
 
       .internal-notes-item:hover {

@@ -285,28 +285,36 @@ const CustomerSearch = (props) => {
                                     return (
                                         <div key={i} className="trow" onDoubleClick={(e) => { rowDoubleClick(e, c) }}>
                                             <div className="tcol code" style={{
-                                                textTransform: 'uppercase'
+                                                textTransform: 'uppercase',
+                                                userSelect: 'none'
                                             }}>{c.code + (c.code_number === 0 ? '' : c.code_number)}</div>
                                             <div className="tcol name" style={{
-                                                textTransform: 'capitalize'
+                                                textTransform: 'capitalize',
+                                                userSelect: 'none'
                                             }}>{c.name}</div>
                                             <div className="tcol address1" style={{
-                                                textTransform: 'capitalize'
+                                                textTransform: 'capitalize',
+                                                userSelect: 'none'
                                             }}>{c.address1}</div>
                                             <div className="tcol address2" style={{
-                                                textTransform: 'capitalize'
+                                                textTransform: 'capitalize',
+                                                userSelect: 'none'
                                             }}>{c.address2}</div>
                                             <div className="tcol city" style={{
-                                                textTransform: 'capitalize'
+                                                textTransform: 'capitalize',
+                                                userSelect: 'none'
                                             }}>{c.city}</div>
                                             <div className="tcol state" style={{
-                                                textTransform: 'uppercase'
+                                                textTransform: 'uppercase',
+                                                userSelect: 'none'
                                             }}>{c.state}</div>
                                             <div className="tcol zip" style={{
-                                                textTransform: 'uppercase'
+                                                textTransform: 'uppercase',
+                                                userSelect: 'none'
                                             }}>{c.zip}</div>
                                             <div className="tcol contact-name" style={{
-                                                textTransform: 'capitalize'
+                                                textTransform: 'capitalize',
+                                                userSelect: 'none'
                                             }}>{
                                                 (c.contacts || []).find(con => con.is_primary === 1) === undefined
                                                     ? c.contact_name

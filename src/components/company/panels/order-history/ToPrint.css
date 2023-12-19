@@ -1,0 +1,39 @@
+.container-sheet .order-history .header-title {
+  display: flex;
+}
+.container-sheet .order-history .header-title > div {
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  padding-bottom: 0.3rem;
+}
+.container-sheet .order-history .footer-title {
+  display: flex;
+  padding: 0.2rem 0rem;
+  border-top: 2px solid rgba(0, 0, 0, 0.7);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.7);
+}
+.container-sheet .order-history .footer-title > div {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.container-sheet .order-history .order-container {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.container-sheet .order-history .order-container .order-info-origin {
+  display: flex;
+  justify-content: center;
+  gap: 10;
+  font-size: 0.7rem;
+}
+.container-sheet .order-history .order-container .order-info-row {
+  display: flex;
+}
+.container-sheet .order-history .order-info {
+  width: calc(100% / 6);
+  text-align: center;
+  padding: 0.2rem 0.7rem;
+}

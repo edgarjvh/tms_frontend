@@ -24,23 +24,67 @@
 .invoice-main-container .mochi-button.active .mochi-button-base {
   color: green;
 }
+.invoice-main-container .swiper-wrapper {
+  align-items: center;
+}
+.invoice-main-container .swiper-invoice-prev-btn {
+  font-size: 1.1rem;
+  color: #4096ee;
+  cursor: pointer;
+  transition: ease 0.3s;
+  margin-right: 7px;
+}
+.invoice-main-container .swiper-invoice-prev-btn.swiper-button-disabled {
+  cursor: no-drop;
+  color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.invoice-main-container .swiper-invoice-prev-btn:hover {
+  color: #095bac;
+}
+.invoice-main-container .swiper-invoice-next-btn {
+  font-size: 1.1rem;
+  color: #4096ee;
+  cursor: pointer;
+  transition: ease 0.3s;
+  margin-left: 7px;
+}
+.invoice-main-container .swiper-invoice-next-btn.swiper-button-disabled {
+  cursor: no-drop;
+  color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.invoice-main-container .swiper-invoice-next-btn:hover {
+  color: #095bac;
+}
+.invoice-main-container .swiper-container {
+  width: 100%;
+  z-index: 0;
+}
 .invoice-main-container .order-pickup {
+  overflow: hidden;
+  padding: 0 2.5px;
+}
+.invoice-main-container .order-pickup .slide-wrapper {
+  overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 1px 15px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: ease 0.3s;
   white-space: nowrap;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
-.invoice-main-container .order-pickup:not(:last-child) {
-  margin-right: 5px;
-}
-.invoice-main-container .order-pickup.selected {
-  background-color: lightgreen;
-}
-.invoice-main-container .order-pickup:hover {
+.invoice-main-container .order-pickup .slide-wrapper:hover {
   box-shadow: inset 0 0 2px green;
+}
+.invoice-main-container .order-pickup.selected .slide-wrapper {
+  background-color: lightgreen;
 }
 .invoice-main-container .selected-pickup-number {
   font-size: 0.7rem;

@@ -61,6 +61,8 @@ const Routing = (props) => {
     const [selectedCarrierInsurance, setSelectedCarrierInsurance] = useState({});
     const [mileageLoaderVisible, setMileageLoaderVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isGettingMiles, setIsGettingMiles] = useState(false);
+    const [isSavingMiles, setIsSavingMiles] = useState(false);
 
     const [driverItems, setDriverItems] = useState([]);
 
@@ -236,8 +238,7 @@ const Routing = (props) => {
 
     useEffect(() => {
         if ((selectedOrder?.is_cancelled || 0) === 0) {
-            if (trigger) {
-                setMileageLoaderVisible(true);
+            if (trigger) {                
                 let routing = list[2].items.map((item, index) => {
                     let route = {
                         id: 0,
@@ -251,217 +252,28 @@ const Routing = (props) => {
                 let selected_order = { ...selectedOrder };
                 selected_order.routing = routing;
 
-                axios.post(props.serverUrl + '/saveOrderRouting', {
+                let url = (props.owner || 'order') === 'template' ? '/saveTemplateRouting' : '/saveOrderRouting';
+
+                axios.post(props.serverUrl + url, {
                     order_id: selectedOrder?.id || 0,
+                    template_id: selectedOrder?.id || 0,
                     routing: routing
                 }).then(res => {
                     if (res.data.result === 'OK') {
                         selected_order = {
                             ...selectedOrder,
-                            routing: res.data.order.routing
+                            routing: (props.owner || 'order') === 'template' ? res.data.routing : res.data.order.routing
                         }
 
                         setSelectedOrder(selected_order);
 
                         props.setSelectedOrder({
                             id: selectedOrder.id,
-                            routing: res.data.order.routing,
+                            routing: (props.owner || 'order') === 'template' ? res.data.routing : res.data.order.routing,
                             component_id: props.componentId
                         })
-
-                        if (res.data.order.routing.length >= 2) {
-                            let origin = null;
-                            let destination = null;
-
-                            let start = res.data.order.routing[0];
-                            let waypoints = [];
-                            let end = res.data.order.routing[res.data.order.routing.length - 1];
-
-                            if (start.type === 'pickup') {
-                                selected_order.pickups.map((p, i) => {
-                                    if (p.id === start.pickup_id) {
-                                        if ((p.customer?.zip_data || '') !== '') {
-                                            origin = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                        }
-                                    }
-                                    return false;
-                                })
-                            } else {
-                                selected_order.deliveries.map((d, i) => {
-                                    if (d.id === start.delivery_id) {
-                                        if ((d.customer?.zip_data || '') !== '') {
-                                            origin = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                        }
-                                    }
-                                    return false;
-                                })
-                            }
-
-                            res.data.order.routing.map((item, i) => {
-                                if (i > 0 && i < (res.data.order.routing.length - 1)) {
-                                    if (item.type === 'pickup') {
-                                        selected_order.pickups.map((p, i) => {
-                                            if (p.id === item.pickup_id) {
-                                                if ((p.customer?.zip_data || '') !== '') {
-                                                    waypoints.push(`${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`);
-                                                }
-                                            }
-                                            return false;
-                                        })
-                                    } else {
-                                        selected_order.deliveries.map((d, i) => {
-                                            if (d.id === item.delivery_id) {
-                                                if ((d.customer?.zip_data || '') !== '') {
-                                                    waypoints.push(`${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`);
-                                                }
-                                            }
-                                            return false;
-                                        })
-                                    }
-                                }
-
-                                return true;
-                            });
-
-                            if (end.type === 'pickup') {
-                                selected_order.pickups.map((p, i) => {
-                                    if (p.id === end.pickup_id) {
-                                        if ((p.customer?.zip_data || '') !== '') {
-                                            destination = `${p.customer.zip_data.latitude.toString()},${p.customer.zip_data.longitude.toString()}`;
-                                        }
-                                    }
-                                    return false;
-                                })
-                            } else {
-                                selected_order.deliveries.map((d, i) => {
-                                    if (d.id === end.delivery_id) {
-                                        if ((d.customer?.zip_data || '') !== '') {
-                                            destination = `${d.customer.zip_data.latitude.toString()},${d.customer.zip_data.longitude.toString()}`;
-                                        }
-                                    }
-                                    return false;
-                                })
-                            }
-
-                            let params = {
-                                'routingMode': 'fast',
-                                'transportMode': 'car',
-                                'origin': origin,
-                                'via': new H.service.Url.MultiValueQueryParameter(waypoints),
-                                'destination': destination,
-                                'return': 'summary'
-                            }
-
-                            routingService.calculateRoute(params,
-                                (result) => {
-                                    let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
-                                        return a + b.summary.length;
-                                    }, 0) || 0;
-
-                                    selected_order.miles = miles;
-
-                                    setSelectedOrder(selected_order);
-
-                                    props.setSelectedOrder({
-                                        id: selectedOrder.id,
-                                        miles: miles,
-                                        component_id: props.componentId
-                                    })
-
-                                    setMileageLoaderVisible(false);
-                                    setTrigger(false);
-
-                                    axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
-                                        if (res.data.result === 'OK') {
-                                            setSelectedOrder({
-                                                ...selected_order,
-                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                order_carrier_ratings: res.data.order.order_carrier_ratings
-                                            })
-
-                                            props.setSelectedOrder({
-                                                id: selectedOrder.id,
-                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                component_id: props.componentId
-                                            })
-                                        }
-                                    }).catch(e => {
-                                        console.log('error on saving order miles', e);
-                                        setMileageLoaderVisible(false);
-                                        setTrigger(false);
-                                    });
-                                },
-                                (error) => {
-                                    console.log('error getting mileage', error.message);
-                                    selected_order.miles = 0;
-
-                                    setSelectedOrder(selected_order)
-
-                                    props.setSelectedOrder({
-                                        id: selectedOrder.id,
-                                        miles: 0,
-                                        component_id: props.componentId
-                                    })
-
-                                    setMileageLoaderVisible(false);
-                                    setTrigger(false);
-
-                                    axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
-                                        if (res.data.result === 'OK') {
-                                            setSelectedOrder({
-                                                ...selected_order,
-                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                order_carrier_ratings: res.data.order.order_carrier_ratings
-                                            })
-
-                                            props.setSelectedOrder({
-                                                id: selectedOrder.id,
-                                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                                order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                                component_id: props.componentId
-                                            })
-                                        }
-                                    }).catch(e => {
-                                        console.log('error on saving order miles', e);
-                                        setMileageLoaderVisible(false);
-                                        setTrigger(false);
-                                    });
-                                });
-                        } else {
-                            selected_order.miles = 0;
-                            setSelectedOrder(selected_order)
-
-                            props.setSelectedOrder({
-                                id: selectedOrder.id,
-                                miles: 0,
-                                component_id: props.componentId
-                            })
-
-                            setMileageLoaderVisible(false);
-                            setTrigger(false);
-
-                            axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
-                                if (res.data.result === 'OK') {
-                                    setSelectedOrder({
-                                        ...selected_order,
-                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                        order_carrier_ratings: res.data.order.order_carrier_ratings
-                                    })
-
-                                    props.setSelectedOrder({
-                                        id: selectedOrder.id,
-                                        order_customer_ratings: res.data.order.order_customer_ratings,
-                                        order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                        component_id: props.componentId
-                                    })
-                                }
-                            }).catch(e => {
-                                console.log('error on saving order miles', e);
-                                setMileageLoaderVisible(false);
-                                setTrigger(false);
-                            });
-                        }
+                        setTrigger(false);
+                        setTimeout(() => { setIsGettingMiles(true) }, 100);                        
                     }
                 }).catch(e => {
                     console.log('error on saving order routing', e);
@@ -478,30 +290,217 @@ const Routing = (props) => {
                     setMileageLoaderVisible(false);
                     setTrigger(false);
 
-                    axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
-                        if (res.data.result === 'OK') {
-                            setSelectedOrder({
-                                ...selected_order,
-                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                order_carrier_ratings: res.data.order.order_carrier_ratings
-                            })
+                    // axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
+                    //     if (res.data.result === 'OK') {
+                    //         setSelectedOrder({
+                    //             ...selected_order,
+                    //             order_customer_ratings: res.data.order.order_customer_ratings,
+                    //             order_carrier_ratings: res.data.order.order_carrier_ratings
+                    //         })
 
-                            props.setSelectedOrder({
-                                id: selectedOrder.id,
-                                order_customer_ratings: res.data.order.order_customer_ratings,
-                                order_carrier_ratings: res.data.order.order_carrier_ratings,
-                                component_id: props.componentId
-                            })
-                        }
-                    }).catch(e => {
-                        console.log('error on saving order miles', e);
-                        setMileageLoaderVisible(false);
-                        setTrigger(false);
-                    });
+                    //         props.setSelectedOrder({
+                    //             id: selectedOrder.id,
+                    //             order_customer_ratings: res.data.order.order_customer_ratings,
+                    //             order_carrier_ratings: res.data.order.order_carrier_ratings,
+                    //             component_id: props.componentId
+                    //         })
+                    //     }
+                    // }).catch(e => {
+                    //     console.log('error on saving order miles', e);
+                    //     setMileageLoaderVisible(false);
+                    //     setTrigger(false);
+                    // });
                 });
             }
         }
     }, [trigger])
+
+    useEffect(() => {
+        if (isGettingMiles) {
+            let pickups = selectedOrder?.pickups || [];
+            let deliveries = selectedOrder?.deliveries || [];
+            let routing = selectedOrder?.routing || [];
+            let currentWaypoints = selectedOrder?.waypoints || '';
+            let origin = null;
+            let destination = null;
+            let waypoints = [];
+
+            if (routing.length >= 2) {
+                routing.map((route, index) => {
+                    let zip_data = '';
+
+                    if (route.type === 'pickup') {
+                        zip_data = pickups.find(x => x.id === route.pickup_id)?.customer?.zip_data;
+                    } else if (route.type === 'delivery') {
+                        zip_data = deliveries.find(x => x.id === route.delivery_id)?.customer?.zip_data;
+                    }
+
+                    if (index === 0) {
+                        origin = `${(zip_data?.latitude || '').toString()},${(zip_data?.longitude || '').toString()}`;
+                    } else if (index === (routing.length - 1)) {
+                        destination = `${(zip_data?.latitude || '').toString()},${(zip_data?.longitude || '').toString()}`;
+                    } else {
+                        waypoints.push(`${(zip_data?.latitude || '').toString()},${(zip_data?.longitude || '').toString()}`);
+                    }
+                })
+
+                let strWaypoints = JSON.stringify(origin) + JSON.stringify(waypoints) + JSON.stringify(destination);
+
+                console.log(routing);
+                console.log(currentWaypoints);
+                console.log(strWaypoints);
+                
+                if (currentWaypoints !== strWaypoints) {
+                    let routingParams = {
+                        'routingMode': 'fast',
+                        'transportMode': 'car',
+                        'origin': origin,
+                        'via': new H.service.Url.MultiValueQueryParameter(waypoints),
+                        'destination': destination,
+                        'return': 'summary'
+                    }
+
+                    console.log(routingParams);
+                    
+                    if (routingService) {
+                        routingService.calculateRoute(routingParams, (result) => {
+                            let miles = (result?.routes[0]?.sections || []).reduce((a, b) => {
+                                return a + b.summary.length;
+                            }, 0) || 0;
+
+                            setSelectedOrder(prev => {
+                                return {
+                                    ...prev,
+                                    miles: miles,
+                                    waypoints: strWaypoints
+                                }
+                            })
+
+                            props.setSelectedOrder({
+                                id: selectedOrder.id,
+                                miles: miles,
+                                waypoints: strWaypoints,
+                                component_id: props.componentId
+                            })
+
+                            if ((props.owner || 'order') === 'template'){
+                                props.callback({
+                                    routing: routing,
+                                    miles: miles,
+                                    waypoints: strWaypoints
+                                })
+                            }
+
+                            setIsGettingMiles(false);
+                            setTimeout(() => { setIsSavingMiles(true); }, 100);
+                        }, (error) => {
+                            console.log("error getting mileage", error);
+                            setSelectedOrder(prev => {
+                                return {
+                                    ...prev,
+                                    miles: 0,
+                                    waypoints: currentWaypoints
+                                }
+                            })
+
+                            props.setSelectedOrder({
+                                id: selectedOrder.id,
+                                miles: 0,
+                                waypoints: currentWaypoints,
+                                component_id: props.componentId
+                            })
+
+                            if ((props.owner || 'order') === 'template'){
+                                props.callback({
+                                    routing: routing,
+                                    miles: 0,
+                                    waypoints: currentWaypoints
+                                })
+                            }
+
+                            setIsGettingMiles(false);
+                            setTimeout(() => { setIsSavingMiles(true); }, 100);
+                        })
+                    } else {
+                        setSelectedOrder(prev => {
+                            return {
+                                ...prev,
+                                miles: 0,
+                                waypoints: currentWaypoints
+                            }
+                        })
+
+                        props.setSelectedOrder({
+                            id: selectedOrder.id,
+                            miles: 0,
+                            waypoints: currentWaypoints,
+                            component_id: props.componentId
+                        })
+
+                        if ((props.owner || 'order') === 'template'){
+                            props.callback({
+                                routing: routing,
+                                miles: 0,
+                                waypoints: currentWaypoints
+                            })
+                        }
+
+                        setIsGettingMiles(false);
+                        setTimeout(() => { setIsSavingMiles(true); }, 100);
+                    }
+                } else {
+                    setIsGettingMiles(false);
+                }
+            } else {
+                setSelectedOrder(prev => {
+                    return {
+                        ...prev,
+                        miles: 0,
+                        waypoints: currentWaypoints
+                    }
+                })
+
+                props.setSelectedOrder({
+                    id: selectedOrder.id,
+                    miles: 0,
+                    waypoints: currentWaypoints,
+                    component_id: props.componentId
+                })
+
+                if ((props.owner || 'order') === 'template'){
+                    props.callback({
+                        routing: routing,
+                        miles: 0,
+                        waypoints: currentWaypoints
+                    })
+                }
+
+                setIsGettingMiles(false);
+                setTimeout(() => { setIsSavingMiles(true); }, 100);
+            }
+
+        }
+    }, [isGettingMiles]);
+
+    useEffect(() => {
+        if (isSavingMiles) {
+            if ((selectedOrder?.id || 0) > 0) {
+                let url = (props.owner || 'order') === 'template' ? '/saveTemplateMilesWaypoints' : '/saveOrderMilesWaypoints';
+
+                axios.post(props.serverUrl + url, {
+                    id: selectedOrder.id,
+                    miles: selectedOrder?.miles,
+                    waypoints: selectedOrder?.waypoints
+                }).catch(e => {
+                    console.log('error saving miles waypoints', e);
+                }).finally(() => {
+                    setIsSavingMiles(false);
+                })
+            } else {
+                setIsSavingMiles(false);
+            }
+        }
+    }, [isSavingMiles]);
 
     const handleDragEnd = (e) => {
         dragNode.current.removeEventListener('dragend', handleDragEnd);
@@ -518,398 +517,30 @@ const Routing = (props) => {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    const getCarrierInfoByCode = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            if (e.target.value.trim() !== '') {
-
-                if ((selectedOrder?.id || 0) === 0) {
-                    e.preventDefault();
-                    window.alert('You must create or load an order first!');
-                    setSelectedCarrier({});
-                    setSelectedCarrierContact({});
-                    setSelectedCarrierDriver({});
-                    return;
-                }
-
-                axios.post(props.serverUrl + '/carriers', {
-                    code: e.target.value.toLowerCase()
-                }).then(res => {
-                    if (res.data.result === 'OK') {
-                        if (res.carriers.length > 0) {
-
-                            setSelectedCarrier(res.data.carriers[0]);
-
-                            res.data.carriers[0].contacts.map(c => {
-                                if (c.is_primary === 1) {
-                                    setSelectedCarrierContact(c);
-                                }
-                                return true;
-                            });
-
-                            setSelectedCarrierInsurance({});
-
-                            let selected_order = { ...selectedOrder } || { order_number: 0 };
-
-                            selected_order.bill_to_customer_id = (selectedBillToCustomer?.id || 0);
-                            selected_order.shipper_customer_id = (selectedShipperCustomer?.id || 0);
-                            selected_order.consignee_customer_id = (selectedConsigneeCustomer?.id || 0);
-                            selected_order.carrier_id = res.data.carriers[0].id;
-
-                            if (res.data.carriers[0].drivers.length > 0) {
-                                setSelectedCarrierDriver(res.data.carriers[0].drivers[0]);
-                                selected_order.carrier_driver_id = res.data.carriers[0].drivers[0].id;
-                            }
-
-                            if ((selected_order.ae_number || '') === '') {
-                                selected_order.ae_number = getRandomInt(1, 100);
-                            }
-
-                            if (!isSavingOrder) {
-                                setIsSavingOrder(true);
-                                axios.post(props.serverUrl + '/saveOrder', selected_order).then(async res => {
-                                    if (res.data.result === 'OK') {
-                                        await setSelectedOrder(res.data.order);
-                                    }
-
-                                    setIsSavingOrder(false);
-                                }).catch(e => {
-                                    console.log('error saving order', e);
-                                });
-                            }
-
-                        } else {
-                            setSelectedCarrier({});
-                            setSelectedCarrierDriver({});
-                            setSelectedCarrierInsurance({});
-                            setSelectedCarrierContact({});
-                        }
-                    } else {
-                        setSelectedCarrier({});
-                        setSelectedCarrierDriver({});
-                        setSelectedCarrierInsurance({});
-                        setSelectedCarrierContact({});
-                    }
-                }).catch(e => {
-                    console.log('error getting carriers', e);
-                });
-            } else {
-                setSelectedCarrier({});
-                setSelectedCarrierDriver({});
-                setSelectedCarrierInsurance({});
-                setSelectedCarrierContact({});
-            }
-        }
-    }
-
-    const validateCarrierInfoForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            window.clearTimeout(delayTimer);
-
-            if ((selectedCarrier.id || 0) === 0) {
-                return;
-            }
-
-            window.setTimeout(() => {
-                let newSelectedCarrierInfoCarrier = { ...selectedCarrier };
-
-                if (newSelectedCarrierInfoCarrier.id === undefined || newSelectedCarrierInfoCarrier.id === -1) {
-                    newSelectedCarrierInfoCarrier.id = 0;
-                }
-
-                if (
-                    (newSelectedCarrierInfoCarrier.name || '').trim().replace(/\s/g, "").replace("&", "A") !== "" &&
-                    (newSelectedCarrierInfoCarrier.city || '').trim().replace(/\s/g, "") !== "" &&
-                    (newSelectedCarrierInfoCarrier.state || '').trim().replace(/\s/g, "") !== "" &&
-                    (newSelectedCarrierInfoCarrier.address1 || '').trim() !== "" &&
-                    (newSelectedCarrierInfoCarrier.zip || '').trim() !== ""
-                ) {
-                    let parseCity = newSelectedCarrierInfoCarrier.city.trim().replace(/\s/g, "").substring(0, 3);
-
-                    if (parseCity.toLowerCase() === "ft.") {
-                        parseCity = "FO";
-                    }
-                    if (parseCity.toLowerCase() === "mt.") {
-                        parseCity = "MO";
-                    }
-                    if (parseCity.toLowerCase() === "st.") {
-                        parseCity = "SA";
-                    }
-
-                    let newCode = (newSelectedCarrierInfoCarrier.name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (newSelectedCarrierInfoCarrier.state || '').trim().replace(/\s/g, "").substring(0, 2);
-
-                    newSelectedCarrierInfoCarrier.code = newCode.toUpperCase();
-
-                    if (!isSavingCarrierInfo) {
-                        setIsSavingCarrierInfo(true);
-
-                        axios.post(props.serverUrl + '/saveCarrier', newSelectedCarrierInfoCarrier).then(async res => {
-                            if (res.data.result === 'OK') {
-                                if (selectedCarrier.id === undefined && (selectedCarrier.id || 0) === 0) {
-                                    await setSelectedCarrier({ ...selectedCarrier, id: res.data.carrier.id });
-                                }
-
-                                (res.data.carrier.contacts || []).map(async (contact, index) => {
-
-                                    if (contact.is_primary === 1) {
-                                        await setSelectedCarrierContact(contact);
-                                    }
-
-                                    return true;
-                                });
-                            }
-
-                            await setIsSavingCarrierInfo(false);
-                        }).catch(e => {
-                            console.log('error saving carrier', e);
-                        });
-                    }
-                }
-            }, 300);
-        }
-    }
-
     const insuranceStatusClasses = () => {
-        let classes = 'input-box-container insurance-status';
-        let curDate = moment().startOf('day');
+        let classes = "input-box-container insurance-status";
+        let curDate = moment().startOf("day");
         let curDate2 = moment();
-        let futureMonth = curDate2.add(1, 'M');
-        let statusClass = '';
+        let futureMonth = curDate2.add(1, "M");
+        let statusClass = "";
 
         (selectedCarrier.insurances || []).map((insurance, index) => {
-            let expDate = moment(insurance.expiration_date, 'MM/DD/YYYY');
+            let expDate = moment(insurance.expiration_date, "MM/DD/YYYY");
 
             if (expDate < curDate) {
-                statusClass = 'expired';
+                statusClass = "expired";
             } else if (expDate >= curDate && expDate <= futureMonth) {
-                if (statusClass !== 'expired') {
-                    statusClass = 'warning';
+                if (statusClass !== "expired") {
+                    statusClass = "warning";
                 }
             } else {
-                if (statusClass !== 'expired' && statusClass !== 'warning') {
-                    statusClass = 'active';
+                if (statusClass !== "expired" && statusClass !== "warning") {
+                    statusClass = "active";
                 }
             }
-        })
-
-        return classes + ' ' + statusClass;
-    }
-
-    const validateCarrierContactForSaving = (e) => {
-        let keyCode = e.keyCode || e.which;
-
-        if (keyCode === 9) {
-            if ((selectedCarrier.id || 0) === 0) {
-                return;
-            }
-
-            if ((selectedCarrierContact.id || 0) === 0) {
-                return;
-            }
-
-            let contact = selectedCarrierContact;
-
-            if (contact.carrier_id === undefined || contact.carrier_id === 0) {
-                contact.carrier_id = selectedCarrier.id;
-            }
-
-            if ((contact.first_name || '').trim() === '' || (contact.last_name || '').trim() === '' || (contact.phone_work || '').trim() === '') {
-                return;
-            }
-
-            if ((contact.address1 || '').trim() === '' && (contact.address2 || '').trim() === '') {
-                contact.address1 = selectedCarrier.address1;
-                contact.address2 = selectedCarrier.address2;
-                contact.city = selectedCarrier.city;
-                contact.state = selectedCarrier.state;
-                contact.zip_code = selectedCarrier.zip;
-            }
-
-            if (!isSavingCarrierContact) {
-                setIsSavingCarrierContact(true);
-
-                axios.post(props.serverUrl + '/saveCarrierContact', contact).then(async res => {
-                    if (res.data.result === 'OK') {
-                        await setSelectedCarrier({ ...selectedCarrier, contacts: res.data.contacts });
-                        await setSelectedCarrierContact(res.data.contact);
-                    }
-
-                    setIsSavingCarrierContact(false);
-                }).catch(e => {
-                    console.log('error saving carrier contact', e);
-                });
-            }
-        }
-    }
-
-    const validateCarrierDriverForSaving = async (e) => {
-        let key = e.keyCode || e.which;
-        let selectedIndex = -1;
-        let items = popupItems.map((a, b) => {
-            if (a.selected) selectedIndex = b;
-            return a;
         });
 
-        if (key === 37 || key === 38) {
-            e.preventDefault();
-            if (selectedIndex === -1) {
-                // items[0].selected = true;
-            } else {
-                items = items.map((a, b) => {
-                    if (selectedIndex === 0) {
-                        if (b === items.length - 1) {
-                            a.selected = true;
-                        } else {
-                            a.selected = false;
-                        }
-                    } else {
-                        if (b === selectedIndex - 1) {
-                            a.selected = true;
-                        } else {
-                            a.selected = false;
-                        }
-                    }
-                    return a;
-                });
-
-                await setPopupItems(items);
-
-                popupItemsRef.current.map((r, i) => {
-                    if (r && r.classList.contains('selected')) {
-                        r.scrollIntoView()
-                    }
-                    return true;
-                });
-            }
-        }
-
-        if (key === 39 || key === 40) {
-            e.preventDefault();
-            if (selectedIndex === -1) {
-                // items[0].selected = true;
-            } else {
-                items = items.map((a, b) => {
-                    if (selectedIndex === items.length - 1) {
-                        if (b === 0) {
-                            a.selected = true;
-                        } else {
-                            a.selected = false;
-                        }
-                    } else {
-                        if (b === selectedIndex + 1) {
-                            a.selected = true;
-                        } else {
-                            a.selected = false;
-                        }
-                    }
-                    return a;
-                });
-
-                await setPopupItems(items);
-
-                popupItemsRef.current.map((r, i) => {
-                    if (r && r.classList.contains('selected')) {
-                        r.scrollIntoView()
-                    }
-                    return true;
-                });
-            }
-        }
-
-        if (key === 13) {
-            await popupItems.map(async (item, index) => {
-                if (item.selected) {
-                    await setSelectedCarrierDriver(item);
-                }
-
-                return true;
-            });
-
-            setPopupItems([]);
-        }
-
-        if (key === 9) {
-            if (popupItems.length === 0) {
-                if ((selectedCarrierDriver.id || 0) === 0) {
-                    await setSelectedCarrierDriver({});
-                } else {
-                    // validateDriverForSaving(e);
-                }
-            } else {
-                popupItems.map(async (item, index) => {
-                    if (item.selected) {
-                        await setSelectedCarrierDriver(item);
-                    }
-
-                    return true;
-                });
-
-                // validateDriverForSaving(e);
-                await setPopupItems([]);
-            }
-        }
-
-        if (key === 9) {
-            let driver = { ...selectedCarrierDriver, id: (selectedCarrierDriver?.id || 0), carrier_id: selectedCarrier?.id };
-
-            if (popupItems.length === 0) {
-                if ((selectedCarrierDriver.id || 0) === 0) {
-                    await setSelectedCarrierDriver({});
-                } else {
-                    if ((selectedCarrier?.id || 0) > 0) {
-                        if ((driver.first_name || '').trim() !== '') {
-                            if (!isSavingCarrierDriver) {
-                                setIsSavingCarrierDriver(true);
-
-                                axios.post(props.serverUrl + '/saveCarrierDriver', driver).then(async res => {
-                                    if (res.data.result === 'OK') {
-                                        await setSelectedCarrier({ ...selectedCarrier, drivers: res.data.drivers });
-                                        await setSelectedCarrierDriver({ ...selectedCarrierDriver, id: res.data.driver.id });
-                                    }
-
-                                    await setIsSavingCarrierDriver(false);
-                                    await setPopupItems([]);
-                                }).catch(e => {
-                                    console.log('error saving carrier driver', e);
-                                });
-                            }
-                        }
-                    }
-                }
-            } else {
-                popupItems.map(async (item, index) => {
-                    if (item.selected) {
-                        driver = item;
-                        await setSelectedCarrierDriver(item);
-                    }
-
-                    return true;
-                });
-
-                if ((selectedCarrier?.id || 0) > 0) {
-                    if ((driver.first_name || '').trim() !== '') {
-                        if (!isSavingCarrierDriver) {
-                            setIsSavingCarrierDriver(true);
-
-                            axios.post(props.serverUrl + '/saveCarrierDriver', driver).then(async res => {
-                                if (res.data.result === 'OK') {
-                                    await setSelectedCarrier({ ...selectedCarrier, drivers: res.data.drivers });
-                                    await setSelectedCarrierDriver({ ...selectedCarrierDriver, id: res.data.driver.id });
-                                }
-
-                                await setIsSavingCarrierDriver(false);
-                            }).catch(e => {
-                                console.log('error saving carrier driver', e);
-                            });
-                        }
-                    }
-                }
-                await setPopupItems([]);
-            }
-        }
+        return (classes + " " + statusClass).trim();
     }
 
     const reorder = (list, startIndex, endIndex) => {
@@ -942,6 +573,7 @@ const Routing = (props) => {
     };
 
     const onDragEnd = (result) => {
+        console.log(result)
         if ((selectedOrder?.is_cancelled || 0) === 0) {
             const { source, destination } = result;
 
@@ -1012,8 +644,6 @@ const Routing = (props) => {
             setTrigger(true);
         }
     }
-
-    const grid = 8;
 
     const getItemStyle = (isDragging, draggableStyle) => ({
         userSelect: "none",
@@ -1169,6 +799,145 @@ const Routing = (props) => {
         }
     }
 
+    const addPickupsToRoute = (type = 'all') => {
+        if ((selectedOrder?.is_cancelled || 0) === 0) {
+            let curList = JSON.parse(JSON.stringify(list));
+            let pickups = curList.find(x => x.title === 'pickup')?.items || [];
+            let route = curList.find(x => x.title === 'route')?.items || [];
+
+            if (type === 'all') {
+                pickups.map(item => {
+                    route.push({ ...item, checked: false });
+                    return true;
+                })
+
+                pickups = [];
+            } else {
+                pickups.map(item => {
+                    if (item.checked) {
+                        route.push({ ...item, checked: false });
+                    }
+                    return true;
+                })
+
+                pickups = pickups.filter(x => !x.checked);
+            }
+
+            curList[0].items = pickups;
+            curList[2].items = route;
+
+            setList(curList);
+            setTrigger(true);
+        }
+    }
+
+    const addDeliveriesToRoute = (type = 'all') => {
+        if ((selectedOrder?.is_cancelled || 0) === 0) {
+            let curList = JSON.parse(JSON.stringify(list));
+            let deliveries = curList.find(x => x.title === 'delivery')?.items || [];
+            let route = curList.find(x => x.title === 'route')?.items || [];
+
+            if (type === 'all') {
+                deliveries.map(item => {
+                    route.push({ ...item, checked: false });
+                    return true;
+                })
+
+                deliveries = [];
+            } else {
+                deliveries.map(item => {
+                    if (item.checked) {
+                        route.push({ ...item, checked: false });
+                    }
+                    return true;
+                })
+
+                deliveries = deliveries.filter(x => !x.checked);
+            }
+
+            curList[1].items = deliveries;
+            curList[2].items = route;
+
+            setList(curList);
+            setTrigger(true);
+        }
+    }
+
+    const removeFromRoute = (type = 'all') => {
+        if ((selectedOrder?.is_cancelled || 0) === 0) {
+            let curList = JSON.parse(JSON.stringify(list));
+            let pickups = curList.find(x => x.title === 'pickup')?.items || [];
+            let deliveries = curList.find(x => x.title === 'delivery')?.items || [];
+            let route = curList.find(x => x.title === 'route')?.items || [];
+
+            switch (type) {
+                case 'all':
+                    route.map(item => {
+                        if (item.type === 'pickup') {
+                            pickups.push({ ...item, checked: false });
+                        }
+
+                        if (item.type === 'delivery') {
+                            deliveries.push({ ...item, checked: false });
+                        }
+
+                        return true;
+                    })
+
+                    route = [];
+                    break;
+                case 'selected':
+                    route.map(item => {
+                        if (item.checked) {
+                            if (item.type === 'pickup') {
+                                pickups.push({ ...item, checked: false });
+                            }
+
+                            if (item.type === 'delivery') {
+                                deliveries.push({ ...item, checked: false });
+                            }
+                        }
+
+                        return true;
+                    })
+
+                    route = route.filter(x => !x.checked);
+                    break;
+                case 'pickups':
+                    route.map(item => {
+                        if (item.type === 'pickup') {
+                            pickups.push({ ...item, checked: false });
+                        }
+
+                        return true;
+                    })
+
+                    route = route.filter(x => x.type !== 'pickup');
+                    break;
+                case 'deliveries':
+                    route.map(item => {
+                        if (item.type === 'delivery') {
+                            deliveries.push({ ...item, checked: false });
+                        }
+
+                        return true;
+                    })
+
+                    route = route.filter(x => x.type !== 'delivery');
+                    break;
+                default:
+                    break;
+            }
+
+            curList[0].items = pickups;
+            curList[1].items = deliveries;
+            curList[2].items = route;
+
+            setList(curList);
+            setTrigger(true);
+        }
+    }
+
     return (
         <div className="panel-content routing">
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
@@ -1205,7 +974,7 @@ const Routing = (props) => {
 
                 <div className="input-box-container" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Miles</div>
-                    <input style={{ textAlign: 'right', fontWeight: 'bold' }} type="text" readOnly={true} onChange={() => { }} value={mileageLoaderVisible ? '' : ((selectedOrder?.miles || 0) / 1609.34).toFixed(0)} />
+                    <input style={{ textAlign: 'right', fontWeight: 'bold' }} type="text" readOnly={true} onChange={() => { }} value={isGettingMiles ? '' : ((selectedOrder?.miles || 0) / 1609.34).toFixed(0)} />
                     <div className="loading-container" style={{
                         width: '100%',
                         height: '100%',
@@ -1214,7 +983,7 @@ const Routing = (props) => {
                         justifyContent: 'flex-end',
                         backgroundColor: 'transparent'
                     }}>
-                        <Loader type="ThreeDots" color="#333738" height={20} width={20} visible={mileageLoaderVisible} />
+                        <Loader type="ThreeDots" color="#333738" height={20} width={20} visible={isGettingMiles} />
                     </div>
                 </div>
 
@@ -1259,6 +1028,41 @@ const Routing = (props) => {
                                         <div className='top-border top-border-left'></div>
                                         <div className='form-title'>Pick Ups</div>
                                         <div className='top-border top-border-middle'></div>
+                                        <div className='form-buttons'>
+                                            <div className={`mochi-button ${(list.find(grp => grp.title === 'pickup')?.items || []).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                                addPickupsToRoute('all');
+                                            }}>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-base'>Add All</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                            </div>
+
+                                            <div className={`mochi-button ${(list.find(grp => grp.title === 'pickup')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                                addPickupsToRoute('selected');
+                                            }}>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-base'>Add Selected</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                            </div>
+
+                                            <div className={`mochi-button ${(list.find(grp => grp.title === 'pickup')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                                let curList = list.map(x => {
+                                                    if (x.title === 'pickup') {
+                                                        x.items.map(i => {
+                                                            i.checked = false;
+                                                            return i;
+                                                        })
+                                                    }
+                                                    return x;
+                                                });
+
+                                                setList(curList);
+                                            }}>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-base'>Clear Selection</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                            </div>
+                                        </div>
                                         <div className='top-border top-border-right'></div>
                                     </div>
 
@@ -1314,9 +1118,22 @@ const Routing = (props) => {
 
                                                                     openPanel(panel, props.origin);
                                                                 }}>
-                                                                    <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
-                                                                    <span>{item.customer?.name || ''}</span>
-                                                                    <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                    <input type="checkbox" onDoubleClick={(e) => e.stopPropagation()}
+                                                                        checked={item.checked}
+                                                                        onChange={(e) => {
+                                                                            let newList = [...list];
+                                                                            let pickupIndex = newList.findIndex(x => x.title === 'pickup');
+                                                                            newList[pickupIndex].items[index].checked = e.target.checked;
+
+                                                                            setList(newList);
+                                                                        }}
+                                                                        id={`routing-route-item-${index}`}
+                                                                    />
+                                                                    <label htmlFor={`routing-route-item-${index}`}>
+                                                                        <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
+                                                                        <span>{item.customer?.name || ''}</span>
+                                                                        <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                    </label>
                                                                 </div>
 
                                                                 {
@@ -2115,6 +1932,41 @@ const Routing = (props) => {
                                     <div className='top-border top-border-left'></div>
                                     <div className='form-title'>Deliveries</div>
                                     <div className='top-border top-border-middle'></div>
+                                    <div className='form-buttons'>
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'delivery')?.items || []).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            addDeliveriesToRoute('all');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Add All</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'delivery')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            addDeliveriesToRoute('selected');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Add Selected</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'delivery')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            let curList = list.map(x => {
+                                                if (x.title === 'delivery') {
+                                                    x.items.map(i => {
+                                                        i.checked = false;
+                                                        return i;
+                                                    })
+                                                }
+                                                return x;
+                                            });
+
+                                            setList(curList);
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Clear Selection</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+                                    </div>
                                     <div className='top-border top-border-right'></div>
                                 </div>
 
@@ -2170,9 +2022,23 @@ const Routing = (props) => {
 
                                                                 openPanel(panel, props.origin);
                                                             }}>
-                                                                <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
-                                                                <span>{item.customer?.name || ''}</span>
-                                                                <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                <input type="checkbox" onDoubleClick={(e) => e.stopPropagation()}
+                                                                    checked={item.checked}
+                                                                    onChange={(e) => {
+                                                                        let newList = [...list];
+                                                                        let deliveryIndex = newList.findIndex(x => x.title === 'delivery');
+                                                                        newList[deliveryIndex].items[index].checked = e.target.checked;
+
+                                                                        setList(newList);
+                                                                    }}
+                                                                    id={`routing-delivery-item-${index}`}
+                                                                />
+                                                                <label htmlFor={`routing-delivery-item-${index}`}>
+                                                                    <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
+                                                                    <span>{item.customer?.name || ''}</span>
+                                                                    <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                </label>
+
                                                             </div>
 
                                                             {
@@ -2202,6 +2068,57 @@ const Routing = (props) => {
                                     <div className='top-border top-border-left'></div>
                                     <div className='form-title'>Route</div>
                                     <div className='top-border top-border-middle'></div>
+                                    <div className='form-buttons'>
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'route')?.items || []).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            removeFromRoute('all');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Remove All</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'route')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            removeFromRoute('selected');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Remove Selected</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'route')?.items || []).filter(x => x.type === 'pickup').length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            removeFromRoute('pickups');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Remove Pick Ups</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'route')?.items || []).filter(x => x.type === 'delivery').length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            removeFromRoute('deliveries');
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Remove Deliveries</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+
+                                        <div className={`mochi-button ${(list.find(grp => grp.title === 'route')?.items || []).filter(x => x.checked).length > 0 ? '' : 'disabled'}`} onClick={() => {
+                                            let curList = list.map(x => {
+                                                if (x.title === 'route') {
+                                                    x.items.map(i => {
+                                                        i.checked = false;
+                                                        return i;
+                                                    })
+                                                }
+                                                return x;
+                                            });
+
+                                            setList(curList);
+                                        }}>
+                                            <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                            <div className='mochi-button-base'>Clear Selection</div>
+                                            <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                        </div>
+                                    </div>
                                     <div className='top-border top-border-right'></div>
                                 </div>
 
@@ -2252,9 +2169,22 @@ const Routing = (props) => {
 
                                                                 openPanel(panel, props.origin);
                                                             }}>
-                                                                <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
-                                                                <span>{item.customer?.name || ''}</span>
-                                                                <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                <input type="checkbox" onDoubleClick={(e) => e.stopPropagation()}
+                                                                    checked={item.checked}
+                                                                    onChange={(e) => {
+                                                                        let newList = [...list];
+                                                                        let routeIndex = newList.findIndex(x => x.title === 'route');
+                                                                        newList[routeIndex].items[index].checked = e.target.checked;
+
+                                                                        setList(newList);
+                                                                    }}
+                                                                    id={`routing-route-item-${index}`}
+                                                                />
+                                                                <label htmlFor={`routing-route-item-${index}`}>
+                                                                    <span>{(item.customer?.code || '') + ((item.customer?.code_number || 0) === 0 ? '' : item.customer.code_number)}</span>
+                                                                    <span>{item.customer?.name || ''}</span>
+                                                                    <span>{item.customer?.city || ''}-{item.customer?.state || ''}</span>
+                                                                </label>
                                                             </div>
 
                                                             {

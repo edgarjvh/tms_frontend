@@ -32,3 +32,4 @@ export {default as Login} from './login/Login';
 export {default as RatingModal} from './rating-modal/RatingModal';
 export {default as ContactList} from './contact-list/ContactList';
 export {default as EmailRecipientInput} from './email-recipient-input/EmailRecipientInput';
+export {default as Template} from './templates/Template';

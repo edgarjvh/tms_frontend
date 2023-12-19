@@ -800,8 +800,18 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                        }}>
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 homePanelTransition((style, panel, item, index) => {
                                     const origin = 'company-home';
@@ -823,7 +833,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -880,7 +890,18 @@ function Company(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 carrierPanelTransition((style, panel, item, index) => {
                                     const origin = 'company-carrier';
@@ -902,7 +923,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -960,7 +981,18 @@ function Company(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
 
                             {
                                 customerPanelTransition((style, panel, item, index) => {
@@ -983,7 +1015,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1043,8 +1075,18 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                        }}>
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 dispatchPanelTransition((style, panel, item, index) => {
                                     const origin = 'company-dispatch';
@@ -1066,7 +1108,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1124,7 +1166,18 @@ function Company(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 invoicePanelTransition((style, panel, item, index) => {
                                     const origin = 'company-invoice';
@@ -1146,7 +1199,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1204,7 +1257,18 @@ function Company(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 loadBoardPanelTransition((style, panel, item, index) => {
                                     const origin = 'company-load-board';
@@ -1226,7 +1290,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1285,7 +1349,18 @@ function Company(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 reportsPanelTransition((style, panel, item, index) => {
                                     const origin = 'company-report';
@@ -1307,7 +1382,7 @@ function Company(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 

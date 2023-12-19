@@ -18,14 +18,26 @@ import {
 } from './../panels';
 
 const CompanyHome = (props) => {
-    useEffect(() => {
-        if ((props.user?.id || 0) === 0){
+    useEffect(() => {   
+        if ((props.user?.id || 0) === 0) {
 
         }
     }, []);
 
     return (
-        <div>
+        <div
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 9) {
+                    if (e.target.type === undefined) {
+                        e.preventDefault();
+                        // refCustomerCode.current.focus();
+                    }
+                }
+            }}
+        >
 
         </div>
     )

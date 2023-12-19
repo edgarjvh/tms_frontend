@@ -14,6 +14,9 @@ import NumberFormat from 'react-number-format';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import SwiperCore, { Navigation } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css";
 import {
     setSelectedOrder,
     setAdminHomePanels,
@@ -2104,7 +2107,19 @@ const Invoice = (props) => {
             background: props.isOnPanel ? 'transparent' : 'radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative',
-        }}>
+        }}
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (key === 9) {
+                    if (e.target.type === undefined) {
+                        e.preventDefault();
+                        refOrderNumber.current.focus();
+                    }
+                }
+            }}
+        >
 
             {
                 loadingTransition((style, item) => item &&
@@ -2258,8 +2273,8 @@ const Invoice = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'order-billing'}
-                                        
-                                        
+
+
                                         componentId={moment().format('x')}
 
                                         selectedOwner={{ ...selectedOrder }}
@@ -2299,8 +2314,8 @@ const Invoice = (props) => {
                                         tabTimes={67000 + props.tabTimes}
                                         panelName={`${props.panelName}-invoice-preview`}
                                         origin={props.origin}
-                                        
-                                        
+
+
                                         componentId={moment().format('x')}
                                         selectedCompany={props.selectedCompany}
                                         selectedOrder={{ ...selectedOrder }}
@@ -6015,8 +6030,8 @@ const Invoice = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'order'}
-                                        
-                                        
+
+
                                         componentId={moment().format('x')}
 
                                         selectedOwner={{ ...selectedOrder }}
@@ -9945,8 +9960,8 @@ const Invoice = (props) => {
                                             panelName={`${props.panelName}-documents`}
                                             origin={props.origin}
                                             suborigin={'order-billing'}
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
 
                                             selectedOwner={{ ...selectedOrder }}
@@ -10007,8 +10022,8 @@ const Invoice = (props) => {
                                                     panelName={`${props.panelName}-documents`}
                                                     origin={props.origin}
                                                     suborigin={'order-billing'}
-                                                    
-                                                    
+
+
                                                     componentId={moment().format('x')}
 
                                                     selectedOwner={{ ...selectedOrder }}
@@ -10065,8 +10080,8 @@ const Invoice = (props) => {
                                             panelName={`${props.panelName}-documents`}
                                             origin={props.origin}
                                             suborigin={'order'}
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
 
                                             selectedOwner={{ ...selectedOrder }}
@@ -10128,8 +10143,8 @@ const Invoice = (props) => {
                                                     panelName={`${props.panelName}-documents`}
                                                     origin={props.origin}
                                                     suborigin={'order'}
-                                                    
-                                                    
+
+
                                                     componentId={moment().format('x')}
 
                                                     selectedOwner={{ ...selectedOrder }}
@@ -10204,8 +10219,8 @@ const Invoice = (props) => {
                                             isOnPanel={true}
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
-                                            
-                                            
+
+
 
                                             customer_id={selectedBillToCustomer.id}
                                         />
@@ -10480,46 +10495,68 @@ const Invoice = (props) => {
                         </div>
                     </div>
 
-                    <div className='form-bordered-box' style={{ border: 0, boxShadow: 'none', padding: '0 5px', overflow: 'hidden' }}>
-                        <div className="form-row" style={{ marginBottom: 2, overflow: 'auto' }}>
-                            {
-                                [
-                                    ...getPickupsOnRouting(),
-                                    ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined),
-                                    ...getDeliveriesOnRouting(),
-                                    ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
-                                ].length > 0 ?
+                    <div className='form-bordered-box' style={{ border: 0, boxShadow: 'none', padding: '0', overflow: 'hidden', marginBottom: 5 }}>
+                        <div className="form-row" style={{ marginBottom: 5, overflow: 'auto' }}>
+                            <div className="swiper-invoice-prev-btn">
+                                <span className="fas fa-chevron-left"></span>
+                            </div>
+
+                            <Swiper
+                                slidesPerView={5}
+                                navigation={{
+                                    prevEl: ".swiper-invoice-prev-btn",
+                                    nextEl: ".swiper-invoice-next-btn",
+                                }}
+                            >
+                                {
                                     [
                                         ...getPickupsOnRouting(),
                                         ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined),
                                         ...getDeliveriesOnRouting(),
                                         ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
-                                    ].map((route, index) => {
-                                        let classes = classnames({
-                                            'order-pickup': true,
-                                            'selected': selectedRoute?.id === route.id
-                                        })
+                                    ].length > 0 ?
+                                        [
+                                            ...getPickupsOnRouting(),
+                                            ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined),
+                                            ...getDeliveriesOnRouting(),
+                                            ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
+                                        ].map((route, index) => {
+                                            let classes = classnames({
+                                                'order-pickup': true,
+                                                'selected': selectedRoute?.id === route.id
+                                            })
 
-                                        return (
-                                            <div className={classes} key={index} onClick={() => {
-                                                setSelectedRoute(route);
-                                            }}>
-                                                {route.type === 'pickup' ? 'PU' : 'Delivery'} {
-                                                    route.type === 'pickup'
-                                                        ? ([
-                                                            ...getPickupsOnRouting(),
-                                                            ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
-                                                        ].map(x => x.id).indexOf(route.id)) + 1
-                                                        : ([
-                                                            ...getDeliveriesOnRouting(),
-                                                            ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
-                                                        ].map(x => x.id).indexOf(route.id)) + 1
-                                                }
-                                            </div>
-                                        )
-                                    })
-                                    : <div className='order-pickup' style={{ pointerEvents: 'none' }}>PU 0</div>
-                            }
+                                            return (
+                                                <SwiperSlide
+                                                    className={classes} key={index} onClick={() => {
+                                                        setSelectedRoute(route);
+                                                    }}
+                                                >
+                                                    <div className="slide-wrapper">
+                                                        {route.type === 'pickup' ? 'PU' : 'Delivery'} {
+                                                            route.type === 'pickup'
+                                                                ? ([
+                                                                    ...getPickupsOnRouting(),
+                                                                    ...(selectedOrder?.pickups || []).filter(p => (selectedOrder?.routing || []).find(r => r.pickup_id === p.id) === undefined)
+                                                                ].map(x => x.id).indexOf(route.id)) + 1
+                                                                : ([
+                                                                    ...getDeliveriesOnRouting(),
+                                                                    ...(selectedOrder?.deliveries || []).filter(d => (selectedOrder?.routing || []).find(r => r.delivery_id === d.id) === undefined)
+                                                                ].map(x => x.id).indexOf(route.id)) + 1
+                                                        }
+                                                    </div>
+                                                </SwiperSlide>
+                                            )
+                                        })
+                                        : '' // <SwiperSlide className='order-pickup' style={{ pointerEvents: 'none' }}>PU 0</SwiperSlide>
+                                }
+
+                            </Swiper>
+
+                            <div className="swiper-invoice-next-btn">
+                                <span className="fas fa-chevron-right"></span>
+                            </div>
+
                         </div>
                         <div className="form-row" style={{
                             display: 'grid',
@@ -10690,8 +10727,8 @@ const Invoice = (props) => {
                                             isOnPanel={true}
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
-                                            
-                                            
+
+
 
                                             carrier_id={selectedCarrier.id}
                                         />
@@ -10743,7 +10780,7 @@ const Invoice = (props) => {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className={insuranceStatusClasses()} style={{ width: '7rem' }}>
-                                <input type="text" placeholder="Insurance" readOnly={true} />
+                                <input type="text" placeholder="Insurance" readOnly={true} tabIndex={-1} />
                             </div>
                         </div>
                         <div className="form-v-sep"></div>
@@ -12797,6 +12834,7 @@ const Invoice = (props) => {
                         <div className="input-box-container">
                             <input type="text" placeholder="Pay By Date"
                                 readOnly={true}
+                                tabIndex={-1}
                                 value={
                                     moment((selectedOrder?.invoice_received_date || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.invoice_received_date || '').trim()
                                         ? (selectedOrder?.term?.id || 0) > 0
@@ -13094,6 +13132,8 @@ const Invoice = (props) => {
                                                     }).finally(() => {
                                                         refOrderNumber.current.focus();
                                                     });
+                                                }else{
+                                                    refOrderNumber.current.focus(); 
                                                 }
                                             }
                                         }
@@ -13201,7 +13241,7 @@ const mapStateToProps = (state) => {
         selectedCompany: state.companySetupReducers.selectedCompany,
         serverUrl: state.systemReducers.serverUrl,
         user: state.systemReducers.user,
-        
+
         adminHomePanels: state.adminReducers.adminHomePanels,
         companyHomePanels: state.companyReducers.companyHomePanels,
         adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,

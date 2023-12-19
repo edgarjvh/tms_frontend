@@ -1,0 +1,22 @@
+.select-box-container.phone-box {
+  align-items: center;
+}
+.select-box-container.phone-box .selected-contact-primary-phone {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+.select-box-container.phone-box .selected-contact-primary-phone.pushed {
+  margin-right: 15px;
+}
+.select-box-container.phone-box .mochi-item {
+  display: flex;
+  align-items: center;
+}
+.select-box-container.phone-box .mochi-item .phone-text {
+  font-weight: bold;
+}
+.select-box-container.phone-box .mochi-item .phone-type {
+  text-transform: capitalize;
+  margin-right: 5px;
+}
+/*# sourceMappingURL=SelectPhoneBox.css.map */

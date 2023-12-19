@@ -762,8 +762,18 @@ function Admin(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                        }}>
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 adminHomePanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-home';
@@ -785,7 +795,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -825,7 +835,18 @@ function Admin(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 carrierPanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-carrier';
@@ -847,7 +868,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -898,7 +919,18 @@ function Admin(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 companySetupPanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-company-setup';
@@ -920,7 +952,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -973,7 +1005,18 @@ function Admin(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 customerPanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-customer';
@@ -995,7 +1038,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1047,8 +1090,18 @@ function Admin(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                        }}>
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 dispatchPanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-dispatch';
@@ -1070,7 +1123,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1121,7 +1174,18 @@ function Admin(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 invoicePanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-invoice';
@@ -1143,7 +1207,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1202,7 +1266,18 @@ function Admin(props) {
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
-                        }}>
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
                             {
                                 reportsPanelTransition((style, panel, item, index) => {
                                     const origin = 'admin-report';
@@ -1224,7 +1299,7 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex='0'
+                                                tabIndex={-1}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
