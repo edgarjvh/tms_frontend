@@ -10,6 +10,7 @@ const ContactList = (props) => {
     const [list, setList] = useState([]);
     const [filterText, setFilterText] = useState('');
 
+    const refContactListContainer = useRef();
     const refFilterText = useRef();
 
     const loadingTransition = useTransition(isLoading, {
@@ -31,10 +32,14 @@ const ContactList = (props) => {
         }).finally(() => {
             setIsLoading(false)
         })
+
+        refContactListContainer.current.focus({
+            preventScroll: true
+        })
     }, [])
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refContactListContainer}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>

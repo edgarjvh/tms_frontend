@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretRight, faCheck, faPencilAlt, faTrashAlt, faCopy } from '@fortawesome/free-solid-svg-icons';
 
 const MCNumbers = (props) => {
+    const refMcNumbersContainer = useRef();
     const [isLoading, setIsLoading] = useState(true);
     const [mcNumbers, setMcNumbers] = useState([]);
     const [filterText, setFilterText] = useState('');
@@ -38,7 +39,9 @@ const MCNumbers = (props) => {
             console.log(e)
         }).finally(() => {
             setIsLoading(false);
-            refFilterText.current.focus();
+            refFilterText.current.focus({
+                preventScroll: true
+            });
         })
     }, [])
 
@@ -48,7 +51,14 @@ const MCNumbers = (props) => {
     });
 
     return (
-        <div className="mc-numbers-content">
+        <div className="mc-numbers-content" tabIndex={0} ref={refMcNumbersContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                e.stopPropagation();
+                props.closeModal();
+            }
+        }}>
             <div className="mc-numbers-title" style={{ textAlign: 'center', marginBottom: 5 }}>
                 {
                     props.type === 'mc'

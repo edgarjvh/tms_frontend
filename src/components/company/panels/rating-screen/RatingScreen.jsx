@@ -37,6 +37,7 @@ import { RatingModal } from './../../panels';
 var delayTimer = null;
 
 const RatingScreen = (props) => {
+    const refRatingScreenContainer = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [selectedBillToRating, setSelectedBillToRating] = useState({});
     const refBillToRateTypes = useRef();
@@ -993,7 +994,19 @@ const RatingScreen = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refRatingScreenContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if (Object.keys(selectedBillToRating || {}).length > 0 ||
+                    (Object.keys(selectedCarrierRating || {}).length > 0)) {
+                        e.stopPropagation();
+                        setSelectedBillToRating({});
+                        setSelectedCarrierRating({});
+                        refBillToRateTypes.current.focus();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
@@ -1013,7 +1026,7 @@ const RatingScreen = (props) => {
                             <div className="mochi-button" style={{
                                 pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
                             }} onClick={() => {
-                                setSelectedBillToRating({});
+                                setSelectedBillToRating(null);
                                 refBillToRateTypes.current.focus();
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>

@@ -601,6 +601,16 @@ function Admin(props) {
         }
     }
 
+    const panelClasses = classnames({
+        'panel': true,
+        'pro': true
+    })
+
+    const screenClasses = classnames({
+        'screen-content': true,
+        'pro': true
+    })
+
     return (
         <div className={containerCls}>
             <div className="main-content">
@@ -745,7 +755,7 @@ function Admin(props) {
                     </div>
                 }
 
-                <div className="screen-content">
+                <div className={screenClasses}>
                     <div className="pages-container" style={{
                         position: 'absolute',
                         display: 'flex',
@@ -791,7 +801,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -864,7 +874,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -948,7 +958,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1034,7 +1044,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1119,7 +1129,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1203,7 +1213,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1295,7 +1305,7 @@ function Admin(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}

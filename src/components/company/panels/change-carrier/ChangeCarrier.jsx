@@ -435,7 +435,14 @@ const ChangeCarrier = (props) => {
     }
 
     return (
-        <div className="change-carrier-content">
+        <div className="change-carrier-content" onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                e.stopPropagation();
+                props.closeModal();
+            }
+        }}>
             <div className="form-container">
                 <div className="form-bordered-box">
                     <div className="form-header">

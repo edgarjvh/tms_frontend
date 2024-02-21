@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './CustomerSearch.css';
 import { useTransition, animated } from 'react-spring';
@@ -26,6 +26,7 @@ import {
 } from './../../../../actions';
 
 const CustomerSearch = (props) => {
+    const refCustomerSearchContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
     const [customers, setCustomers] = useState([]);
 
@@ -73,6 +74,10 @@ const CustomerSearch = (props) => {
             console.log('error searching for customers', e);
             setIsLoading(false);
         });
+
+        refCustomerSearchContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     const openPanel = (panel, origin) => {
@@ -220,7 +225,7 @@ const CustomerSearch = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refCustomerSearchContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
@@ -316,24 +321,38 @@ const CustomerSearch = (props) => {
                                                 textTransform: 'capitalize',
                                                 userSelect: 'none'
                                             }}>{
-                                                (c.contacts || []).find(con => con.is_primary === 1) === undefined
-                                                    ? c.contact_name
-                                                    : c.contacts.find(con => con.is_primary === 1).first_name + ' ' + c.contacts.find(con => con.is_primary === 1).last_name
-                                            }</div>
+                                                    (c.contacts || []).find(x => (x?.is_primary || 0) === 1)
+                                                        ? (c.contacts.find(x => x.is_primary === 1)?.first_name || '') + ' ' + (c.contacts.find(x => x.is_primary === 1)?.last_name || '')
+                                                        : (c.contacts || []).find(x => (x?.pivot?.is_primary || 0) === 1)
+                                                            ? (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.first_name || '') + ' ' + (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.last_name || '')
+                                                            : c?.contact_name || ''
+                                                }</div>
                                             <div className="tcol contact-phone">{
-                                                (c.contacts || []).find(con => con.is_primary === 1) === undefined
-                                                    ? c.contact_phone
-                                                    : c.contacts.find(con => con.is_primary === 1).primary_phone === 'work'
-                                                        ? c.contacts.find(con => con.is_primary === 1).phone_work
-                                                        : c.contacts.find(con => con.is_primary === 1).primary_phone === 'fax'
-                                                            ? c.contacts.find(con => con.is_primary === 1).phone_work_fax
-                                                            : c.contacts.find(con => con.is_primary === 1).primary_phone === 'mobile'
-                                                                ? c.contacts.find(con => con.is_primary === 1).phone_mobile
-                                                                : c.contacts.find(con => con.is_primary === 1).primary_phone === 'direct'
-                                                                    ? c.contacts.find(con => con.is_primary === 1).phone_direct
-                                                                    : c.contacts.find(con => con.is_primary === 1).primary_phone === 'other'
-                                                                        ? c.contacts.find(con => con.is_primary === 1).phone_other
+                                                (c.contacts || []).find(x => (x?.is_primary || 0) === 1)
+                                                    ? (c.contacts.find(x => (x?.is_primary || 0) === 1)?.primary_phone || 'work') === 'work'
+                                                        ? c.contacts.find(x => (x?.is_primary || 0) === 1)?.phone_work || ''
+                                                        : (c.contacts.find(x => (x?.is_primary || 0) === 1)?.primary_phone || 'work') === 'fax'
+                                                            ? c.contacts.find(x => (x?.is_primary || 0) === 1)?.phone_work_fax || ''
+                                                            : (c.contacts.find(x => (x?.is_primary || 0) === 1)?.primary_phone || 'work') === 'mobile'
+                                                                ? c.contacts.find(x => (x?.is_primary || 0) === 1)?.phone_mobile || ''
+                                                                : (c.contacts.find(x => (x?.is_primary || 0) === 1)?.primary_phone || 'work') === 'direct'
+                                                                    ? c.contacts.find(x => (x?.is_primary || 0) === 1)?.phone_direct || ''
+                                                                    : (c.contacts.find(x => (x?.is_primary || 0) === 1)?.primary_phone || 'work') === 'other'
+                                                                        ? c.contacts.find(x => (x?.is_primary || 0) === 1)?.phone_other || ''
                                                                         : ''
+                                                    : (c.contacts || []).find(x => (x?.pivot?.is_primary || 0) === 1)
+                                                        ? (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.primary_phone || 'work') === 'work'
+                                                            ? c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.phone_work || ''
+                                                            : (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.primary_phone || 'work') === 'fax'
+                                                                ? c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.phone_work_fax || ''
+                                                                : (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.primary_phone || 'work') === 'mobile'
+                                                                    ? c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.phone_mobile || ''
+                                                                    : (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.primary_phone || 'work') === 'direct'
+                                                                        ? c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.phone_direct || ''
+                                                                        : (c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.primary_phone || 'work') === 'other'
+                                                                            ? c.contacts.find(x => (x?.pivot?.is_primary || 0) === 1)?.phone_other || ''
+                                                                            : ''
+                                                        : c?.contact_phone || ''
                                             }</div>
 
                                         </div>

@@ -34,6 +34,7 @@ import * as XLSX from 'xlsx';
 import classNames from 'classnames';
 
 const OrderImport = (props) => {
+    const refOrderImportContainer = useRef();
     const refInputFile = useRef();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -2153,8 +2154,6 @@ const OrderImport = (props) => {
         }
     }
 
-
-
     const submitImport = () => {
         if (window.confirm('Are you sure you want to proceed?')) {
             setIsLoading(true);
@@ -2197,6 +2196,12 @@ const OrderImport = (props) => {
             }
         }
     }
+
+    useEffect(() => {
+        refOrderImportContainer.current.focus({
+            preventScroll: true
+        })
+    }, []);
 
     useEffect(() => {
         if (groupOrderList.length > 0) {
@@ -2373,7 +2378,18 @@ const OrderImport = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refOrderImportContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if (refInputFile.current.files.length > 0 || orderList.length > 0) {
+                    e.stopPropagation();
+
+                    refInputFile.current.value = '';
+                    setOrderList([]);
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

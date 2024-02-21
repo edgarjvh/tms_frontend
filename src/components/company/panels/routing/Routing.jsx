@@ -48,6 +48,7 @@ import {
 } from './../../panels';
 
 const Routing = (props) => {
+    const refRoutingContainer = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [selectedBillToCustomer, setSelectedBillToCustomer] = useState({});
     const [selectedBillToCustomerContact, setSelectedBillToCustomerContact] = useState({});
@@ -177,6 +178,10 @@ const Routing = (props) => {
                 })
             }
         ]);
+
+        refRoutingContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     useEffect(() => {
@@ -650,6 +655,7 @@ const Routing = (props) => {
         background: isDragging ? "rgba(43, 193, 255, 0.1)" : "transparent",
         ...draggableStyle
     });
+
     const getListStyle = isDraggingOver => ({
 
         background: !isDraggingOver ? 'transparent' : 'rgba(43, 193, 255, 0.1)'
@@ -939,7 +945,7 @@ const Routing = (props) => {
     }
 
     return (
-        <div className="panel-content routing">
+        <div className="panel-content routing" tabIndex={0} ref={refRoutingContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

@@ -32,6 +32,7 @@ let delay = 300;
 let prevent = false;
 
 const ContactSearch = (props) => {
+    const refContactSearchContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
     const [contacts, setContacts] = useState([]);
 
@@ -178,6 +179,10 @@ const ContactSearch = (props) => {
             console.log('error searching contacts', e);
             setIsLoading(false);
         });
+
+        refContactSearchContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     const openPanel = (panel, origin) => {
@@ -325,7 +330,7 @@ const ContactSearch = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refContactSearchContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">

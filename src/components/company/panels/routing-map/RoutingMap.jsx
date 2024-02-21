@@ -37,6 +37,7 @@ setCompanyReportPanels,
 import { HEREMap } from 'here-maps-react';
 
 const RoutingMap = (props) => {
+    const refRoutingMapContainer = useRef();
     const [map, setMap] = useState(null);
     const [center, setCenter] = useState({ lat: 10.998666, lng: -63.79841 });
     const [selectedOrder, setSelectedOrder] = useState({});
@@ -51,6 +52,12 @@ const RoutingMap = (props) => {
     const routingService = platform.getRoutingService(null, 8);
 
     let hMap = null;
+
+    useEffect(() => {
+        refRoutingMapContainer.current.focus({
+            preventScroll: true
+        })
+    }, []);
 
     useEffect(() => {
 
@@ -230,7 +237,7 @@ const RoutingMap = (props) => {
     }
 
     return (
-        <div className="panel-content routing-map">
+        <div className="panel-content routing-map" tabIndex={0} ref={refRoutingMapContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

@@ -133,8 +133,11 @@ function SelectBox(props) {
                                 break;
 
                             case 27: // escape
-                                props.setItems([]);
-                                e.stopPropagation();
+                                if (!props.noStopPropagationOnEsc) {
+                                    props.setItems([]);
+                                    e.stopPropagation();
+                                }
+                                
                                 break;
 
                             case 13: // enter
@@ -177,13 +180,14 @@ function SelectBox(props) {
                         className="dropdown-button"
                         icon={faCaretDown}
                         onClick={(e) => {
-
-                            if ((props.items || []).length > 0) {
-                                props.setItems([]);
-                            } else {
-                                props.onDropdownClick(e);
-                            }
-                            refInput.current.focus();
+                            window.setTimeout(() => {
+                                if ((props.items || []).length > 0) {
+                                    props.setItems([]);
+                                } else {
+                                    props.onDropdownClick(e);
+                                }
+                                refInput.current.focus();
+                            }, 100)
                         }}
                     />
                 )}
@@ -221,7 +225,8 @@ function SelectBox(props) {
                                                     key={index}
                                                     className={mochiItemClasses}
                                                     id={item.id || ""}
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+
                                                         props.onPopupClick(item)
                                                     }}
                                                     ref={(element) => refPopupItems.current.push(element)}

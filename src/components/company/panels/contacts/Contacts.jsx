@@ -56,6 +56,7 @@ import { PassModal } from './../../../admin/panels/';
 var vCardsJS = require('vcards-js');
 
 const Contacts = (props) => {
+    const refContactsContainer = useRef();
     const refPrefix = useRef();
     const refInputAvatar = useRef();
     const [tempSelectedContact, setTempSelectedContact] = useState({});
@@ -90,8 +91,11 @@ const Contacts = (props) => {
             refPrefix.current.focus({
                 preventScroll: true
             });
+        } else {
+            refContactsContainer.current.focus({
+                preventScroll: true
+            })
         }
-
     }, [])
 
     const saveContact = () => {
@@ -708,8 +712,27 @@ const Contacts = (props) => {
         }
     }
 
+    const listClasses = classnames({
+        'contact-list-container': true,
+        'pro': true
+    })
+    const formClasses = classnames({
+        'contact-form': true,
+        'pro': true
+    })
+
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refContactsContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if (isEditingContact) {
+                    e.stopPropagation();
+                    setIsEditingContact(false);
+                    setTempSelectedContact({});
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
 
             <div className="contact-container" tabIndex="0" onKeyDown={(e) => {
@@ -772,7 +795,7 @@ const Contacts = (props) => {
                         : e.preventDefault()
                 }
             }} style={{ overflow: 'initial' }}>
-                <div className="contact-list-container">
+                <div className={listClasses}>
                     <div className="title">{props.title}</div>
                     <div className="side-title" style={{ left: '-45px' }}>
                         <div>{props.title}</div>
@@ -927,7 +950,7 @@ const Contacts = (props) => {
                 </div>
 
                 <div className="contact-form-bg">
-                    <div className="contact-form">
+                    <div className={formClasses}>
                         <div className="contact-form-header">
                             <div className="contact-avatar-container">
 

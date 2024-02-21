@@ -45,6 +45,7 @@ import ToPrint from './ToPrint';
 import { useReactToPrint } from 'react-to-print';
 
 const RevenueInformation = (props) => {
+    const refRevenueInformationContainer = useRef();
     const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
     const [isDateEndCalendarShown, setIsDateEndCalendarShown] = useState(false);
 
@@ -1194,11 +1195,11 @@ const RevenueInformation = (props) => {
             const finalData = [...title, ...table];
 
             const book = XLSX.utils.book_new();
-            const sheet = XLSX.utils.json_to_sheet(finalData, {skipHeader: true});
+            const sheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
             sheet['!merges'] = merges;
 
             const colLengths = [
-                20,20,20,20,20,20
+                20, 20, 20, 20, 20, 20
             ]
 
             let properties = [];
@@ -1211,14 +1212,14 @@ const RevenueInformation = (props) => {
 
             sheet['!cols'] = properties;
 
-            XLSX.utils.book_append_sheet(book,sheet, 'Revenue Information');
+            XLSX.utils.book_append_sheet(book, sheet, 'Revenue Information');
 
             XLSX.writeFile(book, 'Revenue Information.xlsx');
         }
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refRevenueInformationContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">
@@ -1802,6 +1803,7 @@ const RevenueInformation = (props) => {
                                 <div className="order-info-col carrier-costs">Carrier Costs</div>
                                 <div className="order-info-col profit">Profit</div>
                                 <div className="order-info-col percentage">Percentage</div>
+                                <div className="order-info-col paid">Paid</div>
                             </div>
                         </div>
                     }
@@ -2078,6 +2080,9 @@ const RevenueInformation = (props) => {
                                                                                                                 displayType={'text'}
                                                                                                                 readOnly={true}
                                                                                                             />
+                                                                                                        </div>
+                                                                                                        <div className='order-info-col paid'>
+                                                                                                            <input type="checkbox" name='' checked={(order?.customer_check_number || '') !== ''} />
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 )
@@ -2436,6 +2441,7 @@ const RevenueInformation = (props) => {
                                                             readOnly={true}
                                                         />
                                                     </div>
+                                                    <div></div>
                                                 </div>
                                             }
                                         </div>
@@ -2624,6 +2630,7 @@ const RevenueInformation = (props) => {
                                         readOnly={true}
                                     />
                                 </div>
+                                <div></div>
                             </div>
                         </div>
                     }

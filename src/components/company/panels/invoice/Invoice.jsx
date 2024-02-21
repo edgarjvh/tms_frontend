@@ -30,6 +30,7 @@ import { useTransition, animated } from 'react-spring';
 import classNames from 'classnames';
 
 const Invoice = (props) => {
+    const refInvoiceContainer = useRef();
     const toPrintRef = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -61,6 +62,10 @@ const Invoice = (props) => {
 
     useEffect(() => {
         setSelectedOrder({ ...props.selectedOrder });
+
+        refInvoiceContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     useEffect(() => {
@@ -221,7 +226,7 @@ const Invoice = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refInvoiceContainer}> 
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

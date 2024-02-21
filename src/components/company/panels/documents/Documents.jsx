@@ -50,6 +50,7 @@ import {
 } from './../../../../actions';
 
 const Documents = (props) => {
+    const refDocumentsContainer = useRef();
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
@@ -162,6 +163,10 @@ const Documents = (props) => {
                 })
             }
         });
+
+        refTitleInput.current.focus({
+            preventScroll: true
+        })
     }, [])
 
     const getSizeUnit = (size) => {
@@ -666,7 +671,30 @@ const Documents = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refDocumentsContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                if ((selectedOwnerDocument?.title || '') !== '' ||
+                (selectedOwnerDocument?.subject || '') !== '' ||
+                (selectedOwnerDocument?.tags || '') !== '' ||
+                (selectedOwnerDocumentTags || '') !== '' ||
+                refDocumentInput.current.files.length > 0){
+                    e.stopPropagation();
+
+                    setSelectedOwnerDocument({
+                        id: 0,
+                        user_id: Math.floor(Math.random() * (15 - 1)) + 1,
+                        date_entered: moment().format('MM/DD/YYYY')
+                    });
+
+                    setSelectedOwnerDocumentTags('');
+                    refDocumentInput.current.value = "";
+                    setCurrentQuickLink('');
+                    refTitleInput.current.focus();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">
@@ -755,6 +783,8 @@ const Documents = (props) => {
                                 user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                                 date_entered: moment().format('MM/DD/YYYY')
                             });
+
+                            setSelectedOwnerDocumentTags('');
 
                             refDocumentInput.current.value = "";
 

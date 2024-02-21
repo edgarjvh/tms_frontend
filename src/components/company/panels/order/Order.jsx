@@ -30,6 +30,7 @@ import { EmailRecipientInput } from '../../panels/index';
 import {Invoice} from './../../index';
 
 const Order = (props) => {
+    const refOrderContainer = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const componentRef = useRef();
@@ -113,6 +114,10 @@ const Order = (props) => {
                 setIsLoading(false);
             })
         }
+
+        refOrderContainer.current.focus({
+            preventScroll: true
+        })
     }, [])
 
     const openInvoicedOrder = () => {
@@ -279,7 +284,7 @@ const Order = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refOrderContainer}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>

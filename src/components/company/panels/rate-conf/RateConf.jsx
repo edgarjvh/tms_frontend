@@ -32,6 +32,7 @@ import axios from 'axios';
 import { EmailRecipientInput } from '../../panels/index';
 
 const RateConf = (props) => {
+    const refRateConfContainer = useRef();
     const [showingCarrierConfirmation, setShowingCarrierConfirmation] = useState(true);
     const carrierComponentRef = useRef();
     const customerComponentRef = useRef();
@@ -119,6 +120,10 @@ const RateConf = (props) => {
                 setIsLoading(false);
             })
         }
+
+        refRateConfContainer.current.focus({
+            preventScroll: true
+        })
     }, [])
 
     const openPanel = (panel, origin) => {
@@ -266,7 +271,7 @@ const RateConf = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refRateConfContainer}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>

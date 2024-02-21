@@ -16,6 +16,7 @@ import {
 } from './../../../../actions';
 
 const Modal = (props) => {
+    const refModalContainer = useRef();
     const refText = useRef();
     const [isEditing, setIsEditing] = useState(false);
 
@@ -85,13 +86,20 @@ const Modal = (props) => {
     }, [])
 
     return (
-        <div className="notes-modal" style={{
+        <div className="notes-modal" tabIndex={0} ref={refModalContainer} style={{
             position: 'absolute',
             width: '100%',
             height: '100%',
             top: 0,
             left: 0,
             backgroundColor: 'rgba(0,0,0,0.3)'
+        }} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                e.stopPropagation();
+                props.setSelectedData({});
+            }
         }}>
             <div className="notes-modal-wrapper" style={{
                 width: '100%',

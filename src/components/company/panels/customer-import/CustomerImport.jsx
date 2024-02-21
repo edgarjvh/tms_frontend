@@ -31,6 +31,7 @@ import * as XLSX from 'xlsx';
 import classNames from 'classnames';
 
 const CarrierImport = (props) => {
+    const refCustomerImportContainer = useRef();
     const refInputFile = useRef();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -261,6 +262,12 @@ const CarrierImport = (props) => {
     }
 
     useEffect(() => {
+        refCustomerImportContainer.current.focus({
+            preventScroll: true
+        })
+    }, []);
+
+    useEffect(() => {
         if (groupOrderList.length > 0) {
             processSubmit();
         }
@@ -416,7 +423,7 @@ const CarrierImport = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refCustomerImportContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

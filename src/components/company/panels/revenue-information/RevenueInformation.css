@@ -111,7 +111,7 @@
   top: 1px;
   left: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.1fr;
   z-index: 2;
   background: #ffffff;
   /* Old browsers */
@@ -159,7 +159,7 @@
   top: 0;
   left: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.2fr;
   z-index: 2;
   background: #ffffff;
   /* Old browsers */
@@ -269,7 +269,7 @@
 }
 .order-info-container .form-bordered-box .order-info-wrapper .customer-container .customer-orders .year-container .year-orders .month-container .month-orders .date-group-order-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.1fr;
   cursor: default;
   transition: ease 0.3s;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -301,7 +301,7 @@
 }
 .order-info-container .form-bordered-box .order-info-wrapper .customer-container .year-totals {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   font-size: 0.9rem;
   padding: 2px 0;
   margin-top: 5px;

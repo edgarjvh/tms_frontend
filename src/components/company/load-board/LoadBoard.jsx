@@ -98,6 +98,8 @@ const LoadBoard = (props) => {
             selected: false
         }
     ]);
+
+    const refMainContainer = useRef();
     const [showRefreshIntervals, setShowRefreshIntervals] = useState(false);
     const refShowRefreshIntervalsDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowRefreshIntervals(false) } });
     const refRefreshIntervalPopupItems = useRef([]);
@@ -405,6 +407,10 @@ const LoadBoard = (props) => {
                 console.log('error getting config', e);
             })
         }
+
+        refMainContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     useEffect(() => {
@@ -800,13 +806,14 @@ const LoadBoard = (props) => {
     return (
         <div className="load-board-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : '20px',
-            background: props.isOnPanel ? 'transparent' : 'rgb(250, 250, 250)',
-            background: props.isOnPanel ? 'transparent' : '-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : '-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : 'radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
+            background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
+            background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
         }}
+            ref={refMainContainer}
             tabIndex={-1}
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
@@ -1529,9 +1536,9 @@ const LoadBoard = (props) => {
                                             placeholder="Contact Phone"
                                             popupId="lb-bill-to-contact-phone"
                                             tabIndex={9 + props.tabTimes}
-                                            boxStyle={{minHeight: '1.2rem', maxHeight: '1.2rem', minWidth: '6.5rem', maxWidth: '6.5rem'}}
-                                            wrapperStyle={{minHeight: '1.2rem', maxHeight: '1.2rem'}}
-                                            inputStyle={{fontSize: '0.5rem'}}
+                                            boxStyle={{ minHeight: '1.2rem', maxHeight: '1.2rem', minWidth: '6.5rem', maxWidth: '6.5rem' }}
+                                            wrapperStyle={{ minHeight: '1.2rem', maxHeight: '1.2rem' }}
+                                            inputStyle={{ fontSize: '0.5rem' }}
                                             refs={{
                                                 refInput: null,
                                                 refPopupItems: null,

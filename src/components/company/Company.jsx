@@ -13,7 +13,8 @@ import axios from 'axios';
 import {
     setMainScreen,
     setScale,
-    setUser
+    setUser,
+    setTestingSwitch
 } from '../../actions/systemActions';
 
 import {
@@ -21,13 +22,15 @@ import {
     setCompanyOpenedPanels,
     setSelectedPageIndex,
     setMainCompanyScreenFocused,
+    setCustomerTScreenFocused,
     setDispatchScreenFocused,
     setCustomerScreenFocused,
     setCarrierScreenFocused,
     setLoadBoardScreenFocused,
     setInvoiceScreenFocused,
     setReportsScreenFocused,
-    setCompanyHomePanels
+    setCompanyHomePanels,
+    setCustomersTPanels,
 } from '../../actions/companyActions';
 
 import {
@@ -237,7 +240,7 @@ import {
     setCompanyReportPanels
 } from '../../actions/reportsActions';
 
-import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports } from './../company';
+import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT } from './../company';
 import moment from 'moment';
 
 function Company(props) {
@@ -252,6 +255,8 @@ function Company(props) {
     const [invoicePanels, setInvoicePanels] = useState([]);
     const [reportsPanels, setReportsPanels] = useState([]);
 
+    const [tCount, setTCount] = useState(0);
+
     const containerCls = classnames({
         'main-company-container': true,
         'is-showing': props.mainScreen === 'company'
@@ -260,6 +265,14 @@ function Company(props) {
     const userClick = () => {
         props.setMainScreen('admin');
     }
+
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development'){
+            setTCount(1);
+        }else if(process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api'){
+            setTCount(1);
+        }
+    }, []);
 
     const homeBtnClick = async () => {
         let curPages = props.pages;
@@ -273,6 +286,20 @@ function Company(props) {
         }
 
         props.setMainCompanyScreenFocused(true);
+    }
+
+    const testBtnClick = async () => {
+        let curPages = props.pages;
+
+        if (curPages.indexOf('customers-t') === -1) {
+            await props.setPages([...curPages, 'customers-t']);
+            await props.setSelectedPageIndex(curPages.length);
+
+        } else {
+            await props.setSelectedPageIndex(props.pages.indexOf('customers-t'));
+        }
+
+        props.setCustomerTScreenFocused(true);
     }
 
     const dispatchBtnClick = async () => {
@@ -383,6 +410,35 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(0%)`,
+            }
+        },
+    })
+
+    const customersTPanelTransition = useTransition(props.customersTPanels, {
+        from: panel => {
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (props.customersTPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
+                right: `calc(-100%)`,
+            }
+        },
+        enter: panel => {
+            return {
+                display: panel === undefined ? 'none' : 'block',
+                right: `calc(0%)`,
+            }
+        },
+        leave: panel => {
+            return {
+                right: `calc(-100%)`,
+            }
+        },
+        update: panel => {
+            if (panel === undefined) {
+                // setHomePanels([]);
+            }
+            return {
+                width: `calc(${baseWidth}% - ${panelGap * (props.customersTPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
                 right: `calc(0%)`,
             }
         },
@@ -577,6 +633,12 @@ function Company(props) {
             }
         }
 
+        if (origin === 'customers-t') {
+            if (props.customersTPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCustomersTPanels([...props.customersTPanels, panel]);
+            }
+        }
+
         if (origin === 'company-carrier') {
             if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
                 props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
@@ -619,6 +681,10 @@ function Company(props) {
             props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
         }
 
+        if (origin === 'customers-t') {
+            props.setCustomersTPanels(props.customersTPanels.filter(panel => panel.panelName !== panelName));
+        }
+
         if (origin === 'company-carrier') {
             props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
@@ -643,6 +709,16 @@ function Company(props) {
             props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
         }
     }
+
+    const panelClasses = classnames({
+        'panel': true,
+        'pro': true
+    })
+
+    const screenClasses = classnames({
+        'screen-content': true,
+        'pro': true
+    })
 
     return (
         <div className={containerCls}>
@@ -696,9 +772,11 @@ function Company(props) {
                                 color: 'darkred'
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base" style={{
-                                    color: 'red'
-                                }}>Logout</div>
+                                <div className="mochi-button-base"
+                                    style={{
+                                        color: 'red'
+                                    }}
+                                >Logout</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -717,17 +795,25 @@ function Company(props) {
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Video</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
+                            </div>+
                         </div>
                         <div className="section">
                             <div className="mochi-input-decorator">
                                 <input type="search" placeholder="just type" id="txt-main-search" />
                             </div>
                         </div>
+                        {/* <div className='section' style={{ marginLeft: 5 }}>
+                            <div className="mochi-button" onClick={testBtnClick}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Test</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div> */}
                         <div className="section">
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.mainCompanyScreenFocused
+                                'screen-focused': props.mainCompanyScreenFocused,
+                                'testing': true
                             })} onClick={homeBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Home</div>
@@ -735,7 +821,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.carrierScreenFocused
+                                'screen-focused': props.carrierScreenFocused,
+                                'testing': true
                             })} onClick={carriersBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Carriers</div>
@@ -743,7 +830,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.customerScreenFocused
+                                'screen-focused': props.customerScreenFocused,
+                                'testing': true
                             })} onClick={customersBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Customers</div>
@@ -751,7 +839,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.dispatchScreenFocused
+                                'screen-focused': props.dispatchScreenFocused,
+                                'testing': true
                             })} onClick={dispatchBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Dispatch</div>
@@ -759,7 +848,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.invoiceScreenFocused
+                                'screen-focused': props.invoiceScreenFocused,
+                                'testing': true
                             })} onClick={invoiceBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Invoice</div>
@@ -767,7 +857,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.loadBoardScreenFocused
+                                'screen-focused': props.loadBoardScreenFocused,
+                                'testing': true
                             })} onClick={loadBoardBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Load Board</div>
@@ -775,7 +866,8 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.scale !== 1
+                                'screen-focused': props.scale !== 1,
+                                'testing': true
                             })} onClick={reportsBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Reports</div>
@@ -784,7 +876,7 @@ function Company(props) {
                         </div>
                     </div>
                 }
-                <div className="screen-content" >
+                <div className={screenClasses}>
                     <div className="pages-container" style={{
                         position: 'absolute',
                         display: 'flex',
@@ -829,7 +921,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -883,6 +975,97 @@ function Company(props) {
                             />
                         </div>
 
+                        {/* <div style={{
+                            width: `${100 / props.pages.length}%`,
+                            height: '100%',
+                            transform: `scale(${props.scale})`,
+                            transition: 'all ease 0.7s',
+                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
+                        }}
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
+
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
+                        >
+                            {
+                                customersTPanelTransition((style, panel, item, index) => {
+                                    const origin = 'customers-t';
+
+                                    return (
+                                        <Draggable
+                                            axis="x"
+                                            handle={'.drag-handler'}
+                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
+                                            position={{ x: 0, y: 0 }}
+                                            key={index}
+                                        >
+                                            <animated.div className={panelClasses} key={index} style={{
+                                                ...style,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                            }}
+                                                tabIndex={-1}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
+
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
+                                            // onClick={() => {
+                                            //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                            //     // let _panels = [...props.dispatchOpenedPanels];
+                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+
+                                            //     // props.setDispatchOpenedPanels(_panels);
+                                            // }}
+                                            >
+                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+
+                                                {
+                                                    panel?.component?.props?.isOnPanel
+                                                        ?
+                                                        <div className="panel-content">
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            {panel?.component}
+                                                        </div>
+                                                        :
+                                                        panel?.component
+                                                }
+                                            </animated.div>
+                                        </Draggable>
+                                    )
+                                })
+                            }
+
+                            <CustomersT
+                                pageName={'Customers'}
+                                panelName={'customers-t'}
+                                tabTimes={500}
+                                screenFocused={props.customerTScreenFocused}
+                                componentId={moment().format('x')}
+                                isOnPanel={false}
+                                origin='customers-t'
+                                openPanel={openPanel}
+                                closePanel={closePanel}
+                            />
+                        </div> */}
+
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -919,7 +1102,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -948,7 +1131,7 @@ function Company(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title" tabIndex={0} autoFocus={true}>{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1011,7 +1194,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1104,7 +1287,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1133,7 +1316,7 @@ function Company(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title" tabIndex={0} autoFocus={true}>{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1195,7 +1378,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1286,7 +1469,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1378,7 +1561,7 @@ function Company(props) {
                                             position={{ x: 0, y: 0 }}
                                             key={index}
                                         >
-                                            <animated.div className={`panel panel-${panel?.panelName || ''}`} key={index} style={{
+                                            <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
@@ -1446,9 +1629,11 @@ const mapStateToProps = state => {
         user: state.systemReducers.user,
         scale: state.systemReducers.scale,
         mainScreen: state.systemReducers.mainScreen,
+        testingSwitch: state.systemReducers.testingSwitch,
         pages: state.companyReducers.pages,
         selectedPageIndex: state.companyReducers.selectedPageIndex,
         mainCompanyScreenFocused: state.companyReducers.mainCompanyScreenFocused,
+        customerTScreenFocused: state.companyReducers.customerTScreenFocused,
         dispatchScreenFocused: state.companyReducers.dispatchScreenFocused,
         customerScreenFocused: state.companyReducers.customerScreenFocused,
         carrierScreenFocused: state.companyReducers.carrierScreenFocused,
@@ -1602,6 +1787,7 @@ const mapStateToProps = state => {
         selectedInvoiceCarrierInfoDocumentNote: state.carrierReducers.selectedInvoiceCarrierInfoDocumentNote,
 
         companyHomePanels: state.companyReducers.companyHomePanels,
+        customersTPanels: state.companyReducers.customersTPanels,
         companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
         companyCustomerPanels: state.customerReducers.companyCustomerPanels,
         companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
@@ -1618,6 +1804,7 @@ export default connect(mapStateToProps, {
     setSelectedPageIndex,
     setScale,
     setMainCompanyScreenFocused,
+    setCustomerTScreenFocused,
     setDispatchScreenFocused,
     setCustomerScreenFocused,
     setCarrierScreenFocused,
@@ -1626,6 +1813,8 @@ export default connect(mapStateToProps, {
     setReportsScreenFocused,
     setCompanyOpenedPanels,
     setAdminOpenedPanels,
+
+    setTestingSwitch,
 
     //DISPATCH
     setDispatchOpenedPanels,
@@ -1812,6 +2001,7 @@ export default connect(mapStateToProps, {
 
 
     setCompanyHomePanels,
+    setCustomersTPanels,
     setCompanyCarrierPanels,
     setCompanyCustomerPanels,
     setCompanyDispatchPanels,

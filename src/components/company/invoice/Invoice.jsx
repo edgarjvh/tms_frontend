@@ -2101,16 +2101,35 @@ const Invoice = (props) => {
     return (
         <div className="invoice-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : '20px',
-            background: props.isOnPanel ? 'transparent' : 'rgb(250, 250, 250)',
-            background: props.isOnPanel ? 'transparent' : '-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : '-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : 'radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
+            background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
+            background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative',
         }}
             tabIndex={-1}
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
+
+                if (key === 27) {
+                    if ((selectedOrder?.id || 0) > 0) {
+                        e.stopPropagation();
+                        setSelectedOrder({});
+                        setOrderNumber('');
+                        setTripNumber('');
+                        setSelectedBillToCustomer({});
+                        setSelectedBillToCustomerContact({});
+                        setSelectedCarrier({});
+                        setSelectedCarrierContact({});
+                        setSelectedCarrierDriver({});
+                        setSelectedRoute({});
+
+                        refOrderNumber.current.focus({
+                            preventScroll: true
+                        });
+                    }
+                }
 
                 if (key === 9) {
                     if (e.target.type === undefined) {
@@ -13132,8 +13151,8 @@ const Invoice = (props) => {
                                                     }).finally(() => {
                                                         refOrderNumber.current.focus();
                                                     });
-                                                }else{
-                                                    refOrderNumber.current.focus(); 
+                                                } else {
+                                                    refOrderNumber.current.focus();
                                                 }
                                             }
                                         }

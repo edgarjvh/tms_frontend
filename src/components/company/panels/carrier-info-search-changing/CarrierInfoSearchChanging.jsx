@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
@@ -25,11 +25,18 @@ import {
 } from './../../../../actions';
 
 const CarrierInfoSearchChanging = (props) => {
+    const refCarrierInfoSearchContainer = useRef();
     const closePanelBtnClick = (e, name) => {
         props.setOpenedPanels(props.openedPanels.filter((item, index) => {
             return item !== name;
         }));
     }
+
+    useEffect(() => {
+        refCarrierInfoSearchContainer.current.focus({
+            preventScroll: true
+        })
+    }, []);
 
     const rowDoubleClick = async (e, c) => {
         await props.setNewCarrier(c);
@@ -192,7 +199,7 @@ const CarrierInfoSearchChanging = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refCarrierInfoSearchContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="close-btn" title="Close" onClick={e => closePanelBtnClick(e, props.panelName)}><span className="fas fa-times"></span></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>

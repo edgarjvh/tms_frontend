@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
@@ -25,11 +25,18 @@ import {
 } from './../../../../actions';
 
 const FactoringCompanySearch = (props) => {
+    const refFactoringCompanySearchContainer = useRef();
     const closePanelBtnClick = (e, name) => {
         props.setOpenedPanels(props.openedPanels.filter((item, index) => {
             return item !== name;
         }));
     }
+
+    useEffect(() => {
+        refFactoringCompanySearchContainer.current.focus({
+            preventScroll: true
+        })
+    }, []);
 
     var clickCount = 0;
 
@@ -246,7 +253,7 @@ const FactoringCompanySearch = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refFactoringCompanySearchContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="close-btn" title="Close" onClick={e => closePanelBtnClick(e, props.panelName)}><span className="fas fa-times"></span></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>

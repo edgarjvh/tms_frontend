@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {connect} from 'react-redux';
+import React, { useState, useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
 import './Login.css';
 import axios from 'axios';
-import {useTransition, animated} from 'react-spring';
+import { useTransition, animated } from 'react-spring';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
@@ -26,14 +26,14 @@ const Login = (props) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
-        from: {opacity: 0, display: 'block'},
-        enter: {opacity: 1, display: 'block'},
-        leave: {opacity: 0, display: 'none'},
+        from: { opacity: 0, display: 'block' },
+        enter: { opacity: 1, display: 'block' },
+        leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
     });
 
     useEffect(() => {
-        if (props.loginScreenFocused){
+        if (props.loginScreenFocused) {
             console.log('should focus')
             refEmail.current.focus({
                 preventScroll: true
@@ -42,7 +42,7 @@ const Login = (props) => {
     }, [props.loginScreenFocused])
 
     const submitLogin = (e = null) => {
-        const {userType, email, password} = loginData;
+        const { userType, email, password } = loginData;
 
         if (userType !== 'employee' && userType !== 'agent') {
             window.alert('You must select the user type!');
@@ -104,18 +104,18 @@ const Login = (props) => {
     }, [])
 
     const transitionImage = useTransition(doAnimate, {
-        from: {opacity: 0, x: -380, y: -190, transform: 'rotateY(0deg)'},
-        enter: {opacity: 1, x: -400, y: -190, transform: 'rotateY(15deg)'},
-        leave: {opacity: 0},
-        config: {duration: 1000},
+        from: { opacity: 0, x: -380, y: -190, transform: 'rotateY(0deg)' },
+        enter: { opacity: 1, x: -400, y: -190, transform: 'rotateY(15deg)' },
+        leave: { opacity: 0 },
+        config: { duration: 1000 },
         delay: 500
     });
 
     const transitionLogin = useTransition(doAnimate, {
-        from: {opacity: 0, x: -190, y: -235},
-        enter: {opacity: 1, x: -190, y: -215},
-        leave: {opacity: 0},
-        config: {duration: 500},
+        from: { opacity: 0, x: -190, y: -235 },
+        enter: { opacity: 1, x: -190, y: -215 },
+        leave: { opacity: 0 },
+        config: { duration: 500 },
         delay: 500
     });
 
@@ -125,9 +125,9 @@ const Login = (props) => {
 
             if (key === 9) {
                 e.preventDefault();
-                if (e.shiftKey){
+                if (e.shiftKey) {
                     refPass.current.focus();
-                }else{
+                } else {
                     refEmail.current.focus();
                 }
             }
@@ -139,7 +139,7 @@ const Login = (props) => {
                 opacity: 0.1,
                 transform: 'scale(1.5)'
 
-            }}/>
+            }} />
 
             {/*{*/}
             {/*    transitionImage((style, item) =>*/}
@@ -153,7 +153,7 @@ const Login = (props) => {
             {
                 transitionLogin((style, item) =>
                     item && (
-                        <animated.div style={{...style}} className="login-main-container-wrapper">
+                        <animated.div style={{ ...style }} className="login-main-container-wrapper">
                             <div className="login-form-container">
                                 {
                                     loadingTransition((style, item) => item &&
@@ -164,40 +164,40 @@ const Login = (props) => {
                                                 paddingBottom: 5,
                                                 paddingLeft: 10
                                             }}>
-                                                <Loader type="Circles" color="#009bdd" height={20} width={20} visible={item}/>
+                                                <Loader type="Circles" color="#009bdd" height={20} width={20} visible={item} />
                                             </div>
                                         </animated.div>
                                     )
                                 }
 
                                 <div className="company-logo"
-                                     onKeyDown={e => {
-                                         let key = e.keyCode || e.which;
+                                    onKeyDown={e => {
+                                        let key = e.keyCode || e.which;
 
-                                         if (key === 9) {
-                                             e.preventDefault();
-                                             if (e.shiftKey){
-                                                 refPass.current.focus();
-                                             }else{
-                                                 refEmail.current.focus();
-                                             }
-                                         }
-                                     }}>
+                                        if (key === 9) {
+                                            e.preventDefault();
+                                            if (e.shiftKey) {
+                                                refPass.current.focus();
+                                            } else {
+                                                refEmail.current.focus();
+                                            }
+                                        }
+                                    }}>
                                     <img
                                         onKeyDown={e => {
                                             let key = e.keyCode || e.which;
 
                                             if (key === 9) {
                                                 e.preventDefault();
-                                                if (e.shiftKey){
+                                                if (e.shiftKey) {
                                                     refPass.current.focus();
-                                                }else{
+                                                } else {
                                                     refEmail.current.focus();
                                                 }
                                             }
                                         }}
                                         src="/img/anchor_logo.png"
-                                        alt="Anchor TMS"/>
+                                        alt="Anchor TMS" />
                                 </div>
 
                                 {/*<div className="company-name"*/}
@@ -217,54 +217,54 @@ const Login = (props) => {
                                 <div className="user-type-row">
                                     <div className="user-type employee">
                                         <input type="radio" name="user-type" id="user-type-employee"
-                                               onKeyDown={e => {
-                                                   let key = e.keyCode || e.which;
+                                            onKeyDown={e => {
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9) {
-                                                       e.preventDefault();
-                                                       if (e.shiftKey){
-                                                           refPass.current.focus();
-                                                       }else{
-                                                           refEmail.current.focus();
-                                                       }
-                                                   }
-                                               }}
-                                               onChange={(e) => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           userType: e.target.checked && 'employee'
-                                                       }
-                                                   })
-                                               }}
-                                               checked={(loginData?.userType || '') === 'employee'}
+                                                if (key === 9) {
+                                                    e.preventDefault();
+                                                    if (e.shiftKey) {
+                                                        refPass.current.focus();
+                                                    } else {
+                                                        refEmail.current.focus();
+                                                    }
+                                                }
+                                            }}
+                                            onChange={(e) => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        userType: e.target.checked && 'employee'
+                                                    }
+                                                })
+                                            }}
+                                            checked={(loginData?.userType || '') === 'employee'}
                                         />
                                         <label htmlFor="user-type-employee">Employee</label>
                                     </div>
 
                                     <div className="user-type agent">
                                         <input type="radio" name="user-type" id="user-type-agent"
-                                               onKeyDown={e => {
-                                                   let key = e.keyCode || e.which;
+                                            onKeyDown={e => {
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9) {
-                                                       e.preventDefault();
-                                                       if (e.shiftKey){
-                                                           refPass.current.focus();
-                                                       }else{
-                                                           refEmail.current.focus();
-                                                       }
-                                                   }
-                                               }}
-                                               onChange={(e) => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           userType: e.target.checked && 'agent'
-                                                       }
-                                                   })
-                                               }}
-                                               checked={(loginData?.userType || '') === 'agent'}
+                                                if (key === 9) {
+                                                    e.preventDefault();
+                                                    if (e.shiftKey) {
+                                                        refPass.current.focus();
+                                                    } else {
+                                                        refEmail.current.focus();
+                                                    }
+                                                }
+                                            }}
+                                            onChange={(e) => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        userType: e.target.checked && 'agent'
+                                                    }
+                                                })
+                                            }}
+                                            checked={(loginData?.userType || '') === 'agent'}
                                         />
                                         <label htmlFor="user-type-agent">Agent</label>
                                     </div>
@@ -273,87 +273,87 @@ const Login = (props) => {
                                 <div className="login-form">
                                     <div className="input-box-container">
                                         <input tabIndex={1} type="text" placeholder="E-mail" id="txt-email"
-                                               style={{
-                                                   textTransform: 'lowercase'
-                                               }}
-                                               autoFocus={true}
-                                               ref={refEmail}
-                                               readOnly={isLoading}
-                                               onKeyDown={e => {
-                                                   e.stopPropagation();
+                                            style={{
+                                                textTransform: 'lowercase'
+                                            }}
+                                            autoFocus={true}
+                                            ref={refEmail}
+                                            readOnly={isLoading}
+                                            onKeyDown={e => {
+                                                e.stopPropagation();
 
-                                                   let key = e.keyCode || e.which;
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9) {
-                                                       e.preventDefault();
-                                                       if (e.shiftKey){
-                                                           refPass.current.focus();
-                                                       }else{
-                                                           refPass.current.focus();
-                                                       }
-                                                   }
+                                                if (key === 9) {
+                                                    e.preventDefault();
+                                                    if (e.shiftKey) {
+                                                        refPass.current.focus();
+                                                    } else {
+                                                        refPass.current.focus();
+                                                    }
+                                                }
 
-                                                   if (key === 13) {
-                                                       submitLogin();
-                                                   }
-                                               }}
-                                               onInput={e => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           email: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               onChange={e => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           email: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               value={loginData?.email || ''}/>
+                                                if (key === 13) {
+                                                    submitLogin();
+                                                }
+                                            }}
+                                            onInput={e => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        email: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                            onChange={e => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        email: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                            value={loginData?.email || ''} />
                                     </div>
 
                                     <div className="input-box-container">
                                         <input tabIndex={2} type="password" placeholder="Password" id="txt-password"
-                                               ref={refPass}
-                                               readOnly={isLoading}
-                                               onKeyDown={e => {
-                                                   e.stopPropagation();
-                                                   let key = e.keyCode || e.which;
+                                            ref={refPass}
+                                            readOnly={isLoading}
+                                            onKeyDown={e => {
+                                                e.stopPropagation();
+                                                let key = e.keyCode || e.which;
 
-                                                   if (key === 9) {
-                                                       e.preventDefault();
-                                                       if (e.shiftKey){
-                                                           refEmail.current.focus();
-                                                       }else{
-                                                           refEmail.current.focus();
-                                                       }
-                                                   }
+                                                if (key === 9) {
+                                                    e.preventDefault();
+                                                    if (e.shiftKey) {
+                                                        refEmail.current.focus();
+                                                    } else {
+                                                        refEmail.current.focus();
+                                                    }
+                                                }
 
-                                                   if (key === 13) {
-                                                       submitLogin();
-                                                   }
-                                               }}
-                                               onInput={e => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           password: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               onChange={e => {
-                                                   setLoginData(loginData => {
-                                                       return {
-                                                           ...loginData,
-                                                           password: e.target.value
-                                                       }
-                                                   })
-                                               }}
-                                               value={loginData?.password || ''}/>
+                                                if (key === 13) {
+                                                    submitLogin();
+                                                }
+                                            }}
+                                            onInput={e => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        password: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                            onChange={e => {
+                                                setLoginData(loginData => {
+                                                    return {
+                                                        ...loginData,
+                                                        password: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                            value={loginData?.password || ''} />
                                     </div>
                                 </div>
 
@@ -366,20 +366,26 @@ const Login = (props) => {
                                 </div>
 
                                 <div className="forgot-password-row">
+                                    <div style={{
+                                        color: '#CBA660',
+                                        fontWeight: 'bold',
+                                        fontSize: 14
+                                    }}>Patent Pending</div>
+
                                     <div className="login-message">{message}</div>
                                     <a href="#"
-                                       onKeyDown={e => {
-                                           let key = e.keyCode || e.which;
+                                        onKeyDown={e => {
+                                            let key = e.keyCode || e.which;
 
-                                           if (key === 9) {
-                                               e.preventDefault();
-                                               if (e.shiftKey){
-                                                   refPass.current.focus();
-                                               }else{
-                                                   refEmail.current.focus();
-                                               }
-                                           }
-                                       }}>Forgot your password?</a>
+                                            if (key === 9) {
+                                                e.preventDefault();
+                                                if (e.shiftKey) {
+                                                    refPass.current.focus();
+                                                } else {
+                                                    refEmail.current.focus();
+                                                }
+                                            }
+                                        }}>Forgot your password?</a>
                                 </div>
                             </div>
                         </animated.div>

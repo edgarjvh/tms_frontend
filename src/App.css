@@ -474,6 +474,12 @@ select:focus {
   border-radius: inherit;
   box-shadow: 0 0 5px 3px #4b4b4b;
   background: #ffffff;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+}
+.main-panel-container .panel.pro {
   /* Old browsers */
   background: -moz-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
   /* FF3.6-15 */
@@ -483,10 +489,6 @@ select:focus {
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  right: 0;
 }
 .main-panel-container .panel .panel-content {
   width: 100%;
@@ -567,6 +569,10 @@ select:focus {
   border-radius: 45px 0 0 0;
   box-shadow: 0 0 5px 3px #4b4b4b;
   background: #ffffff;
+  position: fixed;
+  z-index: 1;
+}
+.panel.pro {
   /* Old browsers */
   background: -moz-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
   /* FF3.6-15 */
@@ -576,8 +582,6 @@ select:focus {
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-  position: fixed;
-  z-index: 1;
 }
 .panel .close-btn {
   position: absolute;
@@ -882,3 +886,4 @@ select:focus {
     opacity: 0;
   }
 }
+/*# sourceMappingURL=App.css.map */

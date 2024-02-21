@@ -33,6 +33,7 @@ const ACHWiringInfo = (props) => {
     const [selectedOwner, setSelectedOwner] = useState({});
     const [isEditing, setIsEditing] = useState(false);
 
+    const refACHWiringInfoContainer = useRef();
     const refAchBankingInfo = useRef();
     const refAchAccountInfo = useRef();
     const refAchAbaRouting = useRef();
@@ -54,7 +55,7 @@ const ACHWiringInfo = (props) => {
             wiring_type: (props.selectedOwner?.wiring_type || '') === '' ? 'checking' : props.selectedOwner.wiring_type
         });
 
-        refAchBankingInfo.current.focus({
+        refACHWiringInfoContainer.current.focus({
             preventScroll: true
         })
     }, [])
@@ -275,10 +276,11 @@ const ACHWiringInfo = (props) => {
     }
 
     return (
-        <div className="ach-wiring-info-content" onKeyDown={e => {
+        <div className="ach-wiring-info-content" tabIndex={0} ref={refACHWiringInfoContainer} onKeyDown={e => {
             let key = e.keyCode || e.which;
 
             if (key === 27) {
+                e.stopPropagation();
                 props.closeModal();
             }
         }}>

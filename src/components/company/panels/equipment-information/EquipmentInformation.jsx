@@ -31,6 +31,7 @@ import {
 import axios from 'axios';
 
 const EquipmentInformation = (props) => {
+    const refEquipmentInformationContainer = useRef();
     const [equipmentInformation, setEquipmentInformation] = useState({});
 
     const refEquipmentCarrierCode = useRef();
@@ -465,7 +466,39 @@ const EquipmentInformation = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refEquipmentInformationContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if (equipmentInformation?.id ||
+                    (equipmentInformation?.equipment?.name || '') !== '' ||
+                    equipmentInformation?.equipment_id ||
+                    (equipmentInformation?.units || '') !== '' ||
+                    (equipmentInformation?.equipment_length || '') !== '' ||
+                    (equipmentInformation?.equipment_length_unit || '') !== '' ||
+                    (equipmentInformation?.equipment_width || '') !== '' ||
+                    (equipmentInformation?.equipment_width_unit || '') !== '' ||
+                    (equipmentInformation?.equipment_height || '') !== '' ||
+                    (equipmentInformation?.equipment_height_unit || '') !== '') {
+                    e.stopPropagation();
+                    setEquipmentInformation({
+                        ...equipmentInformation,
+                        id: null,
+                        equipment: {},
+                        equipment_id: null,
+                        units: '',
+                        equipment_length: '',
+                        equipment_length_unit: '',
+                        equipment_width: '',
+                        equipment_width_unit: '',
+                        equipment_height: '',
+                        equipment_height_unit: '',
+                    });
+
+                    refEquipment.current.focus();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">

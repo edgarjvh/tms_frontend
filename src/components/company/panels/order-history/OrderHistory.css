@@ -1,70 +1,70 @@
-.order-fields-container {
+.order-fields-container.order-history {
   display: flex;
   flex-direction: column;
   margin: 20px 0 15px;
   flex-grow: 0 !important;
 }
-.order-fields-container .search-fields {
+.order-fields-container.order-history .search-fields {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto 5rem;
   grid-template-rows: 1fr 1fr;
   align-items: center !important;
   grid-gap: 0.2rem;
 }
-.order-fields-container .search-fields .select-box-container {
+.order-fields-container.order-history .search-fields .select-box-container {
   margin-right: 0 !important;
 }
-.order-fields-container .search-fields .select-box-container.date input {
+.order-fields-container.order-history .search-fields .select-box-container.date input {
   padding-right: 20px;
 }
-.order-fields-container .search-fields .input-code {
+.order-fields-container.order-history .search-fields .input-code {
   width: unset !important;
 }
-.order-fields-container .search-fields .button-container {
+.order-fields-container.order-history .search-fields .button-container {
   display: flex;
   justify-content: space-evenly;
 }
-.order-fields-container .search-fields > div {
+.order-fields-container.order-history .search-fields > div {
   align-items: center;
 }
-.order-fields-container .search-fields input {
+.order-fields-container.order-history .search-fields input {
   text-align: right;
   font-weight: bold;
 }
-.order-fields-container .row-fields {
+.order-fields-container.order-history .row-fields {
   display: flex;
   margin-bottom: 5px;
 }
-.order-fields-container .row-fields .input-box-container:not(:last-child) {
+.order-fields-container.order-history .row-fields .input-box-container:not(:last-child) {
   margin-right: 2px;
 }
-.order-fields-container .row-fields .input-box-container.date {
+.order-fields-container.order-history .row-fields .input-box-container.date {
   width: 8rem;
 }
-.order-fields-container .row-fields .input-box-container.city {
+.order-fields-container.order-history .row-fields .input-box-container.city {
   flex-grow: 1;
 }
-.order-fields-container .row-fields .input-box-container.state {
+.order-fields-container.order-history .row-fields .input-box-container.state {
   width: 8rem;
 }
-.order-fields-container .row-fields .input-box-container.zip {
+.order-fields-container.order-history .row-fields .input-box-container.zip {
   width: 8rem;
 }
-.order-fields-container .row-fields .input-box-container.input-code {
+.order-fields-container.order-history .row-fields .input-box-container.input-code {
   width: 8rem;
   text-transform: uppercase;
 }
-.order-fields-container .row-fields .button-container {
+.order-fields-container.order-history .row-fields .button-container {
   width: 8rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
-.order-fields-container .row-fields .button-container > div {
+.order-fields-container.order-history .row-fields .button-container > div {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.order-fields-container .row-fields .button-container > div .mochi-button {
+.order-fields-container.order-history .row-fields .button-container > div .mochi-button {
   display: flex;
 }
 .order-info-container {
@@ -111,7 +111,7 @@
   top: 1px;
   left: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   z-index: 2;
   background: #ffffff;
   /* Old browsers */
@@ -159,7 +159,7 @@
   top: 0;
   left: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.2fr;
   z-index: 2;
   background: #ffffff;
   /* Old browsers */
@@ -218,7 +218,7 @@
 }
 .order-info-container .form-bordered-box .order-info-wrapper .customer-container .customer-totals {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   font-size: 0.9rem;
   padding: 2px 0;
   margin-top: 5px;
@@ -266,7 +266,7 @@
   font-size: 0.8rem;
   background-color: rgba(0, 0, 0, 0.1);
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 .order-info-container .year-container .year-orders .month-container .month-orders {
   overflow: hidden;
@@ -295,7 +295,7 @@
 }
 .order-info-container .year-container .year-orders .month-container .month-orders .date-group-order-container .date-group-order-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 0.1fr;
   cursor: default;
   transition: ease 0.3s;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);

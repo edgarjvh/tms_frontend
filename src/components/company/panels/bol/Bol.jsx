@@ -36,7 +36,7 @@ import {
 } from './../../../controls';
 
 const Bol = (props) => {
-
+    const refBolContainer = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [selectedShipFrom, setSelectedShipFrom] = useState({});
     const [selectedShipTo, setSelectedShipTo] = useState({});
@@ -226,6 +226,10 @@ const Bol = (props) => {
         if ((props.selectedCompany?.mailing_address?.id || 0) > 0) {
             setFreightChargeTerms3rdParty(true);
         }
+
+        refBolContainer.current.focus({
+            preventScroll: true
+        })
     }, []);
 
     useEffect(() => {
@@ -388,7 +392,7 @@ const Bol = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={props.tabTimesFrom + props.tabTimes + 0} ref={refBolContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 

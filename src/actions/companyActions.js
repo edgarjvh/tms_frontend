@@ -29,6 +29,13 @@ export const setMainCompanyScreenFocused = bool => {
     }
 }
 
+export const setCustomerTScreenFocused = bool => {
+    return {
+        type: companyConstants.SET_CUSTOMER_T_SCREEN_FOCUSED,
+        payload: bool
+    }
+}
+
 export const setDispatchScreenFocused = bool => {
     return {
         type: companyConstants.SET_DISPATCH_SCREEN_FOCUSED,
@@ -81,6 +88,13 @@ export const setReportsScreenFocused = bool => {
 export const setCompanyHomePanels = bool => {
     return {
         type: companyConstants.SET_COMPANY_HOME_PANELS,
+        payload: bool
+    }
+}
+
+export const setCustomersTPanels = bool => {
+    return {
+        type: companyConstants.SET_CUSTOMERS_T_PANELS,
         payload: bool
     }
 }

@@ -6,7 +6,8 @@ export const systemReducers = (state = {
     companyId: 1,
     user: {},
     loginMessage: '',
-    scale: 1
+    scale: 1,
+    testingSwitch: false
 }, action) => {
     switch (action.type) {
         case systemConstants.SET_MAIN_SCREEN:
@@ -34,6 +35,12 @@ export const systemReducers = (state = {
             state = {
                 ...state,
                 scale: action.payload
+            }
+            break;
+        case systemConstants.SET_TESTING_SWITCH:
+            state = {
+                ...state,
+                testingSwitch: action.payload
             }
             break;
         default:

@@ -1,17 +1,40 @@
 import { companyConstants } from '../constants';
 
-export const companyReducers = (state = {
-    pages: [
-        'home',
+const pagesList = process.env.NODE_ENV === 'development'
+    ? [
+        'home',        
         'carrier',
         'customer',
         'dispatch',
         'invoice',
         'load board',
         'reports'
-    ],
+    ] :
+    process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api'
+        ? [
+            'home',
+            'customers-t',
+            'carrier',
+            'customer',
+            'dispatch',
+            'invoice',
+            'load board',
+            'reports'
+        ] : [
+            'home',
+            'carrier',
+            'customer',
+            'dispatch',
+            'invoice',
+            'load board',
+            'reports'
+        ]
+
+export const companyReducers = (state = {
+    pages: pagesList,
     selectedPageIndex: 0,
     mainCompanyScreenFocused: true,
+    customerTScreenFocused: false,
     loginScreenFocused: false,
     dispatchScreenFocused: false,
     customerScreenFocused: false,
@@ -19,7 +42,8 @@ export const companyReducers = (state = {
     loadBoardScreenFocused: false,
     invoiceScreenFocused: false,
     companyOpenedPanels: [],
-    companyHomePanels: []
+    companyHomePanels: [],
+    customersTPanels: [],
 }, action) => {
     switch (action.type) {
         case companyConstants.SET_PAGES:
@@ -130,6 +154,13 @@ export const companyReducers = (state = {
             state = {
                 ...state,
                 companyHomePanels: action.payload
+            }
+            break;
+
+        case companyConstants.SET_CUSTOMERS_T_PANELS:
+            state = {
+                ...state,
+                customersTPanels: action.payload
             }
             break;
         default:

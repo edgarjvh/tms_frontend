@@ -33,3 +33,4 @@ export {default as RatingModal} from './rating-modal/RatingModal';
 export {default as ContactList} from './contact-list/ContactList';
 export {default as EmailRecipientInput} from './email-recipient-input/EmailRecipientInput';
 export {default as Template} from './templates/Template';
+export {default as PanelT} from './panel-t/PanelT';

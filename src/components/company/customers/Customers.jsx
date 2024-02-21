@@ -825,6 +825,9 @@ const Customers = (props) => {
                     }
                 }
                 setIsLoading(false);
+                refCustomerCode.current.focus({
+                    preventScroll: true
+                });
             }).catch(e => {
                 console.log('error getting customer by id')
                 setIsLoading(false);
@@ -1154,7 +1157,6 @@ const Customers = (props) => {
                 tabTimes={19000 + props.tabTimes}
                 panelName={`${props.panelName}-customer-import`}
                 origin={props.origin}
-
 
                 componentId={moment().format('x')}
             />
@@ -2093,16 +2095,24 @@ const Customers = (props) => {
     return (
         <div className="customers-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : '20px',
-            background: props.isOnPanel ? 'transparent' : 'rgb(250, 250, 250)',
-            background: props.isOnPanel ? 'transparent' : '-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : '-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
-            background: props.isOnPanel ? 'transparent' : 'radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)',
+            background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
+            background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
         }}
             tabIndex={-1}
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
+
+                if (key === 27){
+                    if ((selectedCustomer?.id || 0) > 0){
+                        e.stopPropagation();
+                        setInitialValues();
+                        refCustomerCode.current.focus();
+                    }
+                }
 
                 if (key === 9) {
                     if (e.target.type === undefined) {

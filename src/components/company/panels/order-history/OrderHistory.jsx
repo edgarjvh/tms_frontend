@@ -41,6 +41,7 @@ import {
 import { useReactToPrint } from 'react-to-print';
 
 const OrderHistory = (props) => {
+    const refOrderHistoryContainer = useRef();
     const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
     const [isDateEndCalendarShown, setIsDateEndCalendarShown] = useState(false);
 
@@ -336,8 +337,6 @@ const OrderHistory = (props) => {
                             return false;
                         })
 
-                        console.log(groupedOrders);
-
                         groupedOrders = groupedOrders.map((year) => {
 
                             year.totals = {
@@ -401,11 +400,13 @@ const OrderHistory = (props) => {
                 })
             }
 
-            refDateStart.current.inputElement.focus({
-                preventScroll: true
-            });
+            
         }).catch(e => {
 
+        });
+
+        refDateStart.current.inputElement.focus({
+            preventScroll: true
         });
     }, [])
 
@@ -1002,7 +1003,7 @@ const OrderHistory = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refOrderHistoryContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">
@@ -1030,7 +1031,7 @@ const OrderHistory = (props) => {
                 )
             }
 
-            <div className="order-fields-container">
+            <div className="order-fields-container order-history">
 
                 <div className="search-fields">
                     <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
@@ -1586,6 +1587,7 @@ const OrderHistory = (props) => {
                                 <div className="order-info-col carrier-costs">Carrier Costs</div>
                                 <div className="order-info-col profit">Profit</div>
                                 <div className="order-info-col percentage">Percentage</div>
+                                <div className="order-info-col order-paid">Paid</div>
                             </div>
                         </div>
                     }
@@ -1831,6 +1833,9 @@ const OrderHistory = (props) => {
                                                                                                 displayType={'text'}
                                                                                                 readOnly={true}
                                                                                             />
+                                                                                        </div>
+                                                                                        <div className='order-info-col paid'>
+                                                                                            <input type="checkbox" name='' checked={(order?.customer_check_number || '') !== ''} />
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>

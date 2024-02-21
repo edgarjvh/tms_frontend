@@ -23,7 +23,7 @@ import {
     setSelectedCarrierContact,
     setSelectedDriver,
     setSelectedInsurance,
-    
+
     setAdminHomePanels,
     setCompanyHomePanels,
     setAdminCarrierPanels,
@@ -691,107 +691,104 @@ const Carriers = props => {
         if ((props.carrier_id || 0) > 0) {
             setIsLoading(true);
 
-            axios
-                .post(props.serverUrl + "/getCarrierById", { id: props.carrier_id })
-                .then(res => {
-                    if (res.data.result === "OK") {
-                        let carrier = { ...res.data.carrier };
+            axios.post(props.serverUrl + "/getCarrierById", { id: props.carrier_id }).then(res => {
+                if (res.data.result === "OK") {
+                    let carrier = { ...res.data.carrier };
 
-                        let mailing_address = carrier?.mailing_address || {};
+                    let mailing_address = carrier?.mailing_address || {};
 
-                        if ((carrier?.remit_to_address_is_the_same || 0) === 1) {
-                            mailing_address = carrier?.mailing_same || {};
-                            mailing_address.contact_name = "";
-                            mailing_address.contact_phone = "";
-                            mailing_address.ext = "";
-                            mailing_address.email = "";
+                    if ((carrier?.remit_to_address_is_the_same || 0) === 1) {
+                        mailing_address = carrier?.mailing_same || {};
+                        mailing_address.contact_name = "";
+                        mailing_address.contact_phone = "";
+                        mailing_address.ext = "";
+                        mailing_address.email = "";
 
-                            if ((carrier?.mailing_carrier_contact_id || 0) > 0) {
-                                mailing_address.contact_name = ((carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.first_name || "") + " " + ((carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.last_name || "");
+                        if ((carrier?.mailing_carrier_contact_id || 0) > 0) {
+                            mailing_address.contact_name = ((carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.first_name || "") + " " + ((carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.last_name || "");
 
-                                mailing_address.contact_phone =
-                                    (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                        : "";
+                            mailing_address.contact_phone =
+                                (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
+                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
+                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
+                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                    : "";
 
-                                mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
+                            mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
 
-                                mailing_address.email =
-                                    (carrier?.mailing_carrier_contact_primary_email || "") === "work"
-                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
-                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                : "";
-                            }
+                            mailing_address.email =
+                                (carrier?.mailing_carrier_contact_primary_email || "") === "work"
+                                    ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
+                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
+                                        ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                            ? (carrier?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                            : "";
                         }
-
-                        if ((carrier?.mailing_carrier_id || 0) > 0) {
-                            mailing_address = carrier?.mailing_carrier || {};
-                            mailing_address.contact_name = "";
-                            mailing_address.contact_phone = "";
-                            mailing_address.ext = "";
-                            mailing_address.email = "";
-
-                            if ((carrier?.mailing_carrier_contact_id || 0) > 0) {
-                                mailing_address.contact_name = ((mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.first_name || "") + " " + ((mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.last_name || "");
-
-                                mailing_address.contact_phone =
-                                    (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
-                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
-                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
-                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
-                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
-                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
-                                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
-                                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
-                                                        : "";
-
-                                mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
-
-                                mailing_address.email =
-                                    (carrier?.mailing_carrier_contact_primary_email || "") === "work"
-                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
-                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
-                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
-                                            : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
-                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
-                                                : "";
-                            }
-                        }
-
-                        carrier.mailing_address = mailing_address;
-
-                        setSelectedCarrier({
-                            ...carrier,
-                        });
-
-                        setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
-
-                        setSelectedDriver({});
-                        setSelectedInsurance({});
                     }
 
-                    setIsLoading(false);
-                    refCarrierCode.current.focus({
-                        preventScroll: true,
+                    if ((carrier?.mailing_carrier_id || 0) > 0) {
+                        mailing_address = carrier?.mailing_carrier || {};
+                        mailing_address.contact_name = "";
+                        mailing_address.contact_phone = "";
+                        mailing_address.ext = "";
+                        mailing_address.email = "";
+
+                        if ((carrier?.mailing_carrier_contact_id || 0) > 0) {
+                            mailing_address.contact_name = ((mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.first_name || "") + " " + ((mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.last_name || "");
+
+                            mailing_address.contact_phone =
+                                (carrier?.mailing_carrier_contact_primary_phone || "") === "work"
+                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work || ""
+                                    : (carrier?.mailing_carrier_contact_primary_phone || "") === "fax"
+                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_work_fax || ""
+                                        : (carrier?.mailing_carrier_contact_primary_phone || "") === "mobile"
+                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_mobile || ""
+                                            : (carrier?.mailing_carrier_contact_primary_phone || "") === "direct"
+                                                ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_direct || ""
+                                                : (carrier?.mailing_carrier_contact_primary_phone || "") === "other"
+                                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_other || ""
+                                                    : "";
+
+                            mailing_address.ext = (carrier?.mailing_carrier_contact_primary_phone || "") === "work" ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.phone_ext || "" : "";
+
+                            mailing_address.email =
+                                (carrier?.mailing_carrier_contact_primary_email || "") === "work"
+                                    ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_work || ""
+                                    : (carrier?.mailing_carrier_contact_primary_email || "") === "personal"
+                                        ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_personal || ""
+                                        : (carrier?.mailing_carrier_contact_primary_email || "") === "other"
+                                            ? (mailing_address?.contacts || []).find(x => x.id === carrier.mailing_carrier_contact_id)?.email_other || ""
+                                            : "";
+                        }
+                    }
+
+                    carrier.mailing_address = mailing_address;
+
+                    setSelectedCarrier({
+                        ...carrier,
                     });
-                })
-                .catch(e => {
-                    setIsLoading(false);
-                    console.log("error getting carrier by id", e);
+
+                    setSelectedContact((carrier.contacts || []).find(c => c.is_primary === 1) || {});
+
+                    setSelectedDriver({});
+                    setSelectedInsurance({});
+                }
+
+                setIsLoading(false);
+                refCarrierCode.current.focus({
+                    preventScroll: true,
                 });
+            }).catch(e => {
+                setIsLoading(false);
+                console.log("error getting carrier by id", e);
+            });
         } else {
             refCarrierCode.current.focus({
                 preventScroll: true,
@@ -1125,8 +1122,8 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-carrier-search`}
                     origin={props.origin}
-                    
-                    
+
+
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
                     customerSearch={carrierSearch}
@@ -1523,8 +1520,8 @@ const Carriers = props => {
                     owner="carrier"
                     origin={props.origin}
                     suborigin="carrier"
-                    
-                    
+
+
                     componentId={moment().format("x")}
                     contactSearch={{ search: filters }}
                     callback={contact => {
@@ -1748,7 +1745,7 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={0} selectedCarrier={{}} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={0} selectedCarrier={{}} />,
         };
 
         openPanel(panel, props.origin);
@@ -1799,8 +1796,8 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-factoring-company-search`}
                     origin={props.origin}
-                    
-                    
+
+
                     suborigin={"factoring-company"}
                     componentId={moment().format("x")}
                     customerSearch={factoringCompanySearch}
@@ -1828,7 +1825,7 @@ const Carriers = props => {
                                     let panel = {
                                         panelName: `${props.panelName}-factoring-company`,
                                         fixedWidthPercentage: 70,
-                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={factoringCompanyId} selectedCarrier={selectedCarrier} />,
+                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={factoringCompanyId} selectedCarrier={selectedCarrier} />,
                                     };
 
                                     openPanel(panel, props.origin);
@@ -1867,7 +1864,7 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin}   componentId={moment().format("x")} factoringCompanyId={selectedCarrier.factoring_company.id} selectedCarrier={selectedCarrier} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={selectedCarrier.factoring_company.id} selectedCarrier={selectedCarrier} />,
         };
 
         openPanel(panel, props.origin);
@@ -2189,8 +2186,8 @@ const Carriers = props => {
                         panelName={`${props.panelName}-documents`}
                         origin={props.origin}
                         suborigin={"carrier"}
-                        
-                        
+
+
                         componentId={moment().format("x")}
                         selectedOwner={{ ...selectedCarrier }}
                         selectedOwnerDocument={{
@@ -2217,7 +2214,7 @@ const Carriers = props => {
     const revenueInformationBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-revenue-information`,
-            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes} panelName={`${props.panelName}-revenue-information`} origin={props.origin} suborigin={"carrier"}   componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes} panelName={`${props.panelName}-revenue-information`} origin={props.origin} suborigin={"carrier"} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
         openPanel(panel, props.origin);
@@ -2227,7 +2224,7 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-equipment-information`,
             fixedWidthPercentage: 40,
-            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`} tabTimes={15000 + props.tabTimes} title={"Equipment Information"} origin={props.origin}   componentId={moment().format("x")} carrier={selectedCarrier} />,
+            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`} tabTimes={15000 + props.tabTimes} title={"Equipment Information"} origin={props.origin} componentId={moment().format("x")} carrier={selectedCarrier} />,
         };
 
         openPanel(panel, props.origin);
@@ -2236,7 +2233,7 @@ const Carriers = props => {
     const orderHistoryBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-order-history`,
-            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes} panelName={`${props.panelName}-order-history`} origin={props.origin} suborigin={"carrier"}   componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes} panelName={`${props.panelName}-order-history`} origin={props.origin} suborigin={"carrier"} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
         openPanel(panel, props.origin);
@@ -2327,7 +2324,7 @@ const Carriers = props => {
     const importCarrierBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-carrier-import`,
-            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes} panelName={`${props.panelName}-carrier-import`} origin={props.origin}   componentId={moment().format("x")} />,
+            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes} panelName={`${props.panelName}-carrier-import`} origin={props.origin} componentId={moment().format("x")} />,
         };
 
         openPanel(panel, props.origin);
@@ -2532,8 +2529,16 @@ const Carriers = props => {
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
 
-                if (key === 9){                    
-                    if (e.target.type === undefined){
+                if (key === 27) {
+                    if ((selectedCarrier?.id || 0) > 0) {
+                        e.stopPropagation();
+                        setInitialValues();
+                        refCarrierCode.current.focus();
+                    }
+                }
+
+                if (key === 9) {
+                    if (e.target.type === undefined) {
                         e.preventDefault();
                         refCarrierCode.current.focus();
                     }
@@ -3170,8 +3175,8 @@ const Carriers = props => {
                                                     permissionName="carrier contacts"
                                                     origin={props.origin}
                                                     owner="carrier"
-                                                    
-                                                    
+
+
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
                                                         ...selectedCarrier,
@@ -3219,8 +3224,8 @@ const Carriers = props => {
                                                     origin={props.origin}
                                                     owner="carrier"
                                                     isEditingContact={true}
-                                                    
-                                                    
+
+
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
                                                         ...selectedCarrier,
@@ -4158,8 +4163,8 @@ const Carriers = props => {
                                                                     permissionName="carrier contacts"
                                                                     origin={props.origin}
                                                                     owner="carrier"
-                                                                    
-                                                                    
+
+
                                                                     componentId={moment().format("x")}
                                                                     contactSearchCustomer={{
                                                                         ...selectedCarrier,
@@ -4351,7 +4356,7 @@ const Carriers = props => {
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
-                                                    if (key === 9){
+                                                    if (key === 9) {
                                                         e.preventDefault();
                                                         refInsuranceType.current.focus();
                                                         setShowingContactList(true);
@@ -4405,8 +4410,8 @@ const Carriers = props => {
                                             subOrigin='carrier'
                                             owner='carrier'
                                             isEditingDriver={true}
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
                                             selectedDriverId={selectedDriver.id}
                                             selectedParent={selectedCarrier}
@@ -4446,8 +4451,8 @@ const Carriers = props => {
                                             subOrigin='carrier'
                                             owner='carrier'
                                             isEditingDriver={true}
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
                                             selectedParent={selectedCarrier}
 
@@ -5354,126 +5359,124 @@ const Carriers = props => {
                                                 if (e.target.value.trim() !== "") {
                                                     e.preventDefault();
 
-                                                    axios
-                                                        .post(props.serverUrl + "/getCarrierMailingAddressByCode", {
-                                                            code: e.target.value,
-                                                        })
-                                                        .then(res => {
-                                                            if (res.data.result === "OK") {
-                                                                if ((res.data.mailing_address || []).length > 0) {
-                                                                    let selectedCarrierCode = (selectedCarrier?.code || "") + ((selectedCarrier?.code_number || 0) === 0 ? "" : selectedCarrier.code_number);
+                                                    axios.post(props.serverUrl + "/getCarrierMailingAddressByCode", {
+                                                        code: e.target.value,
+                                                    }).then(res => {
+                                                        if (res.data.result === "OK") {
+                                                            if ((res.data.mailing_address || []).length > 0) {
+                                                                let selectedCarrierCode = (selectedCarrier?.code || "") + ((selectedCarrier?.code_number || 0) === 0 ? "" : selectedCarrier.code_number);
 
-                                                                    let data = { ...res.data.mailing_address[0] };
+                                                                let data = { ...res.data.mailing_address[0] };
 
-                                                                    if (data.type === "carrier") {
-                                                                        let dataCode = (data.code || "") + ((data.code_number || 0) === 0 ? "" : data.code_number);
+                                                                if (data.type === "carrier") {
+                                                                    let dataCode = (data.code || "") + ((data.code_number || 0) === 0 ? "" : data.code_number);
 
-                                                                        if (selectedCarrierCode.toLowerCase() === dataCode.toLowerCase()) {
-                                                                            remitToAddressBtn();
-                                                                            refMailingContactName.current.focus();
+                                                                    if (selectedCarrierCode.toLowerCase() === dataCode.toLowerCase()) {
+                                                                        remitToAddressBtn();
+                                                                        refMailingContactName.current.focus();
+                                                                    } else {
+                                                                        let currentCarrier = { ...selectedCarrier };
+                                                                        currentCarrier.remit_to_address_is_the_same = 0;
+                                                                        currentCarrier.mailing_carrier_id = data.id;
+                                                                        currentCarrier.mailing_address_id = null;
+
+                                                                        let mailing_address = { ...data };
+
+                                                                        if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
+                                                                            currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
+
+                                                                            currentCarrier.mailing_carrier_contact_primary_phone =
+                                                                                mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ""
+                                                                                    ? "work"
+                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ""
+                                                                                        ? "fax"
+                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
+                                                                                            ? "mobile"
+                                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
+                                                                                                ? "direct"
+                                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
+                                                                                                    ? "other"
+                                                                                                    : "work";
+
+                                                                            currentCarrier.mailing_carrier_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== "" ? "work" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== "" ? "personal" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== "" ? "other" : "work";
+
+                                                                            mailing_address.contact_name = (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.first_name || "") + " " + (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.last_name || "");
+
+                                                                            mailing_address.contact_phone =
+                                                                                currentCarrier.mailing_carrier_contact_primary_phone === "work"
+                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ""
+                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
+                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
+                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
+                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
+                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
+                                                                                                    : "";
+
+                                                                            mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || "" : "";
+
+                                                                            mailing_address.email =
+                                                                                currentCarrier.mailing_carrier_contact_primary_email === "work"
+                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ""
+                                                                                    : currentCarrier.mailing_carrier_contact_primary_email === "personal"
+                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
+                                                                                        : currentCarrier.mailing_carrier_contact_primary_email === "other"
+                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
+                                                                                            : "";
+                                                                        } else if (mailing_address.contacts.length > 0) {
+                                                                            currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[0].id;
+
+                                                                            currentCarrier.mailing_carrier_contact_primary_phone = mailing_address.contacts[0].phone_work !== "" ? "work" : mailing_address.contacts[0].phone_work_fax !== "" ? "fax" : mailing_address.contacts[0].phone_mobile !== "" ? "mobile" : mailing_address.contacts[0].phone_direct !== "" ? "direct" : mailing_address.contacts[0].phone_other !== "" ? "other" : "work";
+
+                                                                            currentCarrier.mailing_carrier_contact_primary_email = mailing_address.contacts[0].email_work !== "" ? "work" : mailing_address.contacts[0].email_personal !== "" ? "personal" : mailing_address.contacts[0].email_other !== "" ? "other" : "work";
+
+                                                                            mailing_address.contact_name = (mailing_address.contacts[0]?.first_name || "") + " " + (mailing_address.contacts[0]?.last_name || "");
+
+                                                                            mailing_address.contact_phone =
+                                                                                currentCarrier.mailing_carrier_contact_primary_phone === "work"
+                                                                                    ? mailing_address.contacts[0]?.phone_work || ""
+                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
+                                                                                        ? mailing_address.contacts[0]?.phone_work_fax || ""
+                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
+                                                                                            ? mailing_address.contacts[0]?.phone_mobile || ""
+                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
+                                                                                                ? mailing_address.contacts[0]?.phone_direct || ""
+                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "other"
+                                                                                                    ? mailing_address.contacts[0]?.phone_other || ""
+                                                                                                    : "";
+
+                                                                            mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[0]?.phone_ext || "" : "";
+
+                                                                            mailing_address.email = currentCarrier.mailing_carrier_contact_primary_email === "work" ? mailing_address.contacts[0]?.email_work || "" : currentCarrier.mailing_carrier_contact_primary_email === "personal" ? mailing_address.contacts[0]?.email_personal || "" : currentCarrier.mailing_carrier_contact_primary_email === "other" ? mailing_address.contacts[0]?.email_other || "" : "";
                                                                         } else {
-                                                                            let currentCarrier = { ...selectedCarrier };
-                                                                            currentCarrier.remit_to_address_is_the_same = 0;
-                                                                            currentCarrier.mailing_carrier_id = data.id;
-                                                                            currentCarrier.mailing_address_id = null;
-
-                                                                            let mailing_address = { ...data };
-
-                                                                            if (mailing_address.contacts.findIndex(x => x.is_primary === 1) > -1) {
-                                                                                currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].id;
-
-                                                                                currentCarrier.mailing_carrier_contact_primary_phone =
-                                                                                    mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work !== ""
-                                                                                        ? "work"
-                                                                                        : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_work_fax !== ""
-                                                                                            ? "fax"
-                                                                                            : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_mobile !== ""
-                                                                                                ? "mobile"
-                                                                                                : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_direct !== ""
-                                                                                                    ? "direct"
-                                                                                                    : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].phone_other !== ""
-                                                                                                        ? "other"
-                                                                                                        : "work";
-
-                                                                                currentCarrier.mailing_carrier_contact_primary_email = mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_work !== "" ? "work" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_personal !== "" ? "personal" : mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)].email_other !== "" ? "other" : "work";
-
-                                                                                mailing_address.contact_name = (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.first_name || "") + " " + (mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.last_name || "");
-
-                                                                                mailing_address.contact_phone =
-                                                                                    currentCarrier.mailing_carrier_contact_primary_phone === "work"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_work_fax || ""
-                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_mobile || ""
-                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                                                                                                    ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_direct || ""
-                                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_other || ""
-                                                                                                        : "";
-
-                                                                                mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.phone_ext || "" : "";
-
-                                                                                mailing_address.email =
-                                                                                    currentCarrier.mailing_carrier_contact_primary_email === "work"
-                                                                                        ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_work || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_email === "personal"
-                                                                                            ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_personal || ""
-                                                                                            : currentCarrier.mailing_carrier_contact_primary_email === "other"
-                                                                                                ? mailing_address.contacts[mailing_address.contacts.findIndex(x => x.is_primary === 1)]?.email_other || ""
-                                                                                                : "";
-                                                                            } else if (mailing_address.contacts.length > 0) {
-                                                                                currentCarrier.mailing_carrier_contact_id = mailing_address.contacts[0].id;
-
-                                                                                currentCarrier.mailing_carrier_contact_primary_phone = mailing_address.contacts[0].phone_work !== "" ? "work" : mailing_address.contacts[0].phone_work_fax !== "" ? "fax" : mailing_address.contacts[0].phone_mobile !== "" ? "mobile" : mailing_address.contacts[0].phone_direct !== "" ? "direct" : mailing_address.contacts[0].phone_other !== "" ? "other" : "work";
-
-                                                                                currentCarrier.mailing_carrier_contact_primary_email = mailing_address.contacts[0].email_work !== "" ? "work" : mailing_address.contacts[0].email_personal !== "" ? "personal" : mailing_address.contacts[0].email_other !== "" ? "other" : "work";
-
-                                                                                mailing_address.contact_name = (mailing_address.contacts[0]?.first_name || "") + " " + (mailing_address.contacts[0]?.last_name || "");
-
-                                                                                mailing_address.contact_phone =
-                                                                                    currentCarrier.mailing_carrier_contact_primary_phone === "work"
-                                                                                        ? mailing_address.contacts[0]?.phone_work || ""
-                                                                                        : currentCarrier.mailing_carrier_contact_primary_phone === "fax"
-                                                                                            ? mailing_address.contacts[0]?.phone_work_fax || ""
-                                                                                            : currentCarrier.mailing_carrier_contact_primary_phone === "mobile"
-                                                                                                ? mailing_address.contacts[0]?.phone_mobile || ""
-                                                                                                : currentCarrier.mailing_carrier_contact_primary_phone === "direct"
-                                                                                                    ? mailing_address.contacts[0]?.phone_direct || ""
-                                                                                                    : currentCarrier.mailing_carrier_contact_primary_phone === "other"
-                                                                                                        ? mailing_address.contacts[0]?.phone_other || ""
-                                                                                                        : "";
-
-                                                                                mailing_address.ext = currentCarrier.mailing_carrier_contact_primary_phone === "work" ? mailing_address.contacts[0]?.phone_ext || "" : "";
-
-                                                                                mailing_address.email = currentCarrier.mailing_carrier_contact_primary_email === "work" ? mailing_address.contacts[0]?.email_work || "" : currentCarrier.mailing_carrier_contact_primary_email === "personal" ? mailing_address.contacts[0]?.email_personal || "" : currentCarrier.mailing_carrier_contact_primary_email === "other" ? mailing_address.contacts[0]?.email_other || "" : "";
-                                                                            } else {
-                                                                                currentCarrier.mailing_carrier_contact_id = null;
-                                                                                currentCarrier.mailing_carrier_contact_primary_phone = "work";
-                                                                                currentCarrier.mailing_carrier_contact_primary_email = "work";
-                                                                            }
-
-                                                                            setSelectedCarrier({ ...currentCarrier, mailing_address: mailing_address });
-                                                                            validateCarrierForSaving(e);
-                                                                            refCarrierMailingName.current.focus();
+                                                                            currentCarrier.mailing_carrier_contact_id = null;
+                                                                            currentCarrier.mailing_carrier_contact_primary_phone = "work";
+                                                                            currentCarrier.mailing_carrier_contact_primary_email = "work";
                                                                         }
-                                                                    } else if (data.type === "mailing") {
-                                                                        setSelectedCarrier(prev => {
-                                                                            return {
-                                                                                ...prev,
-                                                                                remit_to_address_is_the_same: 0,
-                                                                                mailing_carrier_id: null,
-                                                                                mailing_address_id: data.id,
-                                                                                mailing_address: { ...data },
-                                                                            };
-                                                                        });
 
+                                                                        setSelectedCarrier({ ...currentCarrier, mailing_address: mailing_address });
                                                                         validateCarrierForSaving(e);
                                                                         refCarrierMailingName.current.focus();
                                                                     }
+                                                                } else if (data.type === "mailing") {
+                                                                    setSelectedCarrier(prev => {
+                                                                        return {
+                                                                            ...prev,
+                                                                            remit_to_address_is_the_same: 0,
+                                                                            mailing_carrier_id: null,
+                                                                            mailing_address_id: data.id,
+                                                                            mailing_address: { ...data },
+                                                                        };
+                                                                    });
+
+                                                                    validateCarrierForSaving(e);
+                                                                    refCarrierMailingName.current.focus();
                                                                 }
                                                             }
-                                                        })
+                                                        }
+                                                    })
                                                         .catch(e => {
                                                             console.log(e);
                                                         });
@@ -7703,8 +7706,8 @@ const Carriers = props => {
                                                         subOrigin='carrier'
                                                         owner='carrier'
                                                         isEditingDriver={true}
-                                                        
-                                                        
+
+
                                                         componentId={moment().format('x')}
                                                         selectedDriverId={driver.id}
                                                         selectedParent={selectedCarrier}
@@ -8317,7 +8320,7 @@ const Carriers = props => {
                                             onClick={() => {
                                                 let panel = {
                                                     panelName: `${props.panelName}-dispatch`,
-                                                    component: <Dispatch title="Dispatch" tabTimes={22000 + props.tabTimes} panelName={`${props.panelName}-dispatch`} origin={props.origin} isOnPanel={true} isAdmin={props.isAdmin}   componentId={moment().format("x")} order_id={order.id} />,
+                                                    component: <Dispatch title="Dispatch" tabTimes={22000 + props.tabTimes} panelName={`${props.panelName}-dispatch`} origin={props.origin} isOnPanel={true} isAdmin={props.isAdmin} componentId={moment().format("x")} order_id={order.id} />,
                                                 };
 
                                                 openPanel(panel, props.origin);
@@ -8423,11 +8426,13 @@ const Carriers = props => {
                                     panelName={`${props.panelName}-ach-wiring-info`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    
-                                    
+
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingACHWiringInfo(false);
+                                        refCarrierCode.current.focus({
+                                            preventScroll: true
+                                        })
                                     }}
                                     selectedOwner={selectedCarrier}
                                     setSelectedOwner={setSelectedCarrier}
@@ -8477,8 +8482,8 @@ const Carriers = props => {
                                     panelName={`${props.panelName}-mc-numbers`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    
-                                    
+
+
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingMCNumbers(false);

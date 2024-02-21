@@ -27,3 +27,10 @@ export const setScale = scale => {
         payload: scale
     }
 }
+
+export const setTestingSwitch = bool => {
+    return {
+        type: systemConstants.SET_TESTING_SWITCH,
+        payload: bool
+    }
+}

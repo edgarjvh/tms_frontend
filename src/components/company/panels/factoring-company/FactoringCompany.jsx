@@ -49,6 +49,7 @@ import {
 } from './../../../company';
 
 const FactoringCompany = (props) => {
+    const refFactoringCompanyContainer = useRef();
     const [selectedFactoringCompany, setSelectedFactoringCompany] = useState({});
     const [selectedFactoringCompanyContact, setSelectedFactoringCompanyContact] = useState({});
     const [selectedFactoringCompanyNote, setSelectedFactoringCompanyNote] = useState({});
@@ -629,8 +630,8 @@ const FactoringCompany = (props) => {
                 panelName={`${props.panelName}-factoring-company-search`}
                 origin={props.origin}
                 suborigin={'factoring-company'}
-                
-                
+
+
 
                 customerSearch={factoringCompanySearch}
 
@@ -781,8 +782,8 @@ const FactoringCompany = (props) => {
                 owner='factoring-company'
                 origin={props.origin}
                 suborigin='factoring-company'
-                
-                
+
+
 
                 contactSearch={{ search: filters }}
 
@@ -1018,7 +1019,18 @@ const FactoringCompany = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refFactoringCompanyContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if ((selectedFactoringCompany?.id || 0) > 0) {
+                    e.stopPropagation();
+
+                    setInitialValues();
+                    refFactoringCompanyCode.current.focus();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
@@ -2671,8 +2683,8 @@ const FactoringCompany = (props) => {
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
                                             origin={props.origin}
                                             owner='factoring-company'
-                                            
-                                            
+
+
 
                                             contactSearchCustomer={{
                                                 ...selectedFactoringCompany,
@@ -2712,8 +2724,8 @@ const FactoringCompany = (props) => {
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
                                             origin={props.origin}
                                             owner='factoring-company'
-                                            
-                                            
+
+
                                             isEditingContact={true}
 
                                             contactSearchCustomer={{
@@ -3664,8 +3676,8 @@ const FactoringCompany = (props) => {
                                                                     removeAvatarUrl='/removeFactoringCompanyAvatar'
                                                                     origin={props.origin}
                                                                     owner='factoring-company'
-                                                                    
-                                                                    
+
+
 
                                                                     contactSearchCustomer={{
                                                                         ...selectedFactoringCompany,
@@ -3819,8 +3831,8 @@ const FactoringCompany = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'factoring-company'}
-                                        
-                                        
+
+
 
                                         selectedOwner={{ ...selectedFactoringCompany }}
                                         selectedOwnerDocument={{
@@ -4039,8 +4051,8 @@ const FactoringCompany = (props) => {
                                                                     componentId={moment().format('x')}
                                                                     isOnPanel={true}
                                                                     origin={props.origin}
-                                                                    
-                                                                    
+
+
                                                                     order_id={order.id}
                                                                 />
                                                             }
@@ -4218,8 +4230,8 @@ const FactoringCompany = (props) => {
                                     panelName={`${props.panelName}-ach-wiring-info`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-                                    
-                                    
+
+
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingACHWiringInfo(false);

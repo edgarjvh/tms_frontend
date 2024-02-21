@@ -5,6 +5,12 @@
   display: flex;
   flex-direction: column;
   font-size: 24px;
+  background: white;
+  transition: all ease 0.7s;
+  overflow: hidden;
+  padding: 10px;
+}
+.carriers-main-container.pro {
   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#efefef+0,c8c8c8+100 */
   background: #fafafa;
   /* Old browsers */
@@ -16,9 +22,6 @@
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#efefef', endColorstr='#c8c8c8', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-  transition: all ease 0.7s;
-  overflow: hidden;
-  padding: 10px;
 }
 .carriers-main-container .selected-carrier-contact-primary-phone {
   position: absolute;
@@ -452,3 +455,4 @@
 .carriers-main-container .orders-list-container .orders-list-wrapper .orders-list-item:hover {
   background-color: rgba(0, 0, 0, 0.1);
 }
+/*# sourceMappingURL=Carriers.css.map */

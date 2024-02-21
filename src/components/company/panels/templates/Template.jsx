@@ -39,6 +39,7 @@ import NumberFormat from "react-number-format";
 const Template = (props) => {
 
     //#region MAIN DECLARATIONS
+    const refTemplateContainer = useRef();
     const [selectedTemplate, setSelectedTemplate] = useState({});
     const [selectedShipper, setSelectedShipper] = useState({});
     const [selectedConsignee, setSelectedConsignee] = useState({});
@@ -2367,7 +2368,17 @@ const Template = (props) => {
     //#endregion
 
     return (
-        <div className='panel-content'>
+        <div className='panel-content' tabIndex={0} ref={refTemplateContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                if ((selectedTemplate?.id || 0) > 0){
+                    e.stopPropagation();
+                    setSelectedTemplate({});
+                    refName.current.focus();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">
@@ -2421,6 +2432,7 @@ const Template = (props) => {
                                 refPopupItems: refDivisionPopupItems,
                                 refDropdown: refDivisionDropdown,
                             }}
+                            noStopPropagationOnEsc={true}
                             readOnly={false}
                             isDropdownEnabled={(selectedTemplate?.id || 0) > 0}
                             popupPosition="vertical below"
@@ -2626,6 +2638,7 @@ const Template = (props) => {
                                 refPopupItems: refLoadTypePopupItems,
                                 refDropdown: refLoadTypeDropdown,
                             }}
+                            noStopPropagationOnEsc={true}
                             readOnly={false}
                             isDropdownEnabled={(selectedTemplate?.id || 0) > 0}
                             popupPosition="vertical below"
@@ -3198,6 +3211,7 @@ const Template = (props) => {
                                             refPopupItems: refBillToContactNamePopupItems,
                                             refDropdown: refBillToContactNameDropdown,
                                         }}
+                                        noStopPropagationOnEsc={true}
                                         readOnly={false}
                                         isDropdownEnabled={(selectedTemplate?.bill_to_company?.id || 0) > 0 && (selectedTemplate?.bill_to_company?.contacts || []).length > 0}
                                         popupPosition="vertical below right"
@@ -3800,6 +3814,7 @@ const Template = (props) => {
                                             refPopupItems: refCarrierContactNamePopupItems,
                                             refDropdown: refCarrierContactNameDropdown,
                                         }}
+                                        noStopPropagationOnEsc={true}
                                         readOnly={false}
                                         isDropdownEnabled={(selectedTemplate?.carrier?.id || 0) > 0 && (selectedTemplate?.carrier?.contacts || []).length > 0}
                                         popupPosition="vertical below right"
@@ -4217,6 +4232,7 @@ const Template = (props) => {
                                             refPopupItems: refCarrierEquipmentPopupItems,
                                             refDropdown: refCarrierEquipmentDropdown,
                                         }}
+                                        noStopPropagationOnEsc={true}
                                         readOnly={false}
                                         isDropdownEnabled={(selectedTemplate?.carrier?.id || 0) > 0}
                                         popupPosition="vertical below right"
@@ -4418,6 +4434,7 @@ const Template = (props) => {
                                             refPopupItems: refCarrierDriverNamePopupItems,
                                             refDropdown: refCarrierDriverNameDropdown,
                                         }}
+                                        noStopPropagationOnEsc={true}
                                         readOnly={false}
                                         isDropdownEnabled={(selectedTemplate?.carrier?.id || 0) > 0 && (selectedTemplate?.carrier?.drivers || []).length > 0}
                                         popupPosition="vertical below right"
@@ -6500,6 +6517,7 @@ const Template = (props) => {
                                                             refPopupItems: refShipperContactNamePopupItems,
                                                             refDropdown: refShipperContactNameDropdown,
                                                         }}
+                                                        noStopPropagationOnEsc={true}
                                                         readOnly={false}
                                                         isDropdownEnabled={(selectedShipper?.contacts || []).length > 0}
                                                         popupPosition="vertical below right"
@@ -8284,7 +8302,7 @@ const Template = (props) => {
                                             setSelectedConsignee(prev => {
                                                 return {
                                                     ...prev,
-                                                    name: e.target.value
+                                                    name: e.target.value    
                                                 }
                                             })
                                         }}
@@ -8610,6 +8628,7 @@ const Template = (props) => {
                                                             refPopupItems: refConsigneeContactNamePopupItems,
                                                             refDropdown: refConsigneeContactNameDropdown,
                                                         }}
+                                                        noStopPropagationOnEsc={true}
                                                         readOnly={false}
                                                         isDropdownEnabled={(selectedConsignee?.contacts || []).length > 0}
                                                         popupPosition="vertical below right"
