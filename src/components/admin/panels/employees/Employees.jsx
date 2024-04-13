@@ -37,6 +37,7 @@ import { PassModal } from './../../panels';
 import { Documents } from './../../../company/panels';
 
 const Employees = (props) => {
+    const refEmployeesContainer = useRef();
     const refPrefix = useRef();
     const refInputAvatar = useRef();
     const [tempSelectedEmployee, setTempSelectedEmployee] = useState({});
@@ -70,8 +71,11 @@ const Employees = (props) => {
             refPrefix.current.focus({
                 preventScroll: true
             });
+        } else {
+            refEmployeesContainer.current.focus({
+                preventScroll: true
+            });
         }
-
     }, [])
 
     useEffect(() => {
@@ -494,7 +498,17 @@ const Employees = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refEmployeesContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27) {
+                if (isEditingEmployee) {
+                    e.stopPropagation();
+                    setIsEditingEmployee(false);
+                    setTempSelectedEmployee({});
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
 
             <div className="employee-container" style={{ overflow: 'initial' }}>
@@ -734,8 +748,8 @@ const Employees = (props) => {
                                                 panelName={`${props.panelName}-employee-documents`}
                                                 origin={props.origin}
                                                 suborigin={'company-employee'}
-                                                
-                                                
+
+
                                                 componentId={moment().format('x')}
                                                 selectedOwner={{ ...employeeSearchCompany.selectedEmployee }}
                                                 selectedOwnerDocument={{

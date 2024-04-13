@@ -1193,7 +1193,7 @@ const EmailRecipientInput = (props) => {
                                 setIsLoading(false);
                                 window.setTimeout(() => {
                                     props.close();
-                                }, 1500);
+                                }, 1000);
                             });
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>

@@ -54,6 +54,7 @@ import {
 } from './../../../../actions';
 
 const CompanyDrivers = props => {
+    const refCompanyDriversContainer = useRef();
     const refDriverInfoCode = useRef();
     const refDriverInfoName = useRef();
     const refDriverInfoEmail = useRef();
@@ -1347,7 +1348,17 @@ const CompanyDrivers = props => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refCompanyDriversContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                if ((selectedDriver?.id || 0) > 0){
+                    e.stopPropagation();
+                    setInitialValues();
+                    refDriverInfoCode.current.focus()
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">

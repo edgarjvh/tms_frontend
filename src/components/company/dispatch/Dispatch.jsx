@@ -68,9 +68,8 @@ import {
 } from "./../../company";
 import ModalTemplate from "./modal-template/ModalTemplate";
 
-var delayTimer;
-
-const Dispatch = (props) => {
+const Dispatch = (props) => {    
+    const refOrderNumber = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
 
     const [selectedTemplate, setSelectedTemplate] = useState({});
@@ -152,7 +151,7 @@ const Dispatch = (props) => {
     const [driverItems, setDriverItems] = useState([]);
     SwiperCore.use([Navigation]);
 
-    const refOrderNumber = useRef(null);
+
 
     useEffect(() => {
         if ((props.order_id || 0) > 0) {
@@ -251,16 +250,19 @@ const Dispatch = (props) => {
                         refDispatchEvents.current.focus();
                     }
 
+                    if (props.isOnPanel && refOrderNumber?.current){
+                        refOrderNumber.current.focus({
+                            preventScroll: true,
+                        });
+                    }
                 }
             }).catch((e) => {
                 console.log("error getting order by id", e);
                 setIsLoading(false);
-
-                refOrderNumber.current.focus({
-                    preventScroll: true,
-                });
             });
-        } else {
+        }
+
+        if (props.isOnPanel && refOrderNumber?.current){
             refOrderNumber.current.focus({
                 preventScroll: true,
             });
@@ -268,12 +270,26 @@ const Dispatch = (props) => {
 
         updateSystemDateTime();
     }, []);
+    
+    useEffect(() => {
+        if (props.refOrderNumber?.current){
+            props.refOrderNumber.current.focus({
+                preventScroll: true,
+            });
+        }
+    }, [props.refOrderNumber])
 
     useEffect(() => {
         if (props.screenFocused) {
-            refOrderNumber.current.focus({
-                preventScroll: true,
-            });
+            if (props.isOnPanel){
+                refOrderNumber.current.focus({
+                    preventScroll: true,
+                });
+            }else{
+                props.refOrderNumber.current.focus({
+                    preventScroll: true,
+                });
+            }
         }
     }, [props.screenFocused]);
 
@@ -1128,7 +1144,19 @@ const Dispatch = (props) => {
         setIsCreatingTemplate(false);
         setIsEditingTemplate(false);
 
-        refOrderNumber.current.focus();
+        if (props.isOnPanel){
+            if (refOrderNumber?.current){
+                refOrderNumber.current.focus({
+                    preventScroll: true,
+                });
+            }
+        }else{
+            if (props.refOrderNumber?.current){
+                props.refOrderNumber.current.focus({
+                    preventScroll: true,
+                });
+            }
+        }
     };
 
     const getBillToCompanyByCode = (e) => {
@@ -2532,7 +2560,6 @@ const Dispatch = (props) => {
         if (isSavingOrder) {
             let selected_order = { ...selectedOrder } || { order_number: 0 };
 
-
             // check if there's a bill-to-company loaded
             if ((selectedBillToCustomer?.id || 0) === 0) {
                 setIsSavingOrder(false);
@@ -2545,37 +2572,37 @@ const Dispatch = (props) => {
             selected_order.carrier_id = (selectedCarrier?.id || 0) === 0 ? null : selectedCarrier.id;
             selected_order.carrier_driver_id = (selectedCarrierDriver?.id || 0) === 0 ? null : selectedCarrierDriver.id;
 
-            if ((selected_order?.id || 0) === 0 &&
-                (selected_order.pickups || []).length === 1 &&
-                selected_order.pickups[0].id === 0 &&
-                (selected_order.pickups[0].customer_id || 0) > 0
-            ) {
-                selected_order.pickups = (selected_order.pickups || []).map((pu, i) => {
-                    pu.pu_date1 = getFormattedDates(pu.pu_date1 || "");
-                    pu.pu_date2 = getFormattedDates(pu.pu_date2 || "");
-                    pu.pu_time1 = getFormattedHours(pu.pu_time1 || "");
-                    pu.pu_time2 = getFormattedHours(pu.pu_time2 || "");
-                    return pu;
-                });
-            } else {
-                selected_order.pickups = []; // se envia vacio para no tocarlo
-            }
-
-            if ((selected_order?.id || 0) === 0 &&
-                (selected_order.deliveries || []).length === 1 &&
-                selected_order.deliveries[0].id === 0 &&
-                (selected_order.deliveries[0].customer_id || 0) > 0
-            ) {
-                selected_order.deliveries = (selected_order.deliveries || []).map((delivery, i) => {
-                    delivery.delivery_date1 = getFormattedDates(delivery.delivery_date1 || "");
-                    delivery.delivery_date2 = getFormattedDates(delivery.delivery_date2 || "");
-                    delivery.delivery_time1 = getFormattedHours(delivery.delivery_time1 || "");
-                    delivery.delivery_time2 = getFormattedHours(delivery.delivery_time2 || "");
-                    return delivery;
-                });
-            } else {
-                selected_order.deliveries = []; // se envia vacio para no tocarlo
-            }
+            // if ((selected_order?.id || 0) === 0 &&
+            //     (selected_order.pickups || []).length === 1 &&
+            //     selected_order.pickups[0].id === 0 &&
+            //     (selected_order.pickups[0].customer_id || 0) > 0
+            // ) {
+            //     selected_order.pickups = (selected_order.pickups || []).map((pu, i) => {
+            //         pu.pu_date1 = getFormattedDates(pu.pu_date1 || "");
+            //         pu.pu_date2 = getFormattedDates(pu.pu_date2 || "");
+            //         pu.pu_time1 = getFormattedHours(pu.pu_time1 || "");
+            //         pu.pu_time2 = getFormattedHours(pu.pu_time2 || "");
+            //         return pu;
+            //     });
+            // } else {
+            //     selected_order.pickups = []; // se envia vacio para no tocarlo
+            // }
+            //
+            // if ((selected_order?.id || 0) === 0 &&
+            //     (selected_order.deliveries || []).length === 1 &&
+            //     selected_order.deliveries[0].id === 0 &&
+            //     (selected_order.deliveries[0].customer_id || 0) > 0
+            // ) {
+            //     selected_order.deliveries = (selected_order.deliveries || []).map((delivery, i) => {
+            //         delivery.delivery_date1 = getFormattedDates(delivery.delivery_date1 || "");
+            //         delivery.delivery_date2 = getFormattedDates(delivery.delivery_date2 || "");
+            //         delivery.delivery_time1 = getFormattedHours(delivery.delivery_time1 || "");
+            //         delivery.delivery_time2 = getFormattedHours(delivery.delivery_time2 || "");
+            //         return delivery;
+            //     });
+            // } else {
+            //     selected_order.deliveries = []; // se envia vacio para no tocarlo
+            // }
 
             let toSavePickup = (selected_order.pickups || []).find((p) => (p.toSave || false) === true) !== undefined;
 
@@ -2584,12 +2611,22 @@ const Dispatch = (props) => {
                 selected_order.agent_code = props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
             }
 
-            setSelectedOrder({ ...selected_order });
+            // setSelectedOrder(prev => {
+            //     return {
+            //         ...prev,
+            //         ...selected_order
+            //     }
+            // });
 
             if (!isCreatingTemplate && !isEditingTemplate) {
                 axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
                     if (res.data.result === "OK") {
-                        setSelectedOrder({ ...res.data.order });
+                        setSelectedOrder(prev => {
+                            return {
+                                ...prev,
+                                ...res.data.order
+                            }
+                        });
 
                         if (!isEditingTemplate && !isCreatingTemplate) {
                             props.setSelectedOrder({
@@ -3455,7 +3492,19 @@ const Dispatch = (props) => {
                     } else {
                         setIsLoading(false);
                         dispatchClearBtnClick();
-                        refOrderNumber.current.focus();
+                        if (props.isOnPanel){
+                            if (refOrderNumber?.current){
+                                refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refOrderNumber?.current){
+                                props.refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }).catch((e) => {
                     console.log("error getting order by order number", e);
@@ -3583,7 +3632,19 @@ const Dispatch = (props) => {
                     } else {
                         setIsLoading(false);
                         dispatchClearBtnClick();
-                        refOrderNumber.current.focus();
+                        if (props.isOnPanel){
+                            if (refOrderNumber?.current){
+                                refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refOrderNumber?.current){
+                                props.refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 })
                     .catch((e) => {
@@ -4148,6 +4209,7 @@ const Dispatch = (props) => {
                 padding: props.isOnPanel ? "10px 0" : 10,
                 position: props.isOnPanel ? "unset" : "relative",
             }}
+            ref={props.isOnPanel ? null : props.refDispatchScreen}
             tabIndex={-1}
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
@@ -4162,7 +4224,19 @@ const Dispatch = (props) => {
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        refOrderNumber.current.focus();
+                        if (props.isOnPanel){
+                            if (refOrderNumber?.current){
+                                refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refOrderNumber?.current){
+                                props.refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
             }}
@@ -4263,7 +4337,7 @@ const Dispatch = (props) => {
                                             style={{ textAlign: "right", fontWeight: "bold" }}
                                             tabIndex={1 + props.tabTimes}
                                             type="text"
-                                            ref={refOrderNumber}
+                                            ref={props.isOnPanel ? refOrderNumber : props.refOrderNumber}
                                             readOnly={isEditingTemplate || isCreatingTemplate}
                                             onKeyDown={getOrderByOrderNumber}
                                             onChange={(e) => {
@@ -6151,7 +6225,7 @@ const Dispatch = (props) => {
                         <div
                             className="form-bordered-box"
                             style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}
-                        // onKeyDown={validateOrderForSaving}
+
                         >
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
@@ -17896,7 +17970,19 @@ const Dispatch = (props) => {
 
                                 if (key === 9) {
                                     e.preventDefault();
-                                    refOrderNumber.current.focus();
+                                    if (props.isOnPanel){
+                                        if (refOrderNumber?.current){
+                                            refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }else{
+                                        if (props.refOrderNumber?.current){
+                                            props.refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }
                                 }
                             }} />
                         </div>
@@ -19466,10 +19552,34 @@ const Dispatch = (props) => {
                                         await setDispatchEventTime(formatted);
 
                                         if ((dispatchEvent?.name || "") === "") {
-                                            refOrderNumber.current.focus();
+                                            if (props.isOnPanel){
+                                                if (refOrderNumber?.current){
+                                                    refOrderNumber.current.focus({
+                                                        preventScroll: true,
+                                                    });
+                                                }
+                                            }else{
+                                                if (props.refOrderNumber?.current){
+                                                    props.refOrderNumber.current.focus({
+                                                        preventScroll: true,
+                                                    });
+                                                }
+                                            }
                                         } else {
                                             if ((selectedOrder?.id || 0) === 0) {
-                                                refOrderNumber.current.focus();
+                                                if (props.isOnPanel){
+                                                    if (refOrderNumber?.current){
+                                                        refOrderNumber.current.focus({
+                                                            preventScroll: true,
+                                                        });
+                                                    }
+                                                }else{
+                                                    if (props.refOrderNumber?.current){
+                                                        props.refOrderNumber.current.focus({
+                                                            preventScroll: true,
+                                                        });
+                                                    }
+                                                }
                                                 return;
                                             }
 

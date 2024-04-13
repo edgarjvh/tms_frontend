@@ -155,7 +155,7 @@ function DispatchBillToForm(props) {
                         placeholder='Name'
                         disabled={(props.selectedParent?.id || 0) === 0}
                         tabIndex={5 + props.tabTimes}
-                        containerStyle={{
+                        boxStyle={{
                             flexGrow: 1,
 
                         }}
@@ -186,7 +186,7 @@ function DispatchBillToForm(props) {
                         disabled={(props.selectedParent?.id || 0) === 0}
                         placeholder='Address 1'
                         tabIndex={6 + props.tabTimes}
-                        containerStyle={{
+                        boxStyle={{
                             flexGrow: 1
                         }}
                         inputStyle={{
@@ -214,7 +214,7 @@ function DispatchBillToForm(props) {
                         disabled={(props.selectedParent?.id || 0) === 0}
                         placeholder='Address 2'
                         tabIndex={7 + props.tabTimes}
-                        containerStyle={{
+                        boxStyle={{
                             flexGrow: 1
                         }}
                         inputStyle={{
@@ -242,7 +242,7 @@ function DispatchBillToForm(props) {
                         disabled={(props.selectedParent?.id || 0) === 0}
                         placeholder='City'
                         tabIndex={8 + props.tabTimes}
-                        containerStyle={{
+                        boxStyle={{
                             flexGrow: 1
                         }}
                         inputStyle={{

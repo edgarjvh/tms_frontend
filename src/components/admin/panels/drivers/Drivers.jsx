@@ -39,6 +39,7 @@ import {
 import { Documents, Calendar } from './../../../company/panels';
 
 const Drivers = (props) => {
+    const refDriversContainer = useRef();
     const refPrefix = useRef();
     const refInputAvatar = useRef();
     const refDriverInfoWrapper = useRef();
@@ -181,6 +182,8 @@ const Drivers = (props) => {
             refPrefix.current.focus({
                 preventScroll: true
             });
+        }else{
+            
         }
 
     }, [])

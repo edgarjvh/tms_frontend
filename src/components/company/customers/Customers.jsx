@@ -64,7 +64,8 @@ import {
 } from './../../company';
 
 const Customers = (props) => {
-    // DECLARATIONS    
+    // DECLARATIONS
+    const refCustomerCode = useRef();
     const [selectedCustomer, setSelectedCustomer] = useState({});
     const [selectedContact, setSelectedContact] = useState({});
     const [selectedNote, setSelectedNote] = useState({});
@@ -89,7 +90,7 @@ const Customers = (props) => {
     const [isLoadingCustomerOrders, setIsLoadingCustomerOrders] = useState(false);
 
     const refPrintCustomerInformation = useRef();
-    const refCustomerCode = useRef();
+
     const refCustomerName = useRef();
     const refCustomerMailingCode = useRef();
     const refCustomerMailingName = useRef();
@@ -825,25 +826,62 @@ const Customers = (props) => {
                     }
                 }
                 setIsLoading(false);
-                refCustomerCode.current.focus({
-                    preventScroll: true
-                });
+                if (props.isOnPanel){
+                    if (refCustomerCode?.current){
+                        refCustomerCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }else{
+                    if (props.refCustomerCode?.current){
+                        props.refCustomerCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
             }).catch(e => {
                 console.log('error getting customer by id')
                 setIsLoading(false);
-            });
-        } else {
-            refCustomerCode.current.focus({
-                preventScroll: true
+                if (props.isOnPanel){
+                    if (refCustomerCode?.current){
+                        refCustomerCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }else{
+                    if (props.refCustomerCode?.current){
+                        props.refCustomerCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
             });
         }
     }, [])
 
     useEffect(() => {
-        if (props.screenFocused) {
-            refCustomerCode.current.focus({
+        if (props.refCustomerCode?.current){
+            props.refCustomerCode.current.focus({
                 preventScroll: true
             });
+        }
+    }, [props.refCustomerCode]);
+
+    useEffect(() => {
+        if (props.screenFocused) {
+            if (props.isOnPanel){
+                if (refCustomerCode?.current){
+                    refCustomerCode.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            }else{
+                if (props.refCustomerCode?.current){
+                    props.refCustomerCode.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            }
         }
     }, [props.screenFocused])
 
@@ -1337,7 +1375,19 @@ const Customers = (props) => {
                         refCustomerName.current.focus();
                     }).catch(e => {
                         closePanel(`${props.panelName}-customer-search`, props.origin);
-                        refCustomerCode.current.focus();
+                        if (props.isOnPanel){
+                            if (refCustomerCode?.current){
+                                refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refCustomerCode?.current){
+                                props.refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     })
 
                 }}
@@ -1420,7 +1470,19 @@ const Customers = (props) => {
                         refCustomerName.current.focus();
                     }).catch(e => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        refCustomerCode.current.focus();
+                        if (props.isOnPanel){
+                            if (refCustomerCode?.current){
+                                refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refCustomerCode?.current){
+                                props.refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     })
 
                 }}
@@ -1480,12 +1542,9 @@ const Customers = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'customer'}
-
-
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedCustomer }}
-                    selectedOwnerDocument={{
-                        id: 0,
+                    selectedOwnerDocument={{                        id: 0,
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format('MM/DD/YYYY')
                     }}
@@ -1495,6 +1554,9 @@ const Customers = (props) => {
                     deletingDocumentNoteUrl='/deleteCustomerDocumentNote'
                     serverDocumentsFolder='/customer-documents/'
                     permissionName='customer documents'
+                    onUnmount={() => {
+                        console.log('customer documents unmount!');
+                    }}
                 />
             }
 
@@ -2110,14 +2172,38 @@ const Customers = (props) => {
                     if ((selectedCustomer?.id || 0) > 0){
                         e.stopPropagation();
                         setInitialValues();
-                        refCustomerCode.current.focus();
+                        if (props.isOnPanel){
+                            if (refCustomerCode?.current){
+                                refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refCustomerCode?.current){
+                                props.refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
 
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        refCustomerCode.current.focus();
+                        if (props.isOnPanel){
+                            if (refCustomerCode?.current){
+                                refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refCustomerCode?.current){
+                                props.refCustomerCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
             }}
@@ -2168,13 +2254,25 @@ const Customers = (props) => {
                                     title: 'Clear',
                                     onClick: () => {
                                         setInitialValues();
-                                        refCustomerCode.current.focus();
+                                        if (props.isOnPanel){
+                                            if (refCustomerCode?.current){
+                                                refCustomerCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        }else{
+                                            if (props.refCustomerCode?.current){
+                                                props.refCustomerCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        }
                                     },
                                     isEnabled: (props.user?.user_code?.is_admin || 0) === 1
                                 },
                             ]}
                             refs={{
-                                refCode: refCustomerCode,
+                                refCode: props.isOnPanel ? refCustomerCode : props.refCustomerCode,
                                 refName: refCustomerName,
                                 refEmail: refCustomerEmail
                             }}
@@ -3793,10 +3891,34 @@ const Customers = (props) => {
                                                         resolve('OK');
                                                     }).then((response) => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        refCustomerCode.current.focus();
+                                                        if (props.isOnPanel){
+                                                            if (refCustomerCode?.current){
+                                                                refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }else{
+                                                            if (props.refCustomerCode?.current){
+                                                                props.refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
                                                     }).catch(e => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        refCustomerCode.current.focus();
+                                                        if (props.isOnPanel){
+                                                            if (refCustomerCode?.current){
+                                                                refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }else{
+                                                            if (props.refCustomerCode?.current){
+                                                                props.refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
                                                     })
                                                 }}
                                             />
@@ -5254,10 +5376,34 @@ const Customers = (props) => {
                                                         resolve('OK');
                                                     }).then((response) => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        refCustomerCode.current.focus();
+                                                        if (props.isOnPanel){
+                                                            if (refCustomerCode?.current){
+                                                                refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }else{
+                                                            if (props.refCustomerCode?.current){
+                                                                props.refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
                                                     }).catch(e => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        refCustomerCode.current.focus();
+                                                        if (props.isOnPanel){
+                                                            if (refCustomerCode?.current){
+                                                                refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }else{
+                                                            if (props.refCustomerCode?.current){
+                                                                props.refCustomerCode.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
                                                     })
                                                 }}
                                             />
@@ -5610,7 +5756,19 @@ const Customers = (props) => {
                                                     //     }
                                                     // }
 
-                                                    refCustomerCode.current.focus();
+                                                    if (props.isOnPanel){
+                                                        if (refCustomerCode?.current){
+                                                            refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }else{
+                                                        if (props.refCustomerCode?.current){
+                                                            props.refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }
                                                 }
                                             }}
                                             onBlur={(e) => validateHoursForSaving(e, 'delivery hours close 2')}
@@ -5793,10 +5951,7 @@ const Customers = (props) => {
                                                             origin={props.origin}
                                                             isOnPanel={true}
                                                             isAdmin={props.isAdmin}
-
-
                                                             componentId={moment().format('x')}
-
                                                             order_id={order.id}
                                                         />
                                                     }
@@ -5807,18 +5962,13 @@ const Customers = (props) => {
                                                         color: "#4682B4",
                                                         fontWeight: 'bold',
                                                         marginRight: 5
-                                                    }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                        ? order.routing[0].type === 'pickup'
-                                                            ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-
-                                                            : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                        : ''}
+                                                    }}>{order.order_number}</span>
+                                                    {
+                                                        `${order?.from_pickup_city || order?.from_delivery_city}, 
+                                                            ${order?.from_pickup_state || order?.from_delivery_state} - 
+                                                         ${order?.to_pickup_city || order?.to_delivery_city}, 
+                                                            ${order?.to_pickup_state || order?.to_delivery_state}`
+                                                    }
                                                 </div>
                                             )
                                         })

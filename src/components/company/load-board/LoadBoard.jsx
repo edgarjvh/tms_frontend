@@ -31,7 +31,12 @@ import {
     setAdminLoadBoardPanels,
     setCompanyLoadBoardPanels,
     setAdminReportPanels,
-    setCompanyReportPanels
+    setCompanyReportPanels,
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 } from './../../../actions';
 
 import {
@@ -101,7 +106,11 @@ const LoadBoard = (props) => {
 
     const refMainContainer = useRef();
     const [showRefreshIntervals, setShowRefreshIntervals] = useState(false);
-    const refShowRefreshIntervalsDropDown = useDetectClickOutside({ onTriggered: async () => { await setShowRefreshIntervals(false) } });
+    const refShowRefreshIntervalsDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowRefreshIntervals(false)
+        }
+    });
     const refRefreshIntervalPopupItems = useRef([]);
     const refAutoRefresh = useRef([]);
 
@@ -314,25 +323,25 @@ const LoadBoard = (props) => {
 
                             } else {
                                 setIsLoading(true);
+                                setIsLoadingWidget(true);
 
                                 axios.post(props.serverUrl + '/getLoadBoardOrders', {
-                                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : '',
+                                    order_id: selectedOrder?.id || 0
                                 }).then(async res => {
                                     if (res.data.result === 'OK') {
                                         setAvailableOrders(res.data.available_orders);
-
                                         setBookedOrders(res.data.booked_orders);
+                                        setInTransitOrders(res.data.in_transit_orders);
+                                        setDeliveredNotInvoicedOrders(res.data.not_invoiced_orders);
 
-                                        setInTransitOrders(res.data.in_transit_orders.filter(item =>
-                                            ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))
-                                        ))
+                                        props.setAvailableOrders(res.data.available_orders);
+                                        props.setBookedOrders(res.data.booked_orders);
+                                        props.setInTransitOrders(res.data.in_transit_orders);
+                                        props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
 
-                                        setDeliveredNotInvoicedOrders(res.data.in_transit_orders.filter(item =>
-                                            ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))
-                                        ))
-
-                                        if ((selectedOrder?.id || 0) > 0) {
-                                            let order = res.data.orders.find(o => o.id === selectedOrder.id);
+                                        if (res.data?.selected_order) {
+                                            let order = res.data.selected_order;
 
                                             setSelectedOrder(order);
 
@@ -380,12 +389,14 @@ const LoadBoard = (props) => {
                                         }
 
                                         setIsLoading(false);
+                                        setIsLoadingWidget(false);
 
                                         setLoadBoardTimer();
                                     }
                                 }).catch(e => {
                                     console.log('error loading orders', e)
                                     setIsLoading(false);
+                                    setIsLoadingWidget(false);
                                 })
                             }
                         }
@@ -416,28 +427,29 @@ const LoadBoard = (props) => {
     useEffect(() => {
         if ((props.user?.id || 0) > 0) {
             setIsLoading(true);
+            setIsLoadingWidget(true);
 
             axios.post(props.serverUrl + '/getLoadBoardOrders', {
                 user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
             }).then(async res => {
                 if (res.data.result === 'OK') {
                     setAvailableOrders(res.data.available_orders);
-
                     setBookedOrders(res.data.booked_orders);
+                    setInTransitOrders(res.data.in_transit_orders);
+                    setDeliveredNotInvoicedOrders(res.data.not_invoiced_orders);
 
-                    setInTransitOrders(res.data.in_transit_orders.filter(item =>
-                        ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))
-                    ))
-
-                    setDeliveredNotInvoicedOrders(res.data.in_transit_orders.filter(item =>
-                        ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))
-                    ))
+                    props.setAvailableOrders(res.data.available_orders);
+                    props.setBookedOrders(res.data.booked_orders);
+                    props.setInTransitOrders(res.data.in_transit_orders);
+                    props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
 
                     setIsLoading(false);
+                    setIsLoadingWidget(false);
                 }
             }).catch(e => {
                 console.log('error loading orders', e)
                 setIsLoading(false);
+                setIsLoadingWidget(false);
             })
 
             updateSystemDateTime();
@@ -461,7 +473,9 @@ const LoadBoard = (props) => {
         mywindow.document.write('</body></html>');
         mywindow.document.close();
         mywindow.focus();
-        setTimeout(function () { mywindow.print(); }, 1000);
+        setTimeout(function () {
+            mywindow.print();
+        }, 1000);
 
         return true;
     }
@@ -493,51 +507,64 @@ const LoadBoard = (props) => {
     }
 
     const onOrderClick = (order) => {
-        setSelectedOrder(order);
+        setIsLoading(true);
+        setIsLoadingWidget(true);
+        axios.post(props.serverUrl + '/getLoadBoardOrderById', { id: order.id }).then(res => {
+            if (res.data.result === 'OK') {
+                let order = { ...res.data.order };
 
-        setSelectedBillToCustomer({ ...order.bill_to_company })
-        setSelectedBillToCustomerContact({ ...(order.bill_to_company?.contacts || []).find(c => c.is_primary === 1) });
+                setSelectedOrder(order);
 
-        setSelectedCarrier({ ...order.carrier })
-        setSelectedCarrierContact({ ...(order.carrier?.contacts || []).find(c => c.is_primary === 1) })
-        setSelectedCarrierDriver({
-            ...order.driver,
-            name: (order.driver?.first_name || '') + ((order.driver?.last_name || '').trim() === '' ? '' : ' ' + (order.driver?.last_name || ''))
+                setSelectedBillToCustomer({ ...order.bill_to_company })
+                setSelectedBillToCustomerContact({ ...(order.bill_to_company?.contacts || []).find(c => c.is_primary === 1) });
+
+                setSelectedCarrier({ ...order.carrier })
+                setSelectedCarrierContact({ ...(order.carrier?.contacts || []).find(c => c.is_primary === 1) })
+                setSelectedCarrierDriver({
+                    ...order.driver,
+                    name: (order.driver?.first_name || '') + ((order.driver?.last_name || '').trim() === '' ? '' : ' ' + (order.driver?.last_name || ''))
+                });
+
+                let pickup_id = (order.routing || []).find(r => r.type === 'pickup')?.pickup_id || 0;
+                let pickup = { ...((order.pickups || []).find(p => p.id === pickup_id) || (order.pickups || [])[0]) };
+
+                setSelectedShipperCustomer(pickup === undefined ? {} : {
+                    ...pickup.customer,
+                    pickup_id: pickup.id,
+                    pu_date1: pickup.pu_date1,
+                    pu_date2: pickup.pu_date2,
+                    pu_time1: pickup.pu_time1,
+                    pu_time2: pickup.pu_time2,
+                    bol_numbers: pickup.bol_numbers,
+                    po_numbers: pickup.po_numbers,
+                    ref_numbers: pickup.ref_numbers,
+                    seal_number: pickup.seal_number,
+                    special_instructions: pickup.special_instructions,
+                    type: pickup.type,
+                });
+                setSelectedShipperCustomerContact({ ...(pickup.contacts || []).find(c => c.is_primary === 1) });
+
+                let delivery_id = (order.routing || []).find(r => r.type === 'delivery')?.delivery_id || 0;
+                let delivery = { ...((order.deliveries || []).find(d => d.id === delivery_id) || (order.deliveries || [])[0]) };
+
+                setSelectedConsigneeCustomer(delivery === undefined ? {} : {
+                    ...delivery.customer,
+                    delivery_id: delivery.id,
+                    delivery_date1: delivery.delivery_date1,
+                    delivery_date2: delivery.delivery_date2,
+                    delivery_time1: delivery.delivery_time1,
+                    delivery_time2: delivery.delivery_time2,
+                    special_instructions: delivery.special_instructions,
+                    type: delivery.type,
+                });
+                setSelectedConsigneeCustomerContact({ ...(delivery.contacts || []).find(c => c.is_primary === 1) });
+            }
+        }).catch(e => {
+            console.log('error getting order by id', e);
+        }).finally(() => {
+            setIsLoading(false);
+            setIsLoadingWidget(false);
         });
-
-        let pickup_id = (order.routing || []).find(r => r.type === 'pickup')?.pickup_id || 0;
-        let pickup = { ...((order.pickups || []).find(p => p.id === pickup_id) || (order.pickups || [])[0]) };
-
-        setSelectedShipperCustomer(pickup === undefined ? {} : {
-            ...pickup.customer,
-            pickup_id: pickup.id,
-            pu_date1: pickup.pu_date1,
-            pu_date2: pickup.pu_date2,
-            pu_time1: pickup.pu_time1,
-            pu_time2: pickup.pu_time2,
-            bol_numbers: pickup.bol_numbers,
-            po_numbers: pickup.po_numbers,
-            ref_numbers: pickup.ref_numbers,
-            seal_number: pickup.seal_number,
-            special_instructions: pickup.special_instructions,
-            type: pickup.type,
-        });
-        setSelectedShipperCustomerContact({ ...(pickup.contacts || []).find(c => c.is_primary === 1) });
-
-        let delivery_id = (order.routing || []).find(r => r.type === 'delivery')?.delivery_id || 0;
-        let delivery = { ...((order.deliveries || []).find(d => d.id === delivery_id) || (order.deliveries || [])[0]) };
-
-        setSelectedConsigneeCustomer(delivery === undefined ? {} : {
-            ...delivery.customer,
-            delivery_id: delivery.id,
-            delivery_date1: delivery.delivery_date1,
-            delivery_date2: delivery.delivery_date2,
-            delivery_time1: delivery.delivery_time1,
-            delivery_time2: delivery.delivery_time2,
-            special_instructions: delivery.special_instructions,
-            type: delivery.type,
-        });
-        setSelectedConsigneeCustomerContact({ ...(delivery.contacts || []).find(c => c.is_primary === 1) });
     }
 
     const getPickupsOnRouting = () => {
@@ -570,39 +597,25 @@ const LoadBoard = (props) => {
         if ((props.user?.id || 0) > 0) {
             if (!isLoading) {
                 setIsLoading(true);
+                setIsLoadingWidget(true);
 
                 axios.post(props.serverUrl + '/getLoadBoardOrders', {
-                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+                    user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : '',
+                    order_id: selectedOrder?.id || 0
                 }).then(async res => {
                     if (res.data.result === 'OK') {
                         setAvailableOrders(res.data.available_orders);
-
                         setBookedOrders(res.data.booked_orders);
+                        setInTransitOrders(res.data.in_transit_orders);
+                        setDeliveredNotInvoicedOrders(res.data.not_invoiced_orders);
 
-                        setInTransitOrders(res.data.in_transit_orders.filter(item =>
-                            ((item.deliveries.length === 0) || (item.total_delivered_events < item.deliveries.length))
-                        ))
+                        props.setAvailableOrders(res.data.available_orders);
+                        props.setBookedOrders(res.data.booked_orders);
+                        props.setInTransitOrders(res.data.in_transit_orders);
+                        props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
 
-                        setDeliveredNotInvoicedOrders(res.data.in_transit_orders.filter(item =>
-                            ((item.deliveries.length > 0) && (item.total_delivered_events === item.deliveries.length))
-                        ))
-
-                        // setInTransitOrders(res.data.orders.filter(item =>
-                        //     ((item.carrier_id || 0) > 0) &&
-                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                        //     // ((item.deliveries.length === 0) || (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) === undefined))))
-                        //     ((item.deliveries.length === 0) || (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length > 0))))
-                        //
-                        // setDeliveredNotInvoicedOrders(res.data.orders.filter(item =>
-                        //     ((item.order_invoiced || 0) === 0) &&
-                        //     ((item.carrier_id || 0) > 0) &&
-                        //     (item.events.find(ev => (ev.event_type?.name || '').toLowerCase() === 'loaded') !== undefined) &&
-                        //     // ((item.deliveries.length > 0) && (item.events.find(ev => ev.consignee_id === item.deliveries[item.deliveries.length - 1].id) !== undefined))))
-                        //     ((item.deliveries.length > 0) && (item.deliveries.filter(del => item.events.find(el => el.consignee_id === del.customer.id) === undefined).length === 0))))
-
-
-                        if ((selectedOrder?.id || 0) > 0) {
-                            let order = res.data.orders.find(o => o.id === selectedOrder.id);
+                        if (res.data?.selected_order) {
+                            let order = res.data.selected_order;
 
                             setSelectedOrder(order);
 
@@ -650,10 +663,12 @@ const LoadBoard = (props) => {
                         }
 
                         setIsLoading(false);
+                        setIsLoadingWidget(false);
                     }
                 }).catch(e => {
                     console.log('error loading orders', e)
                     setIsLoading(false);
+                    setIsLoadingWidget(false);
                 })
             }
         }
@@ -853,16 +868,13 @@ const LoadBoard = (props) => {
                                 availableOrders.map((item, index) => {
                                     html += `
                                         <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
-                                            <div style="min-width:20%;max-width:20%">${item.order_number}</div>
-                                            <div style="min-width:30%;max-width:30%">${item.pickups.length > 0
-                                            ? item.pickups[0].city + ', ' + item.pickups[0].state
-                                            : ''
-                                        }</div>
-                                            <div style="min-width:50%;max-width:50%">${item.deliveries.length > 0
-                                            ? item.deliveries[item.deliveries.length - 1].city + ', ' + item.deliveries[item.deliveries.length - 1].state
-                                            : ''
-                                        }</div>
-                                            
+                                            <div style="min-width:20%;max-width:20%">${item?.order_number || ''}</div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}
+                                            </div>
+                                            <div style="min-width:50%;max-width:50%">
+                                            ${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}
+                                            </div>                                            
                                         </div>
                                         `;
                                 })
@@ -895,7 +907,9 @@ const LoadBoard = (props) => {
                                         'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
-                                        <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
+                                        <div className={itemClasses} key={i} onClick={() => {
+                                            onOrderClick(item)
+                                        }} onDoubleClick={() => {
                                             let panel = {
                                                 panelName: `${props.panelName}-dispatch`,
                                                 component: <Dispatch
@@ -915,21 +929,13 @@ const LoadBoard = (props) => {
 
                                             openPanel(panel, props.origin);
                                         }}>
-                                            <div className="order-number">{item.order_number}</div>
-                                            <div className="starting-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[0].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
-                                            <div className="destination-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[item.routing.length - 1].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
+                                            <div className="order-number">{item?.order_number || ''}</div>
+                                            <div className="starting-city-state">
+                                                {`${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}`}
+                                            </div>
+                                            <div className="destination-city-state">
+                                                {`${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}`}
+                                            </div>
                                         </div>
                                     )
                                 })
@@ -965,17 +971,14 @@ const LoadBoard = (props) => {
                                 bookedOrders.map((item, index) => {
                                     html += `
                                         <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
-                                            <div style="min-width:20%;max-width:20%">${item.order_number}</div>
-                                            <div style="min-width:20%;max-width:20%">${item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
-                                            <div style="min-width:30%;max-width:30%">${item.pickups.length > 0
-                                            ? item.pickups[0].customer?.city + ', ' + item.pickups[0].customer?.state
-                                            : ''
-                                        }</div>
-                                            <div style="min-width:30%;max-width:30%">${item.deliveries.length > 0
-                                            ? item.deliveries[item.deliveries.length - 1].customer?.city + ', ' + item.deliveries[item.deliveries.length - 1].customer?.state
-                                            : ''
-                                        }</div>
-                                            
+                                            <div style="min-width:20%;max-width:20%">${item?.order_number || ''}</div>
+                                            <div style="min-width:20%;max-width:20%">${item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}
+                                            </div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}
+                                            </div>                                            
                                         </div>
                                         `;
                                 })
@@ -1009,7 +1012,9 @@ const LoadBoard = (props) => {
                                         'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
-                                        <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
+                                        <div className={itemClasses} key={i} onClick={() => {
+                                            onOrderClick(item)
+                                        }} onDoubleClick={() => {
                                             let panel = {
                                                 panelName: `${props.panelName}-dispatch`,
                                                 component: <Dispatch
@@ -1029,22 +1034,15 @@ const LoadBoard = (props) => {
 
                                             openPanel(panel, props.origin);
                                         }}>
-                                            <div className="order-number">{item.order_number}</div>
-                                            <div className="carrier-code">{item.carrier?.code.toUpperCase() + (item.carrier?.code_number === 0 ? '' : item.carrier?.code_number)}</div>
-                                            <div className="starting-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[0].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
-                                            <div className="destination-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[item.routing.length - 1].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
+                                            <div className="order-number">{item?.order_number || ''}</div>
+                                            <div
+                                                className="carrier-code">{item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div className="starting-city-state">
+                                                {`${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}`}
+                                            </div>
+                                            <div className="destination-city-state">
+                                                {`${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}`}
+                                            </div>
                                         </div>
                                     )
                                 })
@@ -1080,17 +1078,14 @@ const LoadBoard = (props) => {
                                 inTransitOrders.map((item, index) => {
                                     html += `
                                         <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
-                                            <div style="min-width:20%;max-width:20%">${item.order_number}</div>
-                                            <div style="min-width:20%;max-width:20%">${item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
-                                            <div style="min-width:30%;max-width:30%">${item.pickups.length > 0
-                                            ? item.pickups[0].customer?.city + ', ' + item.pickups[0].customer?.state
-                                            : ''
-                                        }</div>
-                                            <div style="min-width:30%;max-width:30%">${item.deliveries.length > 0
-                                            ? item.deliveries[item.deliveries.length - 1].customer?.city + ', ' + item.deliveries[item.deliveries.length - 1].customer?.state
-                                            : ''
-                                        }</div>
-                                            
+                                            <div style="min-width:20%;max-width:20%">${item?.order_number || ''}</div>
+                                            <div style="min-width:20%;max-width:20%">${item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}
+                                            </div>
+                                            <div style="min-width:30%;max-width:30%"> 
+                                            ${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}
+                                            </div>                                            
                                         </div>
                                         `;
                                 })
@@ -1124,7 +1119,9 @@ const LoadBoard = (props) => {
                                         'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
-                                        <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
+                                        <div className={itemClasses} key={i} onClick={() => {
+                                            onOrderClick(item)
+                                        }} onDoubleClick={() => {
                                             let panel = {
                                                 panelName: `${props.panelName}-dispatch`,
                                                 component: <Dispatch
@@ -1144,22 +1141,15 @@ const LoadBoard = (props) => {
 
                                             openPanel(panel, props.origin);
                                         }}>
-                                            <div className="order-number">{item.order_number}</div>
-                                            <div className="carrier-code">{item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
-                                            <div className="starting-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[0].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
-                                            <div className="destination-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[item.routing.length - 1].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
+                                            <div className="order-number">{item?.order_number || ''}</div>
+                                            <div
+                                                className="carrier-code">{item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div className="starting-city-state">
+                                                {`${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}`}
+                                            </div>
+                                            <div className="destination-city-state">
+                                                {`${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}`}
+                                            </div>
                                         </div>
                                     )
                                 })
@@ -1314,16 +1304,18 @@ const LoadBoard = (props) => {
                                                                     }}
                                                                     ref={ref => refRefreshIntervalPopupItems.current.push(ref)}
                                                                 >
-                                                                    <span>{item.time}</span> <span style={{ textTransform: 'capitalize' }}>{item.interval}</span>
+                                                                    <span>{item.time}</span> <span
+                                                                        style={{ textTransform: 'capitalize' }}>{item.interval}</span>
                                                                     {
                                                                         item.selected &&
-                                                                        <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} style={{
-                                                                            position: 'absolute',
-                                                                            left: '-5px',
-                                                                            color: '#2bc1ff',
-                                                                            top: '50%',
-                                                                            transform: 'translateY(-50%)'
-                                                                        }} />
+                                                                        <FontAwesomeIcon className="dropdown-selected"
+                                                                            icon={faCaretRight} style={{
+                                                                                position: 'absolute',
+                                                                                left: '-5px',
+                                                                                color: '#2bc1ff',
+                                                                                top: '50%',
+                                                                                transform: 'translateY(-50%)'
+                                                                            }} />
                                                                     }
                                                                 </div>
                                                             )
@@ -1378,7 +1370,7 @@ const LoadBoard = (props) => {
                         <div className="lb-form-container rows">
                             <div className="lb-form-row">
 
-                                <div className='form-bordered-box'>
+                                <div className='form-bordered-box' style={{ gap: 2 }}>
                                     <div className='form-header'>
                                         <div className='top-border top-border-left'></div>
                                         <div className='form-title'>Bill To</div>
@@ -1403,22 +1395,23 @@ const LoadBoard = (props) => {
                                                         origin={props.origin}
 
 
-
                                                         customer_id={selectedBillToCustomer.id}
                                                     />
                                                 }
 
                                                 openPanel(panel, props.origin);
                                             }}>
-                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                </div>
                                                 <div className='mochi-button-base'>Company info</div>
-                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                </div>
                                             </div>
                                         </div>
                                         <div className='top-border top-border-right'></div>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <TextInput
                                             refs={{
                                                 refInput: null
@@ -1427,7 +1420,8 @@ const LoadBoard = (props) => {
                                             placeholder='Code'
                                             maxLength={8}
                                             tabIndex={1 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={
                                                 (selectedBillToCustomer?.code_number || 0) === 0
                                                     ? (selectedBillToCustomer?.code || '')
@@ -1439,53 +1433,57 @@ const LoadBoard = (props) => {
                                             refs={{
                                                 refInput: null
                                             }}
-                                            containerStyle={{ flexGrow: 1 }}
+                                            boxStyle={{ flexGrow: 1 }}
                                             inputStyle={{ textTransform: 'capitalize' }}
                                             placeholder='Name'
                                             tabIndex={2 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.name || ''}
                                         />
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <TextInput
                                             refs={{
                                                 refInput: null
                                             }}
-                                            containerStyle={{ flexGrow: 1 }}
+                                            boxStyle={{ flexGrow: 1 }}
                                             inputStyle={{ textTransform: 'capitalize' }}
                                             placeholder='Address 1'
                                             tabIndex={3 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.address1 || ''}
                                         />
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <TextInput
                                             refs={{
                                                 refInput: null
                                             }}
-                                            containerStyle={{ flexGrow: 1 }}
+                                            boxStyle={{ flexGrow: 1 }}
                                             inputStyle={{ textTransform: 'capitalize' }}
                                             placeholder='Address 2'
                                             tabIndex={4 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.address2 || ''}
                                         />
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <TextInput
                                             refs={{
                                                 refInput: null
                                             }}
-                                            containerStyle={{ flexGrow: 1 }}
+                                            boxStyle={{ flexGrow: 1 }}
                                             inputStyle={{ textTransform: 'capitalize' }}
                                             placeholder='City'
                                             tabIndex={5 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.city || ''}
                                         />
 
@@ -1497,7 +1495,8 @@ const LoadBoard = (props) => {
                                             placeholder='State'
                                             maxLength={2}
                                             tabIndex={6 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.state || ''}
                                         />
 
@@ -1508,21 +1507,23 @@ const LoadBoard = (props) => {
                                             className='input-zip-code'
                                             placeholder='Postal Code'
                                             tabIndex={7 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={selectedBillToCustomer?.zip || ''}
                                         />
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <TextInput
                                             refs={{
                                                 refInput: null
                                             }}
-                                            containerStyle={{ flexGrow: 1 }}
+                                            boxStyle={{ flexGrow: 1 }}
                                             inputStyle={{ textTransform: 'capitalize' }}
                                             placeholder='Contact Name'
                                             tabIndex={8 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={
                                                 (selectedOrder?.bill_to_contact_id || 0) > 0
                                                     ? ((selectedBillToCustomer?.contacts || []).find(x => x.id === selectedOrder?.bill_to_contact_id)?.first_name || '') + ' ' +
@@ -1536,16 +1537,23 @@ const LoadBoard = (props) => {
                                             placeholder="Contact Phone"
                                             popupId="lb-bill-to-contact-phone"
                                             tabIndex={9 + props.tabTimes}
-                                            boxStyle={{ minHeight: '1.2rem', maxHeight: '1.2rem', minWidth: '6.5rem', maxWidth: '6.5rem' }}
+                                            boxStyle={{
+                                                minHeight: '1.2rem',
+                                                maxHeight: '1.2rem',
+                                                minWidth: '6.5rem',
+                                                maxWidth: '6.5rem'
+                                            }}
                                             wrapperStyle={{ minHeight: '1.2rem', maxHeight: '1.2rem' }}
                                             inputStyle={{ fontSize: '0.5rem' }}
+                                            phoneTypeStyles={{ fontSize: '0.5rem', fontWeight: 'bold' }}
                                             refs={{
                                                 refInput: null,
                                                 refPopupItems: null,
                                                 refDropdown: null,
                                             }}
                                             isDropdownEnabled={false}
-                                            onChange={e => { }}
+                                            onChange={e => {
+                                            }}
                                             value={
                                                 (selectedOrder?.bill_to_contact_id || 0) > 0
                                                     ? (selectedOrder?.bill_to_contact_primary_phone || '') === 'work'
@@ -1562,7 +1570,8 @@ const LoadBoard = (props) => {
                                                     : selectedBillToCustomer?.contact_phone || ''
                                             }
                                             isShowing={false}
-                                            setIsShowing={() => { }}
+                                            setIsShowing={() => {
+                                            }}
                                             primaryPhone={selectedOrder?.bill_to_contact_primary_phone || ''}
                                         />
 
@@ -1573,7 +1582,8 @@ const LoadBoard = (props) => {
                                             className='input-phone-ext'
                                             placeholder='Ext'
                                             tabIndex={10 + props.tabTimes}
-                                            onChange={(e) => { }}
+                                            onChange={(e) => {
+                                            }}
                                             value={
                                                 (selectedOrder?.bill_to_contact_id || 0) > 0
                                                     ? (selectedOrder?.bill_to_contact_primary_phone || '') === 'work'
@@ -1585,7 +1595,7 @@ const LoadBoard = (props) => {
                                     </div>
                                 </div>
 
-                                <div className='form-bordered-box'>
+                                <div className='form-bordered-box' style={{ gap: 2 }}>
                                     <div className='form-header'>
                                         <div className='top-border top-border-left'></div>
                                         <div className='form-title'>Carrier</div>
@@ -1611,45 +1621,51 @@ const LoadBoard = (props) => {
                                                         origin={props.origin}
 
 
-
                                                         carrier_id={selectedCarrier.id}
                                                     />
                                                 }
 
                                                 openPanel(panel, props.origin);
                                             }}>
-                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                </div>
                                                 <div className='mochi-button-base'>Carrier info</div>
-                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                </div>
                                             </div>
                                         </div>
                                         <div className='top-border top-border-right'></div>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <div className="input-box-container input-code">
-                                            <input tabIndex={50 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-
+                                            <input tabIndex={50 + props.tabTimes} type="text" placeholder="Code"
+                                                maxLength="8"
+                                                onChange={e => {
+                                                }}
                                                 value={(selectedCarrier.code_number || 0) === 0 ? (selectedCarrier.code || '') : selectedCarrier.code + selectedCarrier.code_number}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow">
                                             <input tabIndex={51 + props.tabTimes} type="text" placeholder="Name"
-
+                                                onChange={e => {
+                                                }}
                                                 value={selectedCarrier.name || ''}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className={insuranceStatusClasses()} style={{ width: '7rem' }}>
                                             <input type="text" placeholder="Insurance" />
                                         </div>
                                     </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input tabIndex={52 + props.tabTimes} type="text" placeholder="Carrier Load - Starting City State - Destination City State"
 
+                                    <div className="form-row" style={{ gap: 2 }}>
+                                        <div className="input-box-container grow">
+                                            <input tabIndex={52 + props.tabTimes} type="text"
+                                                placeholder="Carrier Load - Starting City State - Destination City State"
+                                                onChange={e => {
+                                                }}
                                                 value={
                                                     ((selectedOrder?.routing || []).length >= 2 && (selectedOrder?.carrier?.id || 0) > 0)
                                                         ? selectedOrder.routing[0].type === 'pickup'
@@ -1667,11 +1683,12 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
+
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <div className="input-box-container grow">
                                             <input tabIndex={53 + props.tabTimes} type="text" placeholder="Contact Name"
-
+                                                onChange={e => {
+                                                }}
                                                 value={
                                                     (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                         ? (selectedCarrier?.contact_name || '')
@@ -1679,13 +1696,14 @@ const LoadBoard = (props) => {
                                                 }
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow" style={{ position: 'relative' }}>
                                             <MaskedInput tabIndex={54 + props.tabTimes}
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
                                                 type="text" placeholder="Contact Phone"
-
+                                                onChange={e => {
+                                                }}
                                                 value={
                                                     (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                         ? (selectedCarrier?.contact_phone || '')
@@ -1708,15 +1726,16 @@ const LoadBoard = (props) => {
                                                     className={classnames({
                                                         'selected-carrier-contact-primary-phone': true,
                                                         'pushed': false
-                                                    })}>
+                                                    })} style={{ fontSize: '0.5rem' }}>
                                                     {selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                 </div>
                                             }
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container input-phone-ext">
                                             <input tabIndex={55 + props.tabTimes} type="text" placeholder="Ext"
-
+                                                onChange={e => {
+                                                }}
                                                 value={
                                                     (selectedCarrier?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                         ? (selectedCarrier?.ext || '')
@@ -1724,45 +1743,51 @@ const LoadBoard = (props) => {
                                                 }
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow" style={{ position: 'relative' }}>
                                             <input tabIndex={56 + props.tabTimes} type="text" placeholder="Equipments"
-
-                                                value={selectedCarrierDriver.equipment?.name || ''}
+                                                onChange={e => {
+                                                }}
+                                                value={selectedOrder.equipment?.name || ''}
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
+
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <div className="input-box-container grow" style={{ position: 'relative' }}>
                                             <input tabIndex={57 + props.tabTimes} type="text" placeholder="Driver Name"
-
+                                                onChange={e => {
+                                                }}
                                                 value={
                                                     ((selectedCarrierDriver?.first_name || '') + ' ' + (selectedCarrierDriver?.last_name || '')).trim()
                                                 }
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow">
                                             <MaskedInput tabIndex={58 + props.tabTimes}
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
                                                 type="text" placeholder="Driver Phone"
-
+                                                onChange={e => {
+                                                }}
                                                 value={selectedCarrierDriver.phone || ''}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow">
                                             <input tabIndex={59 + props.tabTimes} type="text" placeholder="Unit Number"
-
+                                                onChange={e => {
+                                                }}
                                                 value={selectedCarrierDriver.truck || ''}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
-                                        <div className="input-box-container grow">
-                                            <input tabIndex={60 + props.tabTimes} type="text" placeholder="Trailer Number"
 
+                                        <div className="input-box-container grow">
+                                            <input tabIndex={60 + props.tabTimes} type="text"
+                                                placeholder="Trailer Number"
+                                                onChange={e => {
+                                                }}
                                                 value={selectedCarrierDriver.trailer || ''}
                                             />
                                         </div>
@@ -1776,7 +1801,8 @@ const LoadBoard = (props) => {
                             }}>
 
                                 <div className="pickups-container" style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <div className="lb-swiper-pickup-prev-btn"><span className="fas fa-chevron-left"></span></div>
+                                    <div className="lb-swiper-pickup-prev-btn"><span
+                                        className="fas fa-chevron-left"></span></div>
 
                                     <Swiper
                                         slidesPerView={5}
@@ -1868,9 +1894,9 @@ const LoadBoard = (props) => {
                                         }
                                     </Swiper>
 
-                                    <div className="lb-swiper-pickup-next-btn"><span className="fas fa-chevron-right"></span></div>
+                                    <div className="lb-swiper-pickup-next-btn"><span
+                                        className="fas fa-chevron-right"></span></div>
                                 </div>
-
                                 <div className="form-h-sep"></div>
                                 <div className='mochi-button' onClick={() => {
                                     if ((selectedOrder?.id || 0) === 0) {
@@ -1900,8 +1926,10 @@ const LoadBoard = (props) => {
                                     <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
                                 </div>
                                 <div className="form-h-sep"></div>
-                                <div className="deliveries-container" style={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-                                    <div className="lb-swiper-delivery-prev-btn"><span className="fas fa-chevron-left"></span></div>
+                                <div className="deliveries-container"
+                                    style={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+                                    <div className="lb-swiper-delivery-prev-btn"><span
+                                        className="fas fa-chevron-left"></span></div>
 
                                     <Swiper
                                         slidesPerView={5}
@@ -1988,14 +2016,14 @@ const LoadBoard = (props) => {
                                         }
                                     </Swiper>
 
-                                    <div className="lb-swiper-delivery-next-btn"><span className="fas fa-chevron-right"></span></div>
+                                    <div className="lb-swiper-delivery-next-btn"><span
+                                        className="fas fa-chevron-right"></span></div>
                                 </div>
 
                             </div>
 
-
                             <div className="lb-form-row">
-                                <div className='form-bordered-box'>
+                                <div className='form-bordered-box' style={{ gap: 2 }}>
                                     <div className='form-header'>
                                         <div className='top-border top-border-left'></div>
                                         <div className='form-title'>Shipper</div>
@@ -2018,104 +2046,130 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-
-
-
                                                         customer_id={selectedShipperCustomer.id}
                                                     />
                                                 }
 
                                                 openPanel(panel, props.origin);
                                             }}>
-                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                </div>
                                                 <div className='mochi-button-base'>Company info</div>
-                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                </div>
                                             </div>
                                             {
                                                 showingShipperSecondPage &&
-                                                <div className='mochi-button' onClick={() => { setShowingShipperSecondPage(false) }}>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button' onClick={() => {
+                                                    setShowingShipperSecondPage(false)
+                                                }}>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                    </div>
                                                     <div className='mochi-button-base'>1st Page</div>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                    </div>
                                                 </div>
                                             }
                                             {
                                                 !showingShipperSecondPage &&
-                                                <div className='mochi-button' onClick={() => { setShowingShipperSecondPage(true) }}>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button' onClick={() => {
+                                                    setShowingShipperSecondPage(true)
+                                                }}>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                    </div>
                                                     <div className='mochi-button-base'>2nd Page</div>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                    </div>
                                                 </div>
                                             }
-
                                         </div>
                                         <div className='top-border top-border-right'></div>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <div className="input-box-container input-code">
-                                            <input tabIndex={16 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-
+                                            <input tabIndex={16 + props.tabTimes} type="text" placeholder="Code"
+                                                maxLength="8"
+                                                onChange={e => {
+                                                }}
                                                 value={(selectedShipperCustomer.code_number || 0) === 0 ? (selectedShipperCustomer.code || '') : selectedShipperCustomer.code + selectedShipperCustomer.code_number}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow">
                                             <input tabIndex={17 + props.tabTimes} type="text" placeholder="Name"
-
+                                                onChange={e => {
+                                                }}
                                                 value={selectedShipperCustomer.name || ''}
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-slider">
-                                        <div className="form-slider-wrapper" style={{ left: !showingShipperSecondPage ? 0 : '-100%' }}>
-                                            <div className="first-page">
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={18 + props.tabTimes} type="text" placeholder="Address 1"
 
+                                    <div className="form-slider">
+                                        <div className="form-slider-wrapper"
+                                            style={{ left: !showingShipperSecondPage ? 0 : '-100%' }}>
+                                            <div className="first-page" style={{ gap: 2 }}>
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={18 + props.tabTimes} type="text"
+                                                            placeholder="Address 1"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer.address1 || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={19 + props.tabTimes} type="text" placeholder="Address 2"
 
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={19 + props.tabTimes} type="text"
+                                                            placeholder="Address 2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer.address2 || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={20 + props.tabTimes} type="text" placeholder="City"
 
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={20 + props.tabTimes} type="text"
+                                                            placeholder="City"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer.city || ''}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-state">
-                                                        <input tabIndex={21 + props.tabTimes} type="text" placeholder="State" maxLength="2"
 
+                                                    <div className="input-box-container input-state">
+                                                        <input tabIndex={21 + props.tabTimes} type="text"
+                                                            placeholder="State" maxLength="2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer.state || ''}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-zip-code">
-                                                        <input tabIndex={22 + props.tabTimes} type="text" placeholder="Postal Code"
 
+                                                    <div className="input-box-container input-zip-code">
+                                                        <input tabIndex={22 + props.tabTimes} type="text"
+                                                            placeholder="Postal Code"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer.zip || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={23 + props.tabTimes} type="text" placeholder="Contact Name"
 
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={23 + props.tabTimes} type="text"
+                                                            placeholder="Contact Name"
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedShipperCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedShipperCustomer?.contact_name || '')
@@ -2123,13 +2177,15 @@ const LoadBoard = (props) => {
                                                             }
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone" style={{ position: 'relative' }}>
+
+                                                    <div className="input-box-container input-phone"
+                                                        style={{ position: 'relative' }}>
                                                         <MaskedInput tabIndex={24 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={true}
                                                             type="text" placeholder="Contact Phone"
-
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedShipperCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedShipperCustomer?.contact_phone || '')
@@ -2148,19 +2204,20 @@ const LoadBoard = (props) => {
                                                         />
                                                         {
                                                             ((selectedShipperCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined) &&
-                                                            <div
-                                                                className={classnames({
-                                                                    'selected-customer-contact-primary-phone': true,
-                                                                    'pushed': false
-                                                                })}>
+                                                            <div className={classnames({
+                                                                'selected-customer-contact-primary-phone': true,
+                                                                'pushed': false
+                                                            })} style={{ fontSize: '0.5rem' }}>
                                                                 {selectedShipperCustomer?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                             </div>
                                                         }
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone-ext">
-                                                        <input tabIndex={25 + props.tabTimes} type="text" placeholder="Ext"
 
+                                                    <div className="input-box-container input-phone-ext">
+                                                        <input tabIndex={25 + props.tabTimes} type="text"
+                                                            placeholder="Ext"
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedShipperCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedShipperCustomer?.ext || '')
@@ -2171,60 +2228,77 @@ const LoadBoard = (props) => {
                                                 </div>
                                             </div>
 
-                                            <div className="second-page" onFocus={() => { setShowingShipperSecondPage(true) }}>
-                                                <div className="form-row" style={{ alignItems: 'center' }}>
+                                            <div className="second-page" style={{ gap: 2 }} onFocus={() => {
+                                                setShowingShipperSecondPage(true)
+                                            }}>
+                                                <div className="form-row" style={{ gap: 2, alignItems: 'center' }}>
                                                     <div className="input-box-container grow">
                                                         <MaskedInput tabIndex={26 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={false}
                                                             type="text" placeholder="PU Date 1"
-
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedShipperCustomer?.pu_date1 || '')}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={27 + props.tabTimes} type="text" placeholder="PU Time 1"
 
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={27 + props.tabTimes} type="text"
+                                                            placeholder="PU Time 1"
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedShipperCustomer?.pu_time1 || '')}
                                                         />
                                                     </div>
-                                                    <div style={{ minWidth: '1.5rem', fontSize: '0.7rem', textAlign: 'center' }}>To</div>
+
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '0.7rem',
+                                                        textAlign: 'center'
+                                                    }}>To
+                                                    </div>
+
                                                     <div className="input-box-container grow">
                                                         <MaskedInput tabIndex={28 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={false}
                                                             type="text" placeholder="PU Date 2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedShipperCustomer?.pu_date2 || '')}
                                                         />
-
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={29 + props.tabTimes} type="text" placeholder="PU Time 2"
 
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={29 + props.tabTimes} type="text"
+                                                            placeholder="PU Time 2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedShipperCustomer?.pu_time2 || '')}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row" style={{ alignItems: 'center' }}>
-                                                    <div className="input-box-container grow" style={{ flexGrow: 1, flexBasis: '100%' }}>
+
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.bol_numbers || '').split(' ').map((item, index) => {
+                                                            (selectedShipperCustomer?.bol_numbers || '').split('|').map((item, index) => {
                                                                 if (item.trim() !== '') {
                                                                     return (
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.7rem',
+                                                                            fontSize: '0.5rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '2px 10px',
+                                                                            padding: '1px 5px',
                                                                             borderRadius: '10px',
                                                                             marginRight: '2px',
                                                                             cursor: 'default'
                                                                         }} title={item}>
-                                                                            <span className="automatic-email-inputted" style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item}</span>
                                                                         </div>
                                                                     )
                                                                 } else {
@@ -2232,28 +2306,30 @@ const LoadBoard = (props) => {
                                                                 }
                                                             })
                                                         }
-                                                        <input tabIndex={30 + props.tabTimes} type="text" placeholder="BOL Numbers"
-
-                                                            value={''}
-                                                        />
                                                     </div>
-                                                    <div style={{ minWidth: '1.5rem', fontSize: '1rem', textAlign: 'center' }}></div>
-                                                    <div className="input-box-container grow" style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '1rem',
+                                                        textAlign: 'center'
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.po_numbers || '').split(' ').map((item, index) => {
+                                                            (selectedShipperCustomer?.po_numbers || '').split('|').map((item, index) => {
                                                                 if (item.trim() !== '') {
                                                                     return (
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.7rem',
+                                                                            fontSize: '0.5rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '2px 10px',
+                                                                            padding: '1px 5px',
                                                                             borderRadius: '10px',
                                                                             marginRight: '2px',
                                                                             cursor: 'default'
                                                                         }} title={item}>
-                                                                            <span className="automatic-email-inputted" style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
                                                                         </div>
                                                                     )
                                                                 } else {
@@ -2261,30 +2337,28 @@ const LoadBoard = (props) => {
                                                                 }
                                                             })
                                                         }
-                                                        <input tabIndex={31 + props.tabTimes} type="text" placeholder="PO Numbers"
-
-                                                            value={''}
-                                                        />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row" style={{ alignItems: 'center' }}>
-                                                    <div className="input-box-container grow" style={{ flexGrow: 1, flexBasis: '100%' }}>
+
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.ref_numbers || '').split(' ').map((item, index) => {
+                                                            (selectedShipperCustomer?.ref_numbers || '').split('|').map((item, index) => {
                                                                 if (item.trim() !== '') {
                                                                     return (
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.7rem',
+                                                                            fontSize: '0.5rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '2px 10px',
+                                                                            padding: '1px 5px',
                                                                             borderRadius: '10px',
                                                                             marginRight: '2px',
                                                                             cursor: 'default'
                                                                         }} title={item}>
-                                                                            <span className="automatic-email-inputted" style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
                                                                         </div>
                                                                     )
                                                                 } else {
@@ -2292,25 +2366,32 @@ const LoadBoard = (props) => {
                                                                 }
                                                             })
                                                         }
-                                                        <input tabIndex={32 + props.tabTimes} type="text" placeholder="REF Numbers"
-
-                                                            value={''}
-                                                        />
                                                     </div>
-                                                    <div style={{ minWidth: '1.5rem', fontSize: '1rem', textAlign: 'center' }}></div>
-                                                    <div className="input-box-container grow" style={{ flexGrow: 1, flexBasis: '100%' }}>
-                                                        <input tabIndex={33 + props.tabTimes} type="text" placeholder="SEAL Number"
-
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '1rem',
+                                                        textAlign: 'center'
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                        <input tabIndex={33 + props.tabTimes} type="text"
+                                                            placeholder="SEAL Number"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedShipperCustomer?.seal_number || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row" style={{ alignItems: 'center' }}>
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={34 + props.tabTimes} type="text" placeholder="Special Instructions"
 
-                                                            value={props.selectedShipperCompanyInfo?.special_instructions || ''}
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input
+                                                            tabIndex={34 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="Special Instructions"
+                                                            onChange={e => {
+                                                            }}
+                                                            value={selectedShipperCustomer?.special_instructions || ''}
                                                         />
                                                     </div>
                                                 </div>
@@ -2319,7 +2400,7 @@ const LoadBoard = (props) => {
                                     </div>
                                 </div>
 
-                                <div className='form-bordered-box'>
+                                <div className='form-bordered-box' style={{ gap: 2 }}>
                                     <div className='form-header'>
                                         <div className='top-border top-border-left'></div>
                                         <div className='form-title'>Consignee</div>
@@ -2344,101 +2425,130 @@ const LoadBoard = (props) => {
                                                         origin={props.origin}
 
 
-
                                                         customer_id={selectedConsigneeCustomer.id}
                                                     />
                                                 }
 
                                                 openPanel(panel, props.origin);
                                             }}>
-                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                </div>
                                                 <div className='mochi-button-base'>Company info</div>
-                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                <div className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                </div>
                                             </div>
                                             {
                                                 showingConsigneeSecondPage &&
-                                                <div className='mochi-button' onClick={() => { setShowingConsigneeSecondPage(false) }}>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button' onClick={() => {
+                                                    setShowingConsigneeSecondPage(false)
+                                                }}>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                    </div>
                                                     <div className='mochi-button-base'>1st Page</div>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                    </div>
                                                 </div>
                                             }
                                             {
                                                 !showingConsigneeSecondPage &&
-                                                <div className='mochi-button' onClick={() => { setShowingConsigneeSecondPage(true) }}>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-left'>(</div>
+                                                <div className='mochi-button' onClick={() => {
+                                                    setShowingConsigneeSecondPage(true)
+                                                }}>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-left'>(
+                                                    </div>
                                                     <div className='mochi-button-base'>2nd Page</div>
-                                                    <div className='mochi-button-decorator mochi-button-decorator-right'>)</div>
+                                                    <div
+                                                        className='mochi-button-decorator mochi-button-decorator-right'>)
+                                                    </div>
                                                 </div>
                                             }
                                         </div>
                                         <div className='top-border top-border-right'></div>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ gap: 2 }}>
                                         <div className="input-box-container input-code">
-                                            <input tabIndex={35 + props.tabTimes} type="text" placeholder="Code" maxLength="8"
-
+                                            <input tabIndex={35 + props.tabTimes} type="text" placeholder="Code"
+                                                maxLength="8"
+                                                onChange={e => {
+                                                }}
                                                 value={(selectedConsigneeCustomer.code_number || 0) === 0 ? (selectedConsigneeCustomer.code || '') : selectedConsigneeCustomer.code + selectedConsigneeCustomer.code_number}
                                             />
                                         </div>
-                                        <div className="form-h-sep"></div>
+
                                         <div className="input-box-container grow">
                                             <input tabIndex={36 + props.tabTimes} type="text" placeholder="Name"
-
+                                                onChange={e => {
+                                                }}
                                                 value={selectedConsigneeCustomer.name || ''}
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-v-sep"></div>
+
                                     <div className="form-slider">
-                                        <div className="form-slider-wrapper" style={{ left: !showingConsigneeSecondPage ? 0 : '-100%' }}>
-                                            <div className="first-page">
+                                        <div className="form-slider-wrapper"
+                                            style={{ left: !showingConsigneeSecondPage ? 0 : '-100%' }}>
+                                            <div className="first-page" style={{ gap: 2 }}>
                                                 <div className="form-row">
                                                     <div className="input-box-container grow">
-                                                        <input tabIndex={37 + props.tabTimes} type="text" placeholder="Address 1"
-
+                                                        <input tabIndex={37 + props.tabTimes} type="text"
+                                                            placeholder="Address 1"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedConsigneeCustomer.address1 || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
+
                                                 <div className="form-row">
                                                     <div className="input-box-container grow">
-                                                        <input tabIndex={38 + props.tabTimes} type="text" placeholder="Address 2"
-
+                                                        <input tabIndex={38 + props.tabTimes} type="text"
+                                                            placeholder="Address 2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedConsigneeCustomer.address2 || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={39 + props.tabTimes} type="text" placeholder="City"
 
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={39 + props.tabTimes} type="text"
+                                                            placeholder="City"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedConsigneeCustomer.city || ''}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-state">
-                                                        <input tabIndex={40 + props.tabTimes} type="text" placeholder="State" maxLength="2"
 
+                                                    <div className="input-box-container input-state">
+                                                        <input tabIndex={40 + props.tabTimes} type="text"
+                                                            placeholder="State" maxLength="2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedConsigneeCustomer.state || ''}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-zip-code">
-                                                        <input tabIndex={41 + props.tabTimes} type="text" placeholder="Postal Code"
 
+                                                    <div className="input-box-container input-zip-code">
+                                                        <input tabIndex={41 + props.tabTimes} type="text"
+                                                            placeholder="Postal Code"
+                                                            onChange={e => {
+                                                            }}
                                                             value={selectedConsigneeCustomer.zip || ''}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row">
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={42 + props.tabTimes} type="text" placeholder="Contact Name"
 
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={42 + props.tabTimes} type="text"
+                                                            placeholder="Contact Name"
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedConsigneeCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedConsigneeCustomer?.contact_name || '')
@@ -2446,13 +2556,15 @@ const LoadBoard = (props) => {
                                                             }
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone" style={{ position: 'relative' }}>
+
+                                                    <div className="input-box-container input-phone"
+                                                        style={{ position: 'relative' }}>
                                                         <MaskedInput tabIndex={43 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={true}
                                                             type="text" placeholder="Contact Phone"
-
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedConsigneeCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedConsigneeCustomer?.contact_phone || '')
@@ -2472,19 +2584,20 @@ const LoadBoard = (props) => {
 
                                                         {
                                                             ((selectedConsigneeCustomer?.contacts || []).find(c => c.is_primary === 1) !== undefined) &&
-                                                            <div
-                                                                className={classnames({
-                                                                    'selected-customer-contact-primary-phone': true,
-                                                                    'pushed': false
-                                                                })}>
+                                                            <div className={classnames({
+                                                                'selected-customer-contact-primary-phone': true,
+                                                                'pushed': false
+                                                            })} style={{ fontSize: '0.5rem' }}>
                                                                 {selectedConsigneeCustomer?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                             </div>
                                                         }
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container input-phone-ext">
-                                                        <input tabIndex={44 + props.tabTimes} type="text" placeholder="Ext"
 
+                                                    <div className="input-box-container input-phone-ext">
+                                                        <input tabIndex={44 + props.tabTimes} type="text"
+                                                            placeholder="Ext"
+                                                            onChange={e => {
+                                                            }}
                                                             value={
                                                                 (selectedConsigneeCustomer?.contacts || []).find(c => c.is_primary === 1) === undefined
                                                                     ? (selectedConsigneeCustomer?.ext || '')
@@ -2495,55 +2608,169 @@ const LoadBoard = (props) => {
                                                 </div>
                                             </div>
 
-                                            <div className="second-page" onFocus={() => { setShowingConsigneeSecondPage(true) }}>
-                                                <div className="form-row" style={{ alignItems: 'center' }}>
+                                            <div className="second-page" onFocus={() => {
+                                                setShowingConsigneeSecondPage(true)
+                                            }} style={{ gap: 2 }}>
+                                                <div className="form-row" style={{ gap: 2, alignItems: 'center' }}>
                                                     <div className="input-box-container grow">
                                                         <MaskedInput tabIndex={45 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={false}
                                                             type="text" placeholder="Delivery Date 1"
-
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedConsigneeCustomer?.delivery_date1 || '')}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={46 + props.tabTimes} type="text" placeholder="Delivery Time 1"
 
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={46 + props.tabTimes} type="text"
+                                                            placeholder="Delivery Time 1"
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedConsigneeCustomer?.delivery_time1 || '')}
                                                         />
                                                     </div>
-                                                    <div style={{ minWidth: '1.5rem', fontSize: '0.7rem', textAlign: 'center' }}>To</div>
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '0.7rem',
+                                                        textAlign: 'center'
+                                                    }}>To
+                                                    </div>
                                                     <div className="input-box-container grow">
                                                         <MaskedInput tabIndex={47 + props.tabTimes}
                                                             mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                                             guide={false}
                                                             type="text" placeholder="Delivery Date 2"
-
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedConsigneeCustomer?.delivery_date2 || '')}
                                                         />
                                                     </div>
-                                                    <div className="form-h-sep"></div>
-                                                    <div className="input-box-container grow">
-                                                        <input tabIndex={48 + props.tabTimes} type="text" placeholder="Delivery Time 2"
 
+                                                    <div className="input-box-container grow">
+                                                        <input tabIndex={48 + props.tabTimes} type="text"
+                                                            placeholder="Delivery Time 2"
+                                                            onChange={e => {
+                                                            }}
                                                             value={(selectedConsigneeCustomer?.delivery_time2 || '')}
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-v-sep"></div>
-                                                <div className="form-row" style={{ flexGrow: 1 }}>
-                                                    <div className="input-box-container grow" style={{ maxHeight: 'initial', minHeight: 'initial' }}>
-                                                        <textarea tabIndex={49 + props.tabTimes} placeholder="Special Instructions" style={{
-                                                            resize: 'none',
-                                                            flexGrow: 1,
-                                                            border: 0,
-                                                            width: '100%',
-                                                            height: '100%'
-                                                        }}
 
-                                                            value={(selectedConsigneeCustomer?.special_instructions || '')}
-                                                        ></textarea>
+                                                <div className="form-row" style={{ gap: 2 }}>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                        {
+                                                            (selectedConsigneeCustomer?.bol_numbers || '').split('|').map((item, index) => {
+                                                                if (item.trim() !== '') {
+                                                                    return (
+                                                                        <div key={index} style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            fontSize: '0.5rem',
+                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                            padding: '1px 5px',
+                                                                            borderRadius: '10px',
+                                                                            marginRight: '2px',
+                                                                            cursor: 'default'
+                                                                        }} title={item}>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item}</span>
+                                                                        </div>
+                                                                    )
+                                                                } else {
+                                                                    return false;
+                                                                }
+                                                            })
+                                                        }
+                                                    </div>
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '1rem',
+                                                        textAlign: 'center'
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                        {
+                                                            (selectedConsigneeCustomer?.po_numbers || '').split('|').map((item, index) => {
+                                                                if (item.trim() !== '') {
+                                                                    return (
+                                                                        <div key={index} style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            fontSize: '0.5rem',
+                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                            padding: '1px 5px',
+                                                                            borderRadius: '10px',
+                                                                            marginRight: '2px',
+                                                                            cursor: 'default'
+                                                                        }} title={item}>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                        </div>
+                                                                    )
+                                                                } else {
+                                                                    return false;
+                                                                }
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-row" style={{ alignItems: 'center' }}>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                        {
+                                                            (selectedConsigneeCustomer?.ref_numbers || '').split('|').map((item, index) => {
+                                                                if (item.trim() !== '') {
+                                                                    return (
+                                                                        <div key={index} style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            fontSize: '0.5rem',
+                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                            padding: '1px 5px',
+                                                                            borderRadius: '10px',
+                                                                            marginRight: '2px',
+                                                                            cursor: 'default'
+                                                                        }} title={item}>
+                                                                            <span className="automatic-email-inputted"
+                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                        </div>
+                                                                    )
+                                                                } else {
+                                                                    return false;
+                                                                }
+                                                            })
+                                                        }
+                                                    </div>
+                                                    <div style={{
+                                                        minWidth: '1.5rem',
+                                                        fontSize: '1rem',
+                                                        textAlign: 'center'
+                                                    }}></div>
+                                                    <div className="input-box-container grow"
+                                                        style={{ flexGrow: 1, flexBasis: '100%' }}>
+                                                        <input tabIndex={33 + props.tabTimes} type="text"
+                                                            placeholder="SEAL Number"
+                                                            onChange={e => {
+                                                            }}
+                                                            value={selectedConsigneeCustomer?.seal_number || ''}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-row">
+                                                    <div className="input-box-container grow">
+                                                        <input
+                                                            tabIndex={34 + props.tabTimes}
+                                                            type="text"
+                                                            placeholder="Special Instructions"
+                                                            onChange={e => {
+                                                            }}
+                                                            value={selectedConsigneeCustomer?.special_instructions || ''}
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -2584,17 +2811,14 @@ const LoadBoard = (props) => {
                                 deliveredNotInvoiceOrders.map((item, index) => {
                                     html += `
                                         <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
-                                            <div style="min-width:20%;max-width:20%">${item.order_number}</div>
-                                            <div style="min-width:20%;max-width:20%">${item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
-                                            <div style="min-width:30%;max-width:30%">${item.pickups.length > 0
-                                            ? item.pickups[0].customer?.city + ', ' + item.pickups[0].customer?.state
-                                            : ''
-                                        }</div>
-                                            <div style="min-width:30%;max-width:30%">${item.deliveries.length > 0
-                                            ? item.deliveries[item.deliveries.length - 1].customer?.city + ', ' + item.deliveries[item.deliveries.length - 1].customer?.state
-                                            : ''
-                                        }</div>
-                                            
+                                            <div style="min-width:20%;max-width:20%">${item?.order_number || ''}</div>
+                                            <div style="min-width:20%;max-width:20%">${item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}
+                                            </div>
+                                            <div style="min-width:30%;max-width:30%">
+                                            ${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}
+                                            </div>                                            
                                         </div>
                                         `;
                                 })
@@ -2628,7 +2852,9 @@ const LoadBoard = (props) => {
                                         'cancelled': (item?.is_cancelled || 0) === 1
                                     })
                                     return (
-                                        <div className={itemClasses} key={i} onClick={() => { onOrderClick(item) }} onDoubleClick={() => {
+                                        <div className={itemClasses} key={i} onClick={() => {
+                                            onOrderClick(item)
+                                        }} onDoubleClick={() => {
                                             let panel = {
                                                 panelName: `${props.panelName}-invoice`,
                                                 component: <Invoice
@@ -2647,23 +2873,16 @@ const LoadBoard = (props) => {
                                             }
 
                                             openPanel(panel, props.origin);
-                                        }} >
-                                            <div className="order-number">{item.order_number}</div>
-                                            <div className="carrier-code">{item.carrier.code.toUpperCase() + (item.carrier.code_number === 0 ? '' : item.carrier.code_number)}</div>
-                                            <div className="starting-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[0].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[0].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[0].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
-                                            <div className="destination-city-state">{
-                                                ((item.routing || []).length >= 2)
-                                                    ? item.routing[item.routing.length - 1].type === 'pickup'
-                                                        ? (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (item.pickups.find(p => p.id === item.routing[item.routing.length - 1].pickup_id).customer?.state || '')
-                                                        : (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (item.deliveries.find(d => d.id === item.routing[item.routing.length - 1].delivery_id).customer?.state || '')
-                                                    : ''
-                                            }</div>
+                                        }}>
+                                            <div className="order-number">{item?.order_number || ''}</div>
+                                            <div
+                                                className="carrier-code">{item?.code.toUpperCase() + (item?.code_number === 0 ? '' : item?.code_number)}</div>
+                                            <div className="starting-city-state">
+                                                {`${item?.from_pickup_city || item?.from_delivery_city}, ${item?.from_pickup_state || item?.from_delivery_state}`}
+                                            </div>
+                                            <div className="destination-city-state">
+                                                {`${item?.to_pickup_city || item?.to_delivery_city}, ${item?.to_pickup_state || item?.to_delivery_state}`}
+                                            </div>
                                         </div>
                                     )
                                 })
@@ -2696,6 +2915,7 @@ const mapStateToProps = (state) => {
         companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
         adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
         companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        isLoadingWidget: state.loadBoardReducers.isLoadingWidget,
         adminReportPanels: state.reportReducers.adminReportPanels,
         companyReportPanels: state.reportReducers.companyReportPanels,
 
@@ -2724,5 +2944,10 @@ export default connect(mapStateToProps, {
     setAdminLoadBoardPanels,
     setCompanyLoadBoardPanels,
     setAdminReportPanels,
-    setCompanyReportPanels
+    setCompanyReportPanels,
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 })(LoadBoard)

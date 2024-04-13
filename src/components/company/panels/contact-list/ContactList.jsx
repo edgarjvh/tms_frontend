@@ -85,8 +85,8 @@ const ContactList = (props) => {
                                     (item?.last_name || '').toLowerCase().includes(filterText.toLowerCase().trim()) ||
                                     (item?.phone_work || '').toLowerCase().includes(filterText.toLowerCase().trim()) ||
                                     (item?.email_work || '').toLowerCase().includes(filterText.toLowerCase().trim()) ||
-                                    (item?.customer?.code || '').toLowerCase().includes(filterText.toLowerCase().trim()) ||
-                                    (item?.customer?.name || '').toLowerCase().includes(filterText.toLowerCase().trim())
+                                    (item?.code || '').toLowerCase().includes(filterText.toLowerCase().trim()) ||
+                                    (item?.name || '').toLowerCase().includes(filterText.toLowerCase().trim())
                             }).map((item, i) => {
                                 return (
                                     <div className="contact-list-item" key={i} onDoubleClick={() => {
@@ -105,8 +105,8 @@ const ContactList = (props) => {
                                         <div className="contact-list-col last-name">{item?.last_name || ''}</div>
                                         <div className="contact-list-col phone-work">{item?.phone_work || ''}</div>
                                         <div className="contact-list-col email-work">{item?.email_work || ''}</div>
-                                        <div className="contact-list-col customer-code">{(item?.customer?.code || '') + ((item?.customer?.code_number || 0) === 0 ? '' : item?.customer?.code_number)}</div>
-                                        <div className="contact-list-col customer-name">{item?.customer?.name || ''}</div>
+                                        <div className="contact-list-col customer-code">{(item?.code || '') + ((item?.code_number || 0) === 0 ? '' : item?.code_number)}</div>
+                                        <div className="contact-list-col customer-name">{item?.name || ''}</div>
                                     </div>
                                 )
                             })

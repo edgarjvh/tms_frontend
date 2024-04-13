@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
@@ -8,7 +9,16 @@ import moment from "moment";
 import MaskedInput from "react-text-mask";
 import accounting from "accounting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck, faCopy, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCaretDown,
+    faCaretRight,
+    faCalendarAlt,
+    faPencilAlt,
+    faPen,
+    faCheck,
+    faCopy,
+    faSearch
+} from "@fortawesome/free-solid-svg-icons";
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Highlighter from "react-highlight-words";
 import "react-datepicker/dist/react-datepicker.css";
@@ -68,6 +78,7 @@ import { CompanyDrivers } from './../../admin/panels';
 
 const Carriers = props => {
     // DECLARATIONS
+    const refCarrierCode = useRef();
     const [selectedCarrier, setSelectedCarrier] = useState({});
     const [selectedContact, setSelectedContact] = useState({});
     const [selectedDocument, setSelectedDocument] = useState({});
@@ -81,7 +92,6 @@ const Carriers = props => {
     const [isLoadingCarrierOrders, setIsLoadingCarrierOrders] = useState(false);
 
     const refPrintCarrierInformation = useRef();
-    const refCarrierCode = useRef();
     const refFactoringCompanyCode = useRef();
     const refCarrierName = useRef();
     const refCarrierEmail = useRef();
@@ -780,21 +790,48 @@ const Carriers = props => {
                     setSelectedDriver({});
                     setSelectedInsurance({});
                 }
-
+                if (props.isOnPanel) {
+                    if (refCarrierCode?.current) {
+                        refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                } else {
+                    if (props.refCarrierCode?.current) {
+                        props.refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
                 setIsLoading(false);
-                refCarrierCode.current.focus({
-                    preventScroll: true,
-                });
+
             }).catch(e => {
                 setIsLoading(false);
                 console.log("error getting carrier by id", e);
-            });
-        } else {
-            refCarrierCode.current.focus({
-                preventScroll: true,
+                if (props.isOnPanel) {
+                    if (refCarrierCode?.current) {
+                        refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                } else {
+                    if (props.refCarrierCode?.current) {
+                        props.refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
             });
         }
     }, []);
+
+    useEffect(() => {
+        if (props.refCarrierCode?.current) {
+            props.refCarrierCode.current.focus({
+                preventScroll: true,
+            });
+        }
+    }, [props.refCarrierCode]);
 
     useEffect(() => {
         if (props.selectedCarrier?.change_carrier || false) {
@@ -874,13 +911,24 @@ const Carriers = props => {
 
     useEffect(() => {
         if (props.screenFocused) {
-            refCarrierCode.current.focus({
-                preventScroll: true,
-            });
+            if (props.isOnPanel) {
+                if (refCarrierCode?.current) {
+                    refCarrierCode.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            } else {
+                if (props.refCarrierCode?.current) {
+                    props.refCarrierCode.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            }
         }
     }, [props.screenFocused]);
 
-    useEffect(() => { }, []);
+    useEffect(() => {
+    }, []);
 
     useEffect(() => {
         if (isCalendarShown) {
@@ -1059,7 +1107,19 @@ const Carriers = props => {
         setSelectedInsurance({});
         setSelectedCarrier({ id: 0, code: clearCode ? "" : selectedCarrier.code });
 
-        // refCarrierCode.current.focus();
+        if (props.isOnPanel) {
+            if (refCarrierCode?.current) {
+                refCarrierCode.current.focus({
+                    preventScroll: true,
+                });
+            }
+        } else {
+            if (props.refCarrierCode?.current) {
+                props.refCarrierCode.current.focus({
+                    preventScroll: true,
+                });
+            }
+        }
     };
 
     const searchCarrierBtnClick = () => {
@@ -1258,7 +1318,19 @@ const Carriers = props => {
                             })
                             .catch(e => {
                                 closePanel(`${props.panelName}-carrier-search`, props.origin);
-                                refCarrierCode.current.focus();
+                                if (props.isOnPanel) {
+                                    if (refCarrierCode?.current) {
+                                        refCarrierCode.current.focus({
+                                            preventScroll: true,
+                                        });
+                                    }
+                                } else {
+                                    if (props.refCarrierCode?.current) {
+                                        props.refCarrierCode.current.focus({
+                                            preventScroll: true,
+                                        });
+                                    }
+                                }
                             });
                     }}
                 />
@@ -1544,7 +1616,19 @@ const Carriers = props => {
                             })
                             .catch(e => {
                                 closePanel(`${props.panelName}-contact-search`, props.origin);
-                                refCarrierCode.current.focus();
+                                if (props.isOnPanel) {
+                                    if (refCarrierCode?.current) {
+                                        refCarrierCode.current.focus({
+                                            preventScroll: true,
+                                        });
+                                    }
+                                } else {
+                                    if (props.refCarrierCode?.current) {
+                                        props.refCarrierCode.current.focus({
+                                            preventScroll: true,
+                                        });
+                                    }
+                                }
                             });
                     }}
                 />
@@ -1745,7 +1829,10 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={0} selectedCarrier={{}} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company"
+                tabTimes={11000 + props.tabTimes} origin={props.origin}
+                componentId={moment().format("x")} factoringCompanyId={0}
+                selectedCarrier={{}} />,
         };
 
         openPanel(panel, props.origin);
@@ -1820,12 +1907,19 @@ const Carriers = props => {
 
                                             resolve("OK");
                                         })
-                                        .catch(e => { });
+                                        .catch(e => {
+                                        });
                                 } else {
                                     let panel = {
                                         panelName: `${props.panelName}-factoring-company`,
                                         fixedWidthPercentage: 70,
-                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={factoringCompanyId} selectedCarrier={selectedCarrier} />,
+                                        component: <FactoringCompany panelName={`${props.panelName}-factoring-company`}
+                                            title="Factoring Company"
+                                            tabTimes={11000 + props.tabTimes}
+                                            origin={props.origin}
+                                            componentId={moment().format("x")}
+                                            factoringCompanyId={factoringCompanyId}
+                                            selectedCarrier={selectedCarrier} />,
                                     };
 
                                     openPanel(panel, props.origin);
@@ -1864,7 +1958,11 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-factoring-company`,
             fixedWidthPercentage: 70,
-            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company" tabTimes={11000 + props.tabTimes} origin={props.origin} componentId={moment().format("x")} factoringCompanyId={selectedCarrier.factoring_company.id} selectedCarrier={selectedCarrier} />,
+            component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company"
+                tabTimes={11000 + props.tabTimes} origin={props.origin}
+                componentId={moment().format("x")}
+                factoringCompanyId={selectedCarrier.factoring_company.id}
+                selectedCarrier={selectedCarrier} />,
         };
 
         openPanel(panel, props.origin);
@@ -1940,13 +2038,37 @@ const Carriers = props => {
                 if ((selectedDriver?.id || 0) > 0) {
                     if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0) {
                         setIsSavingDriver(false);
-                        refCarrierCode.current.focus();
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                         return;
                     }
                 } else {
                     if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0) {
                         setIsSavingDriver(false);
-                        refCarrierCode.current.focus();
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                         return;
                     }
                 }
@@ -1954,7 +2076,19 @@ const Carriers = props => {
 
             if ((selectedCarrier?.id || 0) === 0) {
                 setIsSavingDriver(false);
-                refCarrierCode.current.focus();
+                if (props.isOnPanel) {
+                    if (refCarrierCode?.current) {
+                        refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                } else {
+                    if (props.refCarrierCode?.current) {
+                        props.refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
                 return;
             }
 
@@ -2005,7 +2139,19 @@ const Carriers = props => {
                     setIsSavingDriver(false);
                 })
             } else {
-                refCarrierCode.current.focus();
+                if (props.isOnPanel) {
+                    if (refCarrierCode?.current) {
+                        refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                } else {
+                    if (props.refCarrierCode?.current) {
+                        props.refCarrierCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
             }
 
             setIsSavingDriver(false);
@@ -2214,7 +2360,10 @@ const Carriers = props => {
     const revenueInformationBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-revenue-information`,
-            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes} panelName={`${props.panelName}-revenue-information`} origin={props.origin} suborigin={"carrier"} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes}
+                panelName={`${props.panelName}-revenue-information`} origin={props.origin}
+                suborigin={"carrier"} componentId={moment().format("x")}
+                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
         openPanel(panel, props.origin);
@@ -2224,7 +2373,10 @@ const Carriers = props => {
         let panel = {
             panelName: `${props.panelName}-equipment-information`,
             fixedWidthPercentage: 40,
-            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`} tabTimes={15000 + props.tabTimes} title={"Equipment Information"} origin={props.origin} componentId={moment().format("x")} carrier={selectedCarrier} />,
+            component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`}
+                tabTimes={15000 + props.tabTimes} title={"Equipment Information"}
+                origin={props.origin} componentId={moment().format("x")}
+                carrier={selectedCarrier} />,
         };
 
         openPanel(panel, props.origin);
@@ -2233,7 +2385,10 @@ const Carriers = props => {
     const orderHistoryBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-order-history`,
-            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes} panelName={`${props.panelName}-order-history`} origin={props.origin} suborigin={"carrier"} componentId={moment().format("x")} selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+            component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes}
+                panelName={`${props.panelName}-order-history`} origin={props.origin}
+                suborigin={"carrier"} componentId={moment().format("x")}
+                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
         };
 
         openPanel(panel, props.origin);
@@ -2324,7 +2479,9 @@ const Carriers = props => {
     const importCarrierBtnClick = () => {
         let panel = {
             panelName: `${props.panelName}-carrier-import`,
-            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes} panelName={`${props.panelName}-carrier-import`} origin={props.origin} componentId={moment().format("x")} />,
+            component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes}
+                panelName={`${props.panelName}-carrier-import`} origin={props.origin}
+                componentId={moment().format("x")} />,
         };
 
         openPanel(panel, props.origin);
@@ -2514,17 +2671,15 @@ const Carriers = props => {
     }
 
     return (
-        <div
-            className="carriers-main-container"
-            style={{
-                borderRadius: props.scale === 1 ? 0 : "20px",
-                background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
-                background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                padding: props.isOnPanel ? "10px 0" : 10,
-                position: props.isOnPanel ? "unset" : "relative",
-            }}
+        <div className="carriers-main-container" style={{
+            borderRadius: props.scale === 1 ? 0 : "20px",
+            background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
+            background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            padding: props.isOnPanel ? "10px 0" : 10,
+            position: props.isOnPanel ? "unset" : "relative",
+        }}
             tabIndex={-1}
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
@@ -2533,14 +2688,38 @@ const Carriers = props => {
                     if ((selectedCarrier?.id || 0) > 0) {
                         e.stopPropagation();
                         setInitialValues();
-                        refCarrierCode.current.focus();
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
 
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        refCarrierCode.current.focus();
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
             }}
@@ -2594,7 +2773,19 @@ const Carriers = props => {
                                     className="mochi-button"
                                     onClick={() => {
                                         setInitialValues(true);
-                                        refCarrierCode.current.focus();
+                                        if (props.isOnPanel) {
+                                            if (refCarrierCode?.current) {
+                                                refCarrierCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        } else {
+                                            if (props.refCarrierCode?.current) {
+                                                props.refCarrierCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        }
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -2612,7 +2803,7 @@ const Carriers = props => {
                                     type="text"
                                     placeholder="Code"
                                     maxLength="8"
-                                    ref={refCarrierCode}
+                                    ref={props.isOnPanel ? refCarrierCode : props.refCarrierCode}
                                     onKeyDown={searchCarrierByCode}
                                     onInput={e => {
                                         setSelectedCarrier({
@@ -3628,7 +3819,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refCarrierContactPhoneDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {carrierContactPhoneItems.map((item, index) => {
@@ -3657,7 +3849,9 @@ const Carriers = props => {
                                                                         ref={ref => refCarrierContactPhonePopupItems.current.push(ref)}
                                                                     >
                                                                         {item.type === "work" ? `Phone Work ` : item.type === "fax" ? `Phone Work Fax ` : item.type === "mobile" ? `Phone Mobile ` : item.type === "direct" ? `Phone Direct ` : item.type === "other" ? `Phone Other ` : ""}(<b>{item.type === "work" ? item.phone : item.type === "fax" ? item.phone : item.type === "mobile" ? item.phone : item.type === "direct" ? item.phone : item.type === "other" ? item.phone : ""}</b>)
-                                                                        {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -4037,7 +4231,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refCarrierContactEmailDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {carrierContactEmailItems.map((item, index) => {
@@ -4063,7 +4258,9 @@ const Carriers = props => {
                                                                         }}
                                                                         ref={ref => refCarrierContactEmailPopupItems.current.push(ref)}
                                                                     >
-                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -4189,14 +4386,18 @@ const Carriers = props => {
                                                         refCarrierContactFirstName.current.focus();
                                                     }}
                                                 >
-                                                    <div className="contact-list-col tcol first-name" style={{ textTransform: "capitalize" }}>
+                                                    <div className="contact-list-col tcol first-name"
+                                                        style={{ textTransform: "capitalize" }}>
                                                         {contact.first_name}
                                                     </div>
-                                                    <div className="contact-list-col tcol last-name" style={{ textTransform: "capitalize" }}>
+                                                    <div className="contact-list-col tcol last-name"
+                                                        style={{ textTransform: "capitalize" }}>
                                                         {contact.last_name}
                                                     </div>
-                                                    <div className="contact-list-col tcol phone-work">{contact.primary_phone === "work" ? contact.phone_work : contact.primary_phone === "fax" ? contact.phone_work_fax : contact.primary_phone === "mobile" ? contact.phone_mobile : contact.primary_phone === "direct" ? contact.phone_direct : contact.primary_phone === "other" ? contact.phone_other : ""}</div>
-                                                    <div className="contact-list-col tcol email-work" style={{ textTransform: "lowercase" }}>
+                                                    <div
+                                                        className="contact-list-col tcol phone-work">{contact.primary_phone === "work" ? contact.phone_work : contact.primary_phone === "fax" ? contact.phone_work_fax : contact.primary_phone === "mobile" ? contact.phone_mobile : contact.primary_phone === "direct" ? contact.phone_direct : contact.primary_phone === "other" ? contact.phone_other : ""}</div>
+                                                    <div className="contact-list-col tcol email-work"
+                                                        style={{ textTransform: "lowercase" }}>
                                                         {contact.primary_email === "work" ? contact.email_work : contact.primary_email === "personal" ? contact.email_personal : contact.primary_email === "other" ? contact.email_other : ""}
                                                     </div>
                                                     {contact.id === (selectedContact?.id || 0) && (
@@ -4561,7 +4762,8 @@ const Carriers = props => {
                         </div>
 
                         <div className="form-row" style={{ gap: 2 }}>
-                            <div className="input-box-container input-phone" style={{ width: '40%', position: 'relative' }}>
+                            <div className="input-box-container input-phone"
+                                style={{ width: '40%', position: 'relative' }}>
                                 <MaskedInput
                                     tabIndex={94 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
@@ -5129,7 +5331,8 @@ const Carriers = props => {
                             paddingBottom: 10,
                         }}
                         >
-                            <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}>
+                            <div
+                                className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">E-Mail Driver</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -5262,7 +5465,7 @@ const Carriers = props => {
                             refCode: refDriverCode,
                             refName: refDriverName,
                             refEmail: refDriverEmail,
-                            refFieldLastTab: refCarrierCode
+                            refFieldLastTab: props.refCarrierCode
                         }}
                         tabTimesFrom={92}
                         tabTimes={props.tabTimes}
@@ -5286,7 +5489,7 @@ const Carriers = props => {
                             'notes'
                         ]}
                         triggerFields={['notes']}
-                        refFieldLastTab={refCarrierCode}
+                        refFieldLastTab={props.refCarrierCode}
                     /> */}
                 </div>
             </div>
@@ -5321,7 +5524,9 @@ const Carriers = props => {
                                     <div className="mochi-button-base">ACH/Wiring Info</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={remitToAddressBtn}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={remitToAddressBtn}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div
                                         className="mochi-button-base"
@@ -5333,7 +5538,9 @@ const Carriers = props => {
                                     </div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={clearMailingAddressBtn}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier mailing address")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={clearMailingAddressBtn}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -5456,7 +5663,10 @@ const Carriers = props => {
                                                                             currentCarrier.mailing_carrier_contact_primary_email = "work";
                                                                         }
 
-                                                                        setSelectedCarrier({ ...currentCarrier, mailing_address: mailing_address });
+                                                                        setSelectedCarrier({
+                                                                            ...currentCarrier,
+                                                                            mailing_address: mailing_address
+                                                                        });
                                                                         validateCarrierForSaving(e);
                                                                         refCarrierMailingName.current.focus();
                                                                     }
@@ -6059,7 +6269,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactNameDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactNameItems.map((item, index) => {
@@ -6097,7 +6308,9 @@ const Carriers = props => {
                                                                     >
                                                                         {item.first_name + ((item.last_name || "") === "" ? "" : " " + item.last_name)}
 
-                                                                        {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -6371,7 +6584,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactPhoneDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactPhoneItems.map((item, index) => {
@@ -6405,7 +6619,9 @@ const Carriers = props => {
                                                                         ref={ref => refMailingContactPhonePopupItems.current.push(ref)}
                                                                     >
                                                                         {item.type === "work" ? `Phone Work ` : item.type === "fax" ? `Phone Work Fax ` : item.type === "mobile" ? `Phone Mobile ` : item.type === "direct" ? `Phone Direct ` : item.type === "other" ? `Phone Other ` : ""}(<b>{item.type === "work" ? item.phone : item.type === "fax" ? item.phone : item.type === "mobile" ? item.phone : item.type === "direct" ? item.phone : item.type === "other" ? item.phone : ""}</b>)
-                                                                        {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -6743,7 +6959,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refMailingContactEmailDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below right" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {mailingContactEmailItems.map((item, index) => {
@@ -6775,7 +6992,9 @@ const Carriers = props => {
                                                                         }}
                                                                         ref={ref => refMailingContactEmailPopupItems.current.push(ref)}
                                                                     >
-                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -6994,61 +7213,55 @@ const Carriers = props => {
                                 setItems={setInsuranceTypeDropdownItems}
                                 onDropdownClick={e => {
                                     if ((selectedInsurance?.insurance_type?.id || 0) === 0 && (selectedInsurance?.insurance_type?.name || "") !== "") {
-                                        axios
-                                            .post(props.serverUrl + "/getInsuranceTypes", {
-                                                name: selectedInsurance?.insurance_type.name,
-                                            })
-                                            .then(res => {
-                                                if (res.data.result === "OK") {
-                                                    setInsuranceTypeDropdownItems(
-                                                        res.data.types.map((item, index) => {
-                                                            item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0 ? index === 0 : item.id === selectedInsurance.insurance_type.id;
-                                                            return item;
-                                                        })
-                                                    );
+                                        axios.post(props.serverUrl + "/getInsuranceTypes", {
+                                            name: selectedInsurance?.insurance_type.name,
+                                        }).then(res => {
+                                            if (res.data.result === "OK") {
+                                                setInsuranceTypeDropdownItems(
+                                                    res.data.types.map((item, index) => {
+                                                        item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0 ? index === 0 : item.id === selectedInsurance.insurance_type.id;
+                                                        return item;
+                                                    })
+                                                );
 
-                                                    refInsuranceTypePopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains("selected")) {
-                                                            r.scrollIntoView({
-                                                                behavior: "auto",
-                                                                block: "center",
-                                                                inline: "nearest",
-                                                            });
-                                                        }
-                                                        return true;
-                                                    });
-                                                }
-                                            })
-                                            .catch(e => {
-                                                console.log("error getting insurance types", e);
-                                            });
+                                                refInsuranceTypePopupItems.current.map((r, i) => {
+                                                    if (r && r.classList.contains("selected")) {
+                                                        r.scrollIntoView({
+                                                            behavior: "auto",
+                                                            block: "center",
+                                                            inline: "nearest",
+                                                        });
+                                                    }
+                                                    return true;
+                                                });
+                                            }
+                                        }).catch(e => {
+                                            console.log("error getting insurance types", e);
+                                        });
                                     } else {
-                                        axios
-                                            .post(props.serverUrl + "/getInsuranceTypes")
-                                            .then(res => {
-                                                if (res.data.result === "OK") {
-                                                    setInsuranceTypeDropdownItems(
-                                                        res.data.types.map((item, index) => {
-                                                            item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0 ? index === 0 : item.id === selectedInsurance.insurance_type.id;
-                                                            return item;
-                                                        })
-                                                    );
+                                        axios.post(props.serverUrl + "/getInsuranceTypes").then(res => {
+                                            if (res.data.result === "OK") {
+                                                setInsuranceTypeDropdownItems(
+                                                    res.data.types.map((item, index) => {
+                                                        item.selected = (selectedInsurance?.insurance_type?.id || 0) === 0 ? index === 0 : item.id === selectedInsurance.insurance_type.id;
+                                                        return item;
+                                                    })
+                                                );
 
-                                                    refInsuranceTypePopupItems.current.map((r, i) => {
-                                                        if (r && r.classList.contains("selected")) {
-                                                            r.scrollIntoView({
-                                                                behavior: "auto",
-                                                                block: "center",
-                                                                inline: "nearest",
-                                                            });
-                                                        }
-                                                        return true;
-                                                    });
-                                                }
-                                            })
-                                            .catch(e => {
-                                                console.log("error getting insurance types", e);
-                                            });
+                                                refInsuranceTypePopupItems.current.map((r, i) => {
+                                                    if (r && r.classList.contains("selected")) {
+                                                        r.scrollIntoView({
+                                                            behavior: "auto",
+                                                            block: "center",
+                                                            inline: "nearest",
+                                                        });
+                                                    }
+                                                    return true;
+                                                });
+                                            }
+                                        }).catch(e => {
+                                            console.log("error getting insurance types", e);
+                                        });
                                     }
                                 }}
                                 onPopupClick={(item) => {
@@ -7295,7 +7508,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refInsuranceCompanyDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below" style={{ height: 150 }}>
+                                                <div className="mochi-contextual-popup vertical below"
+                                                    style={{ height: 150 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             {insuranceCompanyDropdownItems.map((item, index) => {
@@ -7322,8 +7536,15 @@ const Carriers = props => {
                                                                         }}
                                                                         ref={ref => refInsuranceCompanyPopupItems.current.push(ref)}
                                                                     >
-                                                                        {searchValue === undefined ? item.company : <Highlighter highlightClassName="mochi-item-highlight-text" searchWords={[searchValue]} autoEscape={true} textToHighlight={item.company} />}
-                                                                        {item.selected && <FontAwesomeIcon className="dropdown-selected" icon={faCaretRight} />}
+                                                                        {searchValue === undefined ? item.company :
+                                                                            <Highlighter
+                                                                                highlightClassName="mochi-item-highlight-text"
+                                                                                searchWords={[searchValue]}
+                                                                                autoEscape={true}
+                                                                                textToHighlight={item.company} />}
+                                                                        {item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
                                                                     </div>
                                                                 );
                                                             })}
@@ -7401,7 +7622,8 @@ const Carriers = props => {
                                                 }}
                                                 ref={refInsuranceCalendarDropDown}
                                             >
-                                                <div className="mochi-contextual-popup vertical below" style={{ height: 275 }}>
+                                                <div className="mochi-contextual-popup vertical below"
+                                                    style={{ height: 275 }}>
                                                     <div className="mochi-contextual-popup-content">
                                                         <div className="mochi-contextual-popup-wrapper">
                                                             <Calendar
@@ -7430,7 +7652,8 @@ const Carriers = props => {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <span className="currency-symbol">{(selectedInsurance.amount || "") === "" ? "" : "$"}</span>
+                                <span
+                                    className="currency-symbol">{(selectedInsurance.amount || "") === "" ? "" : "$"}</span>
 
                                 <input
                                     tabIndex={89 + props.tabTimes}
@@ -7455,7 +7678,8 @@ const Carriers = props => {
                             </div>
                             <div className="form-h-sep"></div>
                             <div className="input-box-container grow">
-                                <span className="currency-symbol">{(selectedInsurance.deductible || "") === "" ? "" : "$"}</span>
+                                <span
+                                    className="currency-symbol">{(selectedInsurance.deductible || "") === "" ? "" : "$"}</span>
 
                                 <input
                                     tabIndex={90 + props.tabTimes}
@@ -7563,7 +7787,8 @@ const Carriers = props => {
 
                         <div className="insurances-list-container">
                             {(selectedCarrier.insurances || []).length > 0 && (
-                                <div className={`insurances-list-header ${insurancesScrollBarVisible ? "scrolling" : ""}`}>
+                                <div
+                                    className={`insurances-list-header ${insurancesScrollBarVisible ? "scrolling" : ""}`}>
                                     <div className="contact-list-col tcol type">Type</div>
                                     <div className="contact-list-col tcol company">Company</div>
                                     <div className="contact-list-col tcol expiration-date">Exp. Date</div>
@@ -7571,7 +7796,8 @@ const Carriers = props => {
                                 </div>
                             )}
 
-                            <div className="insurances-list-wrapper" id={props.panelName + "-insurances-list-wrapper"} ref={refInsurancesListWrapper}>
+                            <div className="insurances-list-wrapper" id={props.panelName + "-insurances-list-wrapper"}
+                                ref={refInsurancesListWrapper}>
                                 {(selectedCarrier.insurances || []).map((insurance, index) => {
                                     const itemClasses = classnames({
                                         "insurances-list-item": true,
@@ -7587,10 +7813,13 @@ const Carriers = props => {
                                                 }
                                             }}
                                         >
-                                            <div className="insurances-list-col tcol type">{insurance.insurance_type.name}</div>
+                                            <div
+                                                className="insurances-list-col tcol type">{insurance.insurance_type.name}</div>
                                             <div className="insurances-list-col tcol company">{insurance.company}</div>
-                                            <div className="insurances-list-col tcol expiration-date">{insurance.expiration_date}</div>
-                                            <div className="insurances-list-col tcol amount">{accounting.formatMoney(insurance.amount)}</div>
+                                            <div
+                                                className="insurances-list-col tcol expiration-date">{insurance.expiration_date}</div>
+                                            <div
+                                                className="insurances-list-col tcol amount">{accounting.formatMoney(insurance.amount)}</div>
                                             {insurance.id === (selectedInsurance?.id || 0) && (
                                                 <div className="insurances-list-col tcol insurances-selected">
                                                     <FontAwesomeIcon icon={faPencilAlt} />
@@ -7782,22 +8011,30 @@ const Carriers = props => {
                             <div className="form-title">Factoring Company</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={addFactoringCompanyBtnClick}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={addFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Add Factoring Company</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={searchFactoringCompanyBtnClick}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={searchFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Search</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={moreFactoringCompanyBtnClick}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={moreFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">More</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"} onClick={clearFactoringCompanyBtnClick}>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={clearFactoringCompanyBtnClick}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -8269,7 +8506,8 @@ const Carriers = props => {
                             <div className="notes-list-wrapper">
                                 {(selectedCarrier.notes || []).map((note, index) => {
                                     return (
-                                        <div className="notes-list-item" key={index} onClick={() => setSelectedNote(note)}>
+                                        <div className="notes-list-item" key={index}
+                                            onClick={() => setSelectedNote(note)}>
                                             <div className="notes-list-col tcol note-text">{note.text}</div>
                                             {note.id === (selectedNote?.id || 0) && (
                                                 <div className="notes-list-col tcol notes-selected">
@@ -8289,24 +8527,6 @@ const Carriers = props => {
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Past Orders</div>
                             <div className="top-border top-border-middle"></div>
-                            {/* <div className="form-buttons">
-                                <div className="mochi-button">
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Search</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div className="mochi-button" onClick={() => {
-                                    if (selectedCarrier.id === undefined || (selectedCarrier.past_orders || []).length === 0) {
-                                        window.alert('There is nothing to print!');
-                                        return;
-                                    }
-
-                                }}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Print</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                            </div> */}
                             <div className="top-border top-border-right"></div>
                         </div>
 
@@ -8320,38 +8540,30 @@ const Carriers = props => {
                                             onClick={() => {
                                                 let panel = {
                                                     panelName: `${props.panelName}-dispatch`,
-                                                    component: <Dispatch title="Dispatch" tabTimes={22000 + props.tabTimes} panelName={`${props.panelName}-dispatch`} origin={props.origin} isOnPanel={true} isAdmin={props.isAdmin} componentId={moment().format("x")} order_id={order.id} />,
+                                                    component: <Dispatch title="Dispatch"
+                                                        tabTimes={22000 + props.tabTimes}
+                                                        panelName={`${props.panelName}-dispatch`}
+                                                        origin={props.origin} isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
+                                                        componentId={moment().format("x")}
+                                                        order_id={order.id} />,
                                                 };
 
                                                 openPanel(panel, props.origin);
                                             }}
                                         >
-                                            <span
-                                                style={{
-                                                    color: "#4682B4",
-                                                    fontWeight: "bold",
-                                                    marginRight: 5,
-                                                }}
-                                            >
-                                                {order.order_number}
-                                            </span>{" "}
-                                            {(order?.routing || []).length >= 2
-                                                ? order.routing[0].type === "pickup"
-                                                    ? (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || "") +
-                                                    ", " +
-                                                    (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || "") +
-                                                    " - " +
-                                                    (order.routing[order.routing.length - 1].type === "pickup"
-                                                        ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
-                                                        : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
-                                                    : (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || "") +
-                                                    ", " +
-                                                    (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || "") +
-                                                    " - " +
-                                                    (order.routing[order.routing.length - 1].type === "pickup"
-                                                        ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || "") + ", " + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || "")
-                                                        : (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || "") + ", " + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || ""))
-                                                : ""}
+                                            <span style={{
+                                                color: "#4682B4",
+                                                fontWeight: "bold",
+                                                marginRight: 5,
+                                            }}
+                                            >{order.order_number}</span>
+                                            {
+                                                `${order?.from_pickup_city || order?.from_delivery_city}, 
+                                                    ${order?.from_pickup_state || order?.from_delivery_state} - 
+                                                 ${order?.to_pickup_city || order?.to_delivery_city}, 
+                                                    ${order?.to_pickup_state || order?.to_delivery_state}`
+                                            }
                                         </div>
                                     );
                                 })}
@@ -8430,9 +8642,19 @@ const Carriers = props => {
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingACHWiringInfo(false);
-                                        refCarrierCode.current.focus({
-                                            preventScroll: true
-                                        })
+                                        if (props.isOnPanel) {
+                                            if (refCarrierCode?.current) {
+                                                refCarrierCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        } else {
+                                            if (props.refCarrierCode?.current) {
+                                                props.refCarrierCode.current.focus({
+                                                    preventScroll: true,
+                                                });
+                                            }
+                                        }
                                     }}
                                     selectedOwner={selectedCarrier}
                                     setSelectedOwner={setSelectedCarrier}
@@ -8599,9 +8821,19 @@ const Carriers = props => {
                                                 }
 
                                                 setIsLoading(false);
-                                                refCarrierCode.current.focus({
-                                                    preventScroll: true,
-                                                });
+                                                if (props.isOnPanel) {
+                                                    if (refCarrierCode?.current) {
+                                                        refCarrierCode.current.focus({
+                                                            preventScroll: true,
+                                                        });
+                                                    }
+                                                } else {
+                                                    if (props.refCarrierCode?.current) {
+                                                        props.refCarrierCode.current.focus({
+                                                            preventScroll: true,
+                                                        });
+                                                    }
+                                                }
                                             })
                                             .catch(e => {
                                                 setIsLoading(false);

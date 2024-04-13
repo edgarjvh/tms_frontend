@@ -1,34 +1,14 @@
 import { companyConstants } from '../constants';
 
-const pagesList = process.env.NODE_ENV === 'development'
-    ? [
-        'home',        
-        'carrier',
-        'customer',
-        'dispatch',
-        'invoice',
-        'load board',
-        'reports'
-    ] :
-    process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api'
-        ? [
-            'home',
-            'customers-t',
-            'carrier',
-            'customer',
-            'dispatch',
-            'invoice',
-            'load board',
-            'reports'
-        ] : [
-            'home',
-            'carrier',
-            'customer',
-            'dispatch',
-            'invoice',
-            'load board',
-            'reports'
-        ]
+const pagesList = [
+    'home',        
+    'carrier',
+    'customer',
+    'dispatch',
+    'invoice',
+    'load board',
+    'reports'
+]
 
 export const companyReducers = (state = {
     pages: pagesList,

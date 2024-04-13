@@ -58,6 +58,7 @@ import { Dispatch } from "../../../company";
 import { useReactToPrint } from "react-to-print";
 
 const Divisions = (props) => {
+    const refDivisionsContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDivisionOrders, setIsLoadingDivisionOrders] = useState(false);
     const [selectedDivision, setSelectedDivision] = useState({});
@@ -251,6 +252,12 @@ const Divisions = (props) => {
     const disabledDivisionHoursFields = classnames({
         'disabled': !isEditingDivision
     })
+
+    useEffect(() => {
+        refDivisionCode.current.focus({
+            preventScroll: true
+        });
+    }, []);
 
     useEffect(() => {
         if ((selectedDivision?.contacts || []).length === 0) {
@@ -1271,7 +1278,17 @@ const Divisions = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refDivisionsContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                if ((selectedDivision?.id || 0) > 0){
+                    e.stopPropagation();
+
+                    setInitialValues();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">

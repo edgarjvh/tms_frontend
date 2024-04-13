@@ -2,12 +2,11 @@ import React, { createContext, useRef } from 'react';
 
 const RefsContext = createContext();
 
-export const DispatchRefsProvider = ({ children }) => {
-    const inputRef1 = useRef(null);
-    const inputRef2 = useRef(null);
+export const CompanyDispatchRefsProvider = ({ children }) => {
+    const refOrderNumber = useRef(null);
 
     return (
-        <RefsContext.Provider value={{ inputRef1, inputRef2 }}>
+        <RefsContext.Provider value={{ refOrderNumber }}>
             {children}
         </RefsContext.Provider>
     );

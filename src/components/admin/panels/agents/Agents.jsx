@@ -66,6 +66,7 @@ import { Dispatch } from "../../../company";
 import { useReactToPrint } from "react-to-print";
 
 const Agents = (props) => {
+    const refAgentsContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingAgentOrders, setIsLoadingAgentOrders] = useState(false);
     const [selectedAgent, setSelectedAgent] = useState({});
@@ -371,6 +372,10 @@ const Agents = (props) => {
                 setIsLoading(false);
             });
         }
+
+        refAgentCode.current.focus({
+            preventScroll: true
+        });
     }, [])
 
     useEffect(() => {
@@ -1535,7 +1540,17 @@ const Agents = (props) => {
     }
     
     return (
-        <div className="panel-content">
+        <div className="panel-content" tabIndex={0} ref={refAgentsContainer} onKeyDown={(e) => {
+            let key = e.keyCode || e.which;
+
+            if (key === 27){
+                if ((selectedAgent?.id || 0) > 0){
+                    e.stopPropagation();
+
+                    setInitialValues();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
             <div className="side-title">

@@ -304,8 +304,6 @@ function CompanySetup(props) {
     }, [props.selectedAgent])
 
     useEffect(() => {
-        console.log(props.selectedDriver, props.componentId, selectedDriver)
-
         if ((props.selectedDriver?.component_id || '') !== props.componentId) {
             if (((selectedDriver?.id || 0) > 0 && (props.selectedDriver?.id || 0) > 0) && selectedDriver.id === props.selectedDriver.id) {
                 setSelectedDriver(selectedDriver => {

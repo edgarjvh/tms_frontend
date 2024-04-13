@@ -56,6 +56,7 @@ import { useReactToPrint } from 'react-to-print';
 var delayTimer = null;
 
 const Invoice = (props) => {
+    const refOrderNumber = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
     const [selectedBillToCustomer, setSelectedBillToCustomer] = useState({});
     const [selectedBillToCustomerContact, setSelectedBillToCustomerContact] = useState({});
@@ -652,8 +653,6 @@ const Invoice = (props) => {
         }
     }, [props.selectedCarrierDriver])
 
-    const refOrderNumber = useRef();
-
     const currencyMask = createNumberMask({
         prefix: '$ ',
         suffix: '',
@@ -704,29 +703,65 @@ const Invoice = (props) => {
                     });
 
                     setIsLoading(false);
-
-                    refOrderNumber.current.focus({
-                        preventScroll: true
-                    });
+                    if (props.isOnPanel){
+                        if (refOrderNumber?.current){
+                            refOrderNumber.current.focus({
+                                preventScroll: true,
+                            });
+                        }
+                    }else{
+                        if (props.refOrderNumber?.current){
+                            props.refOrderNumber.current.focus({
+                                preventScroll: true,
+                            });
+                        }
+                    }
                 }
             }).catch(e => {
                 console.log('error getting order by id', e);
                 setIsLoading(false);
+                if (props.isOnPanel){
+                    if (refOrderNumber?.current){
+                        refOrderNumber.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }else{
+                    if (props.refOrderNumber?.current){
+                        props.refOrderNumber.current.focus({
+                            preventScroll: true,
+                        });
+                    }
+                }
             })
-        } else {
-            refOrderNumber.current.focus({
-                preventScroll: true
-            });
         }
 
         updateSystemDateTime();
     }, [])
 
     useEffect(() => {
-        if (props.screenFocused) {
-            refOrderNumber.current.focus({
+        if (props.refOrderNumber?.current){
+            props.refOrderNumber.current.focus({
                 preventScroll: true
             });
+        }
+    }, [props.refOrderNumber]);
+
+    useEffect(() => {
+        if (props.screenFocused) {
+            if (props.isOnPanel){
+                if (refOrderNumber?.current){
+                    refOrderNumber.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            }else{
+                if (props.refOrderNumber?.current){
+                    props.refOrderNumber.current.focus({
+                        preventScroll: true,
+                    });
+                }
+            }
         }
     }, [props.screenFocused])
 
@@ -2125,16 +2160,38 @@ const Invoice = (props) => {
                         setSelectedCarrierDriver({});
                         setSelectedRoute({});
 
-                        refOrderNumber.current.focus({
-                            preventScroll: true
-                        });
+                        if (props.isOnPanel){
+                            if (refOrderNumber?.current){
+                                refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refOrderNumber?.current){
+                                props.refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
 
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        refOrderNumber.current.focus();
+                        if (props.isOnPanel){
+                            if (refOrderNumber?.current){
+                                refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }else{
+                            if (props.refOrderNumber?.current){
+                                props.refOrderNumber.current.focus({
+                                    preventScroll: true,
+                                });
+                            }
+                        }
                     }
                 }
             }}
@@ -9868,9 +9925,19 @@ const Invoice = (props) => {
                             setSelectedCarrierDriver({});
                             setSelectedRoute({});
 
-                            refOrderNumber.current.focus({
-                                preventScroll: true
-                            });
+                            if (props.isOnPanel){
+                                if (refOrderNumber?.current){
+                                    refOrderNumber.current.focus({
+                                        preventScroll: true,
+                                    });
+                                }
+                            }else{
+                                if (props.refOrderNumber?.current){
+                                    props.refOrderNumber.current.focus({
+                                        preventScroll: true,
+                                    });
+                                }
+                            }
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left"
                                 style={{ fontSize: '0.9rem' }}>(
@@ -9900,7 +9967,7 @@ const Invoice = (props) => {
                         </div>
                         <input style={{ textAlign: 'right', fontWeight: 'bold' }} tabIndex={1 + props.tabTimes}
                             type="text"
-                            ref={refOrderNumber}
+                            ref={props.isOnPanel ? refOrderNumber : props.refOrderNumber}
                             onKeyDown={getOrderByOrderNumber}
                             onChange={(e) => {
                                 setSelectedOrder(selectedOrder => {
@@ -10233,14 +10300,11 @@ const Invoice = (props) => {
                                             pageName={'Customer'}
                                             title={'Bill-To Company'}
                                             panelName={`${props.panelName}-customer`}
-                                            tabTimes={28000 + props.tabTimes}
+                                            tabTimes={2804500 + props.tabTimes}
                                             componentId={moment().format('x')}
                                             isOnPanel={true}
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
-
-
-
                                             customer_id={selectedBillToCustomer.id}
                                         />
                                     }
@@ -11769,13 +11833,37 @@ const Invoice = (props) => {
                             onClick={() => {
                                 if ((selectedOrder?.id || 0) === 0) {
                                     window.alert('You must load an order first!');
-                                    refOrderNumber.current.focus();
+                                    if (props.isOnPanel){
+                                        if (refOrderNumber?.current){
+                                            refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }else{
+                                        if (props.refOrderNumber?.current){
+                                            props.refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }
                                     return;
                                 }
 
                                 if ((selectedOrder?.order_invoiced || 0) === 0) {
                                     window.alert('You must approve the customer invoice first!');
-                                    refOrderNumber.current.focus();
+                                    if (props.isOnPanel){
+                                        if (refOrderNumber?.current){
+                                            refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }else{
+                                        if (props.refOrderNumber?.current){
+                                            props.refOrderNumber.current.focus({
+                                                preventScroll: true,
+                                            });
+                                        }
+                                    }
                                     return;
                                 }
 
@@ -13149,10 +13237,34 @@ const Invoice = (props) => {
                                                     }).catch(e => {
                                                         console.log(e);
                                                     }).finally(() => {
-                                                        refOrderNumber.current.focus();
+                                                        if (props.isOnPanel){
+                                                            if (refOrderNumber?.current){
+                                                                refOrderNumber.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }else{
+                                                            if (props.refOrderNumber?.current){
+                                                                props.refOrderNumber.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
                                                     });
                                                 } else {
-                                                    refOrderNumber.current.focus();
+                                                    if (props.isOnPanel){
+                                                        if (refOrderNumber?.current){
+                                                            refOrderNumber.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }else{
+                                                        if (props.refOrderNumber?.current){
+                                                            props.refOrderNumber.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

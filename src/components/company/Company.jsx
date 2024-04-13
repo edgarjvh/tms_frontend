@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import './Company.css';
 import classnames from 'classnames';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 // import { Transition, Spring, animated, config } from 'react-spring';
-import { useTransition, animated } from 'react-spring';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { useDetectClickOutside } from "react-detect-click-outside";
+import {useTransition, animated} from 'react-spring';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck} from '@fortawesome/free-solid-svg-icons';
+import {useDetectClickOutside} from "react-detect-click-outside";
 import Draggable from 'react-draggable';
 import axios from 'axios';
 
@@ -240,7 +240,7 @@ import {
     setCompanyReportPanels
 } from '../../actions/reportsActions';
 
-import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT } from './../company';
+import {CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT} from './../company';
 import moment from 'moment';
 
 function Company(props) {
@@ -255,6 +255,19 @@ function Company(props) {
     const [invoicePanels, setInvoicePanels] = useState([]);
     const [reportsPanels, setReportsPanels] = useState([]);
 
+    const refCompanyCustomerCode = useRef(null);
+    const refCompanyCarrierCode = useRef(null);
+    const refCompanyDispatchOrderNumber = useRef(null);
+    const refCompanyInvoiceOrderNumber = useRef(null);
+    
+    const refCompanyHomePanels = useRef([]);
+    const refCompanyCustomerPanels = useRef([]);
+    const refCompanyCarrierPanels = useRef([]);
+    const refCompanyDispatchPanels = useRef([]);
+    const refCompanyLoadBoardPanels = useRef([]);
+    const refCompanyInvoicePanels = useRef([]);
+    const refCompanyReportsPanels = useRef([]);
+
     const [tCount, setTCount] = useState(0);
 
     const containerCls = classnames({
@@ -267,9 +280,9 @@ function Company(props) {
     }
 
     useEffect(() => {
-        if (process.env.NODE_ENV === 'development'){
+        if (process.env.NODE_ENV === 'development') {
             setTCount(1);
-        }else if(process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api'){
+        } else if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api') {
             setTCount(1);
         }
     }, []);
@@ -678,35 +691,137 @@ function Company(props) {
 
     const closePanel = (panelName, origin) => {
         if (origin === 'company-home') {
+            let currentCompanyHomePanels = [...props.companyHomePanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
-        }
 
-        if (origin === 'customers-t') {
-            props.setCustomersTPanels(props.customersTPanels.filter(panel => panel.panelName !== panelName));
+            let companyHomePanelsLength = currentCompanyHomePanels.length;
+
+            if (companyHomePanelsLength > 0){
+                let lastPanelName = currentCompanyHomePanels[companyHomePanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyHomePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
 
         if (origin === 'company-carrier') {
-            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+            let currentCompanyCarrierPanels = [...props.companyCarrierPanels.filter(panel => panel.panelName !== panelName)];
+            props.setCompanyCarrierPanels(currentCompanyCarrierPanels);
+
+            let companyCarrierPanelsLength = currentCompanyCarrierPanels.length;
+
+            if (companyCarrierPanelsLength > 0){
+                let lastPanelName = currentCompanyCarrierPanels[companyCarrierPanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyCarrierPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refCompanyCarrierCode?.current){
+                    refCompanyCarrierCode.current.focus();
+                }
+            }
         }
 
         if (origin === 'company-customer') {
-            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+            let currentCompanyCustomerPanels = [...props.companyCustomerPanels.filter(panel => panel.panelName !== panelName)];
+            props.setCompanyCustomerPanels(currentCompanyCustomerPanels);
+
+            let companyCustomerPanelsLength = currentCompanyCustomerPanels.length;
+
+            if (companyCustomerPanelsLength > 0){
+                let lastPanelName = currentCompanyCustomerPanels[companyCustomerPanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyCustomerPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refCompanyCustomerCode?.current){
+                    refCompanyCustomerCode.current.focus();
+                }
+            }
         }
 
         if (origin === 'company-dispatch') {
-            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+            let currentCompanyDispatchPanels = [...props.companyDispatchPanels.filter(panel => panel.panelName !== panelName)];
+            props.setCompanyDispatchPanels(currentCompanyDispatchPanels);
+
+            let companyDispatchPanelsLength = currentCompanyDispatchPanels.length;
+
+            if (companyDispatchPanelsLength > 0){
+                let lastPanelName = currentCompanyDispatchPanels[companyDispatchPanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyDispatchPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refCompanyDispatchOrderNumber?.current){
+                    refCompanyDispatchOrderNumber.current.focus();
+                }
+            }
         }
 
         if (origin === 'company-invoice') {
-            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+            let currentCompanyInvoicePanels = [...props.companyInvoicePanels.filter(panel => panel.panelName !== panelName)];
+            props.setCompanyInvoicePanels(currentCompanyInvoicePanels);
+
+            let companyInvoicePanelsLength = currentCompanyInvoicePanels.length;
+
+            if (companyInvoicePanelsLength > 0){
+                let lastPanelName = currentCompanyInvoicePanels[companyInvoicePanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyInvoicePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refCompanyInvoiceOrderNumber?.current){
+                    refCompanyInvoiceOrderNumber.current.focus();
+                }
+            }
         }
 
         if (origin === 'company-load-board') {
+            let currentCompanyLoadBoardPanels = [...props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+
+            let companyLoadBoardPanelsLength = currentCompanyLoadBoardPanels.length;
+
+            if (companyLoadBoardPanelsLength > 0){
+                let lastPanelName = currentCompanyLoadBoardPanels[companyLoadBoardPanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyLoadBoardPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
 
         if (origin === 'company-report') {
+            let currentCompanyReportPanels = [...props.companyReportPanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+
+            let companyReportPanelsLength = currentCompanyReportPanels.length;
+
+            if (companyReportPanelsLength > 0){
+                let lastPanelName = currentCompanyReportPanels[companyReportPanelsLength - 1]?.panelName || '';
+                let refEl = (refCompanyReportsPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
     }
 
@@ -744,9 +859,9 @@ function Company(props) {
                                 alignItems: 'center',
                                 lineHeight: '1rem'
                             }}>
-                                <div className="user-name" style={{ display: 'flex', alignItems: 'center' }}>
+                                <div className="user-name" style={{display: 'flex', alignItems: 'center'}}>
                                     <span>{props.user.user_code.code}</span>
-                                    <span style={{ marginRight: 5, marginLeft: 5 }}>-</span>
+                                    <span style={{marginRight: 5, marginLeft: 5}}>-</span>
                                     <span>{props.user?.first_name || ''} {props.user?.last_name || ''}</span>
                                 </div>
                             </div>
@@ -773,10 +888,11 @@ function Company(props) {
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base"
-                                    style={{
-                                        color: 'red'
-                                    }}
-                                >Logout</div>
+                                     style={{
+                                         color: 'red'
+                                     }}
+                                >Logout
+                                </div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
                         </div>
@@ -795,11 +911,11 @@ function Company(props) {
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Video</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>+
+                            </div>
                         </div>
                         <div className="section">
                             <div className="mochi-input-decorator">
-                                <input type="search" placeholder="just type" id="txt-main-search" />
+                                <input type="search" placeholder="just type" id="txt-main-search"/>
                             </div>
                         </div>
                         {/* <div className='section' style={{ marginLeft: 5 }}>
@@ -813,7 +929,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.mainCompanyScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={homeBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Home</div>
@@ -822,7 +938,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.carrierScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={carriersBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Carriers</div>
@@ -831,7 +947,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.customerScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={customersBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Customers</div>
@@ -840,7 +956,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.dispatchScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={dispatchBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Dispatch</div>
@@ -849,7 +965,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.invoiceScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={invoiceBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Invoice</div>
@@ -858,7 +974,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.loadBoardScreenFocused,
-                                'testing': true
+                                'testing': false
                             })} onClick={loadBoardBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Load Board</div>
@@ -867,7 +983,7 @@ function Company(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.scale !== 1,
-                                'testing': true
+                                'testing': false
                             })} onClick={reportsBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Reports</div>
@@ -884,6 +1000,9 @@ function Company(props) {
                         overflowX: 'hidden',
                         transform: `translateX(${((100 / props.pages.length) * -1) * (props.selectedPageIndex + 1)}%)`
                     }}>
+                        {/**
+                         * COMPANY HOME
+                        */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -893,16 +1012,16 @@ function Company(props) {
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 homePanelTransition((style, panel, item, index) => {
@@ -918,39 +1037,42 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyHomePanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.dispatchOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setDispatchOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}
+                                                
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div
+                                                                className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -975,97 +1097,9 @@ function Company(props) {
                             />
                         </div>
 
-                        {/* <div style={{
-                            width: `${100 / props.pages.length}%`,
-                            height: '100%',
-                            transform: `scale(${props.scale})`,
-                            transition: 'all ease 0.7s',
-                            boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px',
-                            overflow: 'hidden'
-                        }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
-
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
-                        >
-                            {
-                                customersTPanelTransition((style, panel, item, index) => {
-                                    const origin = 'customers-t';
-
-                                    return (
-                                        <Draggable
-                                            axis="x"
-                                            handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
-                                            key={index}
-                                        >
-                                            <animated.div className={panelClasses} key={index} style={{
-                                                ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
-                                            }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
-
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.dispatchOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setDispatchOpenedPanels(_panels);
-                                            // }}
-                                            >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
-
-                                                {
-                                                    panel?.component?.props?.isOnPanel
-                                                        ?
-                                                        <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
-                                                            {panel?.component}
-                                                        </div>
-                                                        :
-                                                        panel?.component
-                                                }
-                                            </animated.div>
-                                        </Draggable>
-                                    )
-                                })
-                            }
-
-                            <CustomersT
-                                pageName={'Customers'}
-                                panelName={'customers-t'}
-                                tabTimes={500}
-                                screenFocused={props.customerTScreenFocused}
-                                componentId={moment().format('x')}
-                                isOnPanel={false}
-                                origin='customers-t'
-                                openPanel={openPanel}
-                                closePanel={closePanel}
-                            />
-                        </div> */}
-
+                        {/**
+                         * COMPANY CARRIERS
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1074,16 +1108,16 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 carrierPanelTransition((style, panel, item, index) => {
@@ -1099,39 +1133,41 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyCarrierPanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}                                                
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title" tabIndex={0} autoFocus={true}>{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title" tabIndex={0}
+                                                                 autoFocus={true}>{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1154,9 +1190,13 @@ function Company(props) {
                                 origin='company-carrier'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refCarrierCode={refCompanyCarrierCode}
                             />
                         </div>
 
+                        {/**
+                         * COMPANY CUSTOMERS
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1165,18 +1205,17 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
-
                             {
                                 customerPanelTransition((style, panel, item, index) => {
                                     const origin = 'company-customer';
@@ -1191,39 +1230,41 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyCustomerPanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div
+                                                                className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1247,9 +1288,13 @@ function Company(props) {
                                 origin='company-customer'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refCustomerCode={refCompanyCustomerCode}
                             />
                         </div>
 
+                        {/**
+                         * COMPANY DISPATCH
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1259,16 +1304,16 @@ function Company(props) {
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 dispatchPanelTransition((style, panel, item, index) => {
@@ -1284,39 +1329,43 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses}
+                                                          id={`${origin}-panel-${panel?.panelName || ''}`}
+                                                          key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyDispatchPanels.current[index] = el)}                                                          
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.dispatchOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.dispatchOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setDispatchOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title" tabIndex={0} autoFocus={true}>{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title" tabIndex={0}
+                                                                 autoFocus={true}>{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1339,9 +1388,13 @@ function Company(props) {
                                 origin='company-dispatch'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refOrderNumber={refCompanyDispatchOrderNumber}
                             />
                         </div>
 
+                        {/**
+                         * COMPANY INVOICE
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1350,16 +1403,16 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 invoicePanelTransition((style, panel, item, index) => {
@@ -1375,39 +1428,41 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyInvoicePanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div
+                                                                className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1430,9 +1485,13 @@ function Company(props) {
                                 origin='company-invoice'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refOrderNumber={refCompanyInvoiceOrderNumber}
                             />
                         </div>
 
+                        {/**
+                         * COMPANY LOAD BOARD
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1441,16 +1500,16 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 loadBoardPanelTransition((style, panel, item, index) => {
@@ -1466,39 +1525,41 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyLoadBoardPanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}                                                
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div
+                                                                className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1525,6 +1586,9 @@ function Company(props) {
                             />
                         </div>
 
+                        {/**
+                         * COMPANY REPORTS
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1533,16 +1597,16 @@ function Company(props) {
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
                             borderRadius: props.scale === 1 ? 0 : '20px'
                         }}
-                            tabIndex={-1}
-                            onKeyDown={(e) => {
-                                let key = e.keyCode || e.which;
+                             tabIndex={-1}
+                             onKeyDown={(e) => {
+                                 let key = e.keyCode || e.which;
 
-                                if (key === 9) {
-                                    if (e.target.type === undefined) {
-                                        e.preventDefault();
-                                    }
-                                }
-                            }}
+                                 if (key === 9) {
+                                     if (e.target.type === undefined) {
+                                         e.preventDefault();
+                                     }
+                                 }
+                             }}
                         >
                             {
                                 reportsPanelTransition((style, panel, item, index) => {
@@ -1558,39 +1622,48 @@ function Company(props) {
                                             onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{ x: 0, y: 0 }}
+                                            position={{x: 0, y: 0}}
                                             key={index}
                                         >
                                             <animated.div className={panelClasses} key={index} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refCompanyReportsPanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
+                                                              let key = e.keyCode || e.which;
 
-                                                    if (key === 27) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        closePanel(panel?.panelName, origin);
-                                                    }
-                                                }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+                                                              if (key === 27) {
+                                                                  e.stopPropagation();
+                                                                  e.preventDefault();
+                                                                  closePanel(panel?.panelName, origin);
+                                                              }
+                                                          }}
+                                                // onClick={() => {
+                                                //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
+                                                //     // let _panels = [...props.customerOpenedPanels];
+                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
 
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
+                                                //     // props.setCustomerOpenedPanels(_panels);
+                                                // }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
+                                                <div className="close-btn" title="Close" onClick={e => {
+                                                    e.stopPropagation();
+                                                    closePanel(panel?.panelName, origin)
+                                                }}><span className="fas fa-times"></span></div>
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="drag-handler"
+                                                                 onClick={e => e.stopPropagation()}></div>
+                                                            <div
+                                                                className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title">
+                                                                <div>{panel?.component?.props?.title}</div>
+                                                            </div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1619,7 +1692,7 @@ function Company(props) {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
 
@@ -1997,7 +2070,6 @@ export default connect(mapStateToProps, {
     setSelectedInvoiceCarrierInfoDocument,
     setSelectedInvoiceCarrierInfoDocumentTags,
     setSelectedInvoiceCarrierInfoDocumentNote,
-
 
 
     setCompanyHomePanels,

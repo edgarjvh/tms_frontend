@@ -4039,7 +4039,7 @@ const FactoringCompany = (props) => {
                                             {
                                                 (selectedFactoringCompany?.orders || []).map((order, index) => {
                                                     return (
-                                                        <div className="factoring-company-invoice-list-item" key={index} onDoubleClick={() => {
+                                                        <div className="factoring-company-invoice-list-item" key={index} onClick={() => {
                                                             let panel = {
                                                                 panelName: `${props.panelName}-invoice`,
                                                                 component: <Invoice

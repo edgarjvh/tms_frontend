@@ -1,35 +1,62 @@
-import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
-import classnames from "classnames";
+import React from "react";
+import {connect} from "react-redux";
+import PropTypes from 'prop-types';
 
-function TextInput(props) {
-    const { refInput } = props.refs;
+function TextInput(
+    {
+        id = '',
+        refs = {
+            refInput: null
+        },
+        type = 'text',
+        className = '',
+        disabled = false,
+        boxStyle = {},
+        fixedPlaceholder = false,
+        placeholderStyle = {},
+        placeholder = '',
+        isDataSplitted = false,
+        dataToSplit = '',
+        removeItem = () => {},
+        tabIndex = 0,
+        maxLength = 1000,
+        readOnly = false,
+        inputStyle = {},
+        value = '',
+        onChange = () => {},
+        onInput = () => {},
+        onKeyDown = () => {},
+        onBlur = () => {},
+        autoFocus = false
+    }
+) {
+    const {refInput} = refs;
 
     return (
-        <div className={`input-box-container ${props.className || ''}`} style={{
-            pointerEvents: props.disabled ? 'none' : 'all',
-            backgroundColor: props.disabled ? 'rgba(0,0,0,0.01)' : 'white',
-            userSelect: props.disabled ? 'none' : 'all',
-            ...(props.containerStyle || {})
+        <div className={`input-box-container ${className || ''}`} style={{
+            pointerEvents: disabled ? 'none' : 'all',
+            backgroundColor: disabled ? 'rgba(0,0,0,0.01)' : 'white',
+            userSelect: disabled ? 'none' : 'all',
+            ...boxStyle
         }}>
             {
-                props.fixedPlaceholder &&
+                fixedPlaceholder &&
                 <label
-                    htmlFor={props.id || ''}
-                    style={{ ...(props.placeholderStyle || {}) }}
+                    htmlFor={id }
+                    style={{...placeholderStyle}}
                 >
-                    {props.placeholder || ''}
+                    {placeholder}
                 </label>
             }
 
             {
-                (props.isDataSplitted && (props.dataToSplit || '').trim() !== '') &&
+                (isDataSplitted && dataToSplit.trim() !== '') &&
                 <div style={{
                     display: "flex",
                     alignItems: "center"
                 }}>
                     {
-                        (props.dataToSplit || '').toString().split('|').map((item, index) => {
+                        dataToSplit.toString().split('|').map((item, index) => {
                             if (item.trim() !== '') {
                                 return (
                                     <div key={index} style={{
@@ -42,22 +69,22 @@ function TextInput(props) {
                                         marginRight: "2px",
                                         cursor: "default",
                                     }}
-                                        title={item}
+                                         title={item}
                                     >
                                         <span className="fas fa-trash-alt" style={{
                                             marginRight: "5px",
                                             cursor: "pointer"
                                         }} onClick={() => {
-                                            props.removeItem(item);
+                                            removeItem(item);
                                         }}
                                         ></span>
 
-                                        <span className="automatic-email-inputted" style={{ whiteSpace: "nowrap" }}>{item}</span>
+                                        <span className="automatic-email-inputted"
+                                              style={{whiteSpace: "nowrap"}}>{item}</span>
                                     </div>)
                             } else {
                                 return ''
                             }
-
                         })
                     }
                 </div>
@@ -65,22 +92,47 @@ function TextInput(props) {
 
             <input
                 ref={refInput}
-                type="text"
-                id={props.id || ''}
-                tabIndex={props.tabIndex || 0}
-                maxLength={props.maxLength || 1000}
-                readOnly={props.readOnly}
-                placeholder={props.fixedPlaceholder ? '' : (props.placeholder || '')}
-                style={{ ...(props.inputStyle || {}) }}
-                value={props.value || ''}
-                onChange={props.onChange}
-                onInput={props.onInput}
-                onKeyDown={props.onKeyDown}
-                onBlur={props.onBlur}
-                autoFocus={props.autoFocus}
+                type={type}
+                id={id}
+                tabIndex={tabIndex}
+                maxLength={maxLength}
+                readOnly={readOnly}
+                placeholder={fixedPlaceholder ? '' : placeholder}
+                style={{...inputStyle}}
+                value={value}
+                onChange={onChange}
+                onInput={onInput}
+                onKeyDown={onKeyDown}
+                onBlur={onBlur}
+                autoFocus={autoFocus}
             />
         </div>
     )
+}
+
+TextInput.propTypes = {
+    id: PropTypes.string,
+    refs: PropTypes.object,
+    type: PropTypes.string,
+    className: PropTypes.string,
+    disabled: PropTypes.bool,
+    boxStyle: PropTypes.object,
+    fixedPlaceholder: PropTypes.bool,
+    placeholderStyle: PropTypes.object,
+    placeholder: PropTypes.string,
+    isDataSplitted: PropTypes.string,
+    dataToSplit: PropTypes.string,
+    removeItem: () => {},
+    tabIndex: PropTypes.number,
+    maxLength: PropTypes.number,
+    readOnly: PropTypes.bool,
+    inputStyle: PropTypes.object,
+    onChange: () =>  {},
+    onInput: () =>  {},
+    onKeyDown: () =>  {},
+    onBlur: () =>  {},
+    value: PropTypes.string,
+    autoFocus: PropTypes.bool
 }
 
 const mapStateToProps = state => {
@@ -91,4 +143,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps, null, null, { forwardRef: true })(TextInput);
+export default connect(mapStateToProps, null, null, {forwardRef: true})(TextInput);

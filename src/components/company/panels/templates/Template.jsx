@@ -3038,7 +3038,7 @@ const Template = (props) => {
                                         placeholder='Name'
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         tabIndex={5 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1,
                                             
                                         }}
@@ -3069,7 +3069,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Address 1'
                                         tabIndex={6 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -3097,7 +3097,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Address 2'
                                         tabIndex={7 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -3125,7 +3125,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='City'
                                         tabIndex={8 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -3741,7 +3741,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Name'
                                         tabIndex={53 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -3769,7 +3769,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Carrier Load - Starting City State - Destination City State'
                                         tabIndex={54 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -4625,7 +4625,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Driver Phone'
                                         tabIndex={60 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             width: '9rem'
                                         }}
                                         inputStyle={{
@@ -4649,7 +4649,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Unit Number'
                                         tabIndex={61 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             maxWidth: '5.6rem'
                                         }}
                                         inputStyle={{
@@ -4682,7 +4682,7 @@ const Template = (props) => {
                                                 refName.current.focus();
                                             }
                                         }}
-                                        containerStyle={{
+                                        boxStyle={{
                                             maxWidth: '5.6rem'
                                         }}
                                         inputStyle={{
@@ -6145,7 +6145,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Name'
                                         tabIndex={15 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -6210,7 +6210,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='Address 1'
                                                         tabIndex={16 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -6271,7 +6271,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='Address 2'
                                                         tabIndex={17 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -6332,7 +6332,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='City'
                                                         tabIndex={18 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -7607,7 +7607,7 @@ const Template = (props) => {
                                                         className='shipper-bol-numbers'
                                                         placeholder='BOL Numbers'
                                                         tabIndex={28 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -7738,7 +7738,7 @@ const Template = (props) => {
                                                         className='shipper-po-numbers'
                                                         placeholder='PO Numbers'
                                                         tabIndex={29 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -7870,7 +7870,7 @@ const Template = (props) => {
                                                         className='shipper-ref-numbers'
                                                         placeholder='REF Numbers'
                                                         tabIndex={30 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -8001,7 +8001,7 @@ const Template = (props) => {
                                                         className='shipper-seal-number'
                                                         placeholder='SEAL Number'
                                                         tabIndex={31 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onInput={(e) => {
                                                             setSelectedTemplate(prev => {
                                                                 return {
@@ -8054,7 +8054,7 @@ const Template = (props) => {
                                                         className='shipper-special-instructions'
                                                         placeholder='Special Instructions'
                                                         tabIndex={32 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -8256,7 +8256,7 @@ const Template = (props) => {
                                         disabled={(selectedTemplate?.id || 0) === 0}
                                         placeholder='Name'
                                         tabIndex={34 + props.tabTimes}
-                                        containerStyle={{
+                                        boxStyle={{
                                             flexGrow: 1
                                         }}
                                         inputStyle={{
@@ -8321,7 +8321,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='Address 1'
                                                         tabIndex={35 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -8382,7 +8382,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='Address 2'
                                                         tabIndex={36 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -8443,7 +8443,7 @@ const Template = (props) => {
                                                         disabled={(selectedTemplate?.id || 0) === 0}
                                                         placeholder='City'
                                                         tabIndex={37 + props.tabTimes}
-                                                        containerStyle={{
+                                                        boxStyle={{
                                                             flexGrow: 1
                                                         }}
                                                         inputStyle={{
@@ -9717,7 +9717,7 @@ const Template = (props) => {
                                                         className='consignee-bol-numbers'
                                                         placeholder='BOL Numbers'
                                                         tabIndex={47 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -9848,7 +9848,7 @@ const Template = (props) => {
                                                         className='consignee-po-numbers'
                                                         placeholder='PO Numbers'
                                                         tabIndex={48 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -9980,7 +9980,7 @@ const Template = (props) => {
                                                         className='consignee-ref-numbers'
                                                         placeholder='REF Numbers'
                                                         tabIndex={49 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 
@@ -10111,7 +10111,7 @@ const Template = (props) => {
                                                         className='consignee-seal-number'
                                                         placeholder='SEAL Number'
                                                         tabIndex={50 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onInput={(e) => {
                                                             setSelectedTemplate(prev => {
                                                                 return {
@@ -10164,7 +10164,7 @@ const Template = (props) => {
                                                         className='consignee-special-instructions'
                                                         placeholder='Special Instructions'
                                                         tabIndex={51 + props.tabTimes}
-                                                        containerStyle={{ flexGrow: 1, flexBasis: '100%' }}
+                                                        boxStyle={{ flexGrow: 1, flexBasis: '100%' }}
                                                         onKeyDown={(e) => {
                                                             let key = e.keyCode || e.which;
 

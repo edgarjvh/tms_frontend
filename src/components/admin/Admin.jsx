@@ -204,6 +204,19 @@ function Admin(props) {
     const [companySetupPanels, setCompanySetupPanels] = useState([]);
     const [invoicePanels, setInvoicePanels] = useState([]);
 
+    const refAdminCustomerCode = useRef(null);
+    const refAdminCarrierCode = useRef(null);
+    const refAdminDispatchOrderNumber = useRef(null);
+    const refAdminInvoiceOrderNumber = useRef(null);
+
+    const refAdminHomePanels = useRef([]);
+    const refAdminCustomerPanels = useRef([]);
+    const refAdminCarrierPanels = useRef([]);
+    const refAdminDispatchPanels = useRef([]);
+    const refAdminCompanySetupPanels = useRef([]);
+    const refAdminInvoicePanels = useRef([]);
+    const refAdminReportsPanels = useRef([]);
+    
     const baseWidth = 95;
     const panelGap = 70;
 
@@ -573,31 +586,137 @@ function Admin(props) {
 
     const closePanel = (panelName, origin) => {
         if (origin === 'admin-home') {
+            let currentAdminHomePanels = [...props.adminHomePanels.filter(panel => panel.panelName !== panelName)];
             props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+
+            let adminHomePanelsLength = currentAdminHomePanels.length;
+
+            if (adminHomePanelsLength > 0){
+                let lastPanelName = currentAdminHomePanels[adminHomePanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminHomePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
 
         if (origin === 'admin-carrier') {
-            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+            let currentAdminCarrierPanels = [...props.adminCarrierPanels.filter(panel => panel.panelName !== panelName)];
+            props.setAdminCarrierPanels(currentAdminCarrierPanels);
+
+            let adminCarrierPanelsLength = currentAdminCarrierPanels.length;
+
+            if (adminCarrierPanelsLength > 0){
+                let lastPanelName = currentAdminCarrierPanels[adminCarrierPanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminCarrierPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refAdminCarrierCode?.current){
+                    refAdminCarrierCode.current.focus();
+                }
+            }
         }
 
         if (origin === 'admin-company-setup') {
-            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+            let currentAdminCompanySetupPanels = [...props.adminAdminSetupPanels.filter(panel => panel.panelName !== panelName)];
+            props.setAdminCompanySetupPanels(currentAdminCompanySetupPanels);
+
+            let adminCompanySetupPanelsLength = currentAdminCompanySetupPanels.length;
+
+            if (adminCompanySetupPanelsLength > 0){
+                let lastPanelName = currentAdminCompanySetupPanels[adminCompanySetupPanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminCompanySetupPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
 
         if (origin === 'admin-customer') {
-            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+            let currentAdminCustomerPanels = [...props.adminCustomerPanels.filter(panel => panel.panelName !== panelName)];
+            props.setAdminCustomerPanels(currentAdminCustomerPanels);
+
+            let adminCustomerPanelsLength = currentAdminCustomerPanels.length;
+
+            if (adminCustomerPanelsLength > 0){
+                let lastPanelName = currentAdminCustomerPanels[adminCustomerPanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminCustomerPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refAdminCustomerCode?.current){
+                    refAdminCustomerCode.current.focus();
+                }
+            }
         }
 
         if (origin === 'admin-dispatch') {
-            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+            let currentAdminDispatchPanels = [...props.adminDispatchPanels.filter(panel => panel.panelName !== panelName)];
+            props.setAdminDispatchPanels(currentAdminDispatchPanels);
+
+            let adminDispatchPanelsLength = currentAdminDispatchPanels.length;
+
+            if (adminDispatchPanelsLength > 0){
+                let lastPanelName = currentAdminDispatchPanels[adminDispatchPanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminDispatchPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refAdminDispatchOrderNumber?.current){
+                    refAdminDispatchOrderNumber.current.focus();
+                }
+            }
         }
 
         if (origin === 'admin-invoice') {
-            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+            let currentAdminInvoicePanels = [...props.adminInvoicePanels.filter(panel => panel.panelName !== panelName)];
+            props.setAdminInvoicePanels(currentAdminInvoicePanels);
+
+            let adminInvoicePanelsLength = currentAdminInvoicePanels.length;
+
+            if (adminInvoicePanelsLength > 0){
+                let lastPanelName = currentAdminInvoicePanels[adminInvoicePanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminInvoicePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                if (refAdminInvoiceOrderNumber?.current){
+                    refAdminInvoiceOrderNumber.current.focus();
+                }
+            }
         }
 
         if (origin === 'admin-report') {
+            let currentAdminReportPanels = [...props.adminReportPanels.filter(panel => panel.panelName !== panelName)];
             props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+
+            let adminReportPanelsLength = currentAdminReportPanels.length;
+
+            if (adminReportPanelsLength > 0){
+                let lastPanelName = currentAdminReportPanels[adminReportPanelsLength - 1]?.panelName || '';
+                let refEl = (refAdminReportsPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+
+                if (refEl){
+                    refEl.focus();
+                }
+            }else{
+                // Focus the main input when is available
+            }
         }
     }
 
@@ -763,7 +882,9 @@ function Admin(props) {
                         overflowX: 'auto',
                         transform: `translateX(${((100 / props.pages.length) * -1) * (props.selectedPageIndex + 1)}%)`
                     }}>
-
+                        {/**
+                         * ADMIN HOME
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -805,7 +926,8 @@ function Admin(props) {
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                tabIndex={-1}
+                                                          tabIndex={-1}
+                                                          ref={(el) => (refAdminHomePanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -838,6 +960,9 @@ function Admin(props) {
                             <AdminHome />
                         </div>
 
+                        {/**
+                         * ADMIN CARRIERS
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -879,6 +1004,7 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
+                                                          ref={(el) => (refAdminCarrierPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -919,9 +1045,13 @@ function Admin(props) {
                                 origin='admin-carrier'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refCarrierCode={refAdminCarrierCode}
                             />
                         </div>
 
+                        {/**
+                         * ADMIN COMPANY SETUP
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -963,6 +1093,7 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
+                                                          ref={(el) => (refAdminCompanySetupPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1008,6 +1139,9 @@ function Admin(props) {
                             />
                         </div>
 
+                        {/**
+                         * ADMIN CUSTOMERS
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1049,6 +1183,7 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
+                                                          ref={(el) => (refAdminCustomerPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1089,9 +1224,13 @@ function Admin(props) {
                                 origin='admin-customer'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refCustomerCode={refAdminCustomerCode}
                             />
                         </div>
 
+                        {/**
+                         * ADMIN DISPATCH
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1134,7 +1273,8 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
-                                                onKeyDown={(e) => {
+                                                          ref={(el) => (refAdminDispatchPanels.current[index] = el)}
+                                                          onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
                                                     if (key === 27) {
@@ -1174,9 +1314,13 @@ function Admin(props) {
                                 origin='admin-dispatch'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refOrderNumber={refAdminDispatchOrderNumber}
                             />
                         </div>
 
+                        {/**
+                         * COMPANY INVOICE
+                         */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1218,6 +1362,7 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
+                                                          ref={(el) => (refAdminInvoicePanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1227,13 +1372,6 @@ function Admin(props) {
                                                         closePanel(panel?.panelName, origin);
                                                     }
                                                 }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1266,9 +1404,13 @@ function Admin(props) {
                                 origin='admin-invoice'
                                 openPanel={openPanel}
                                 closePanel={closePanel}
+                                refOrderNumber={refAdminInvoiceOrderNumber}
                             />
                         </div>
 
+                        {/**
+                         * ADMIN REPORTS
+                         * */}
                         <div style={{
                             width: `${100 / props.pages.length}%`,
                             height: '100%',
@@ -1310,6 +1452,7 @@ function Admin(props) {
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
+                                                          ref={(el) => (refAdminReportsPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 

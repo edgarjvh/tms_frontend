@@ -53,6 +53,7 @@ function MainForm(props) {
                             <input tabIndex={props.tabTimesFrom + props.tabTimes + 0} type="text" placeholder="Code" maxLength="8"
                                 id="txt-parent-code"
                                 ref={refCode}
+                                autoFocus={true}
                                 onKeyDown={(e) => {
                                     let key = e.keyCode || e.which;
 

@@ -20,3 +20,38 @@ export const setCompanyLoadBoardPanels = panels => {
         payload: panels
     }
 }
+
+export const setAvailableOrders = orders => {
+    return {
+        type: loadBoardConstants.SET_AVAILABLE_ORDERS,
+        payload: orders
+    }
+}
+
+export const setBookedOrders = orders => {
+    return {
+        type: loadBoardConstants.SET_BOOKED_ORDERS,
+        payload: orders
+    }
+}
+
+export const setInTransitOrders = orders => {
+    return {
+        type: loadBoardConstants.SET_IN_TRANSIT_ORDERS,
+        payload: orders
+    }
+}
+
+export const setDeliveredNotInvoiced = orders => {
+    return {
+        type: loadBoardConstants.SET_DELIVERED_NOT_INVOICED,
+        payload: orders
+    }
+}
+
+export const setIsLoadingWidget = bool => {
+    return {
+        type: loadBoardConstants.SET_IS_LOADING_WIDGET,
+        payload: bool
+    }
+}

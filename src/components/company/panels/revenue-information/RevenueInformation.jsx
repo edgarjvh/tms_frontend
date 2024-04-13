@@ -218,10 +218,15 @@ const RevenueInformation = (props) => {
                     let lastCustomer = { id: 0 };
                     const orderLength = newOrders.length - 1;
 
-                    newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
-
                     newOrders.map((order, index) => {
-                        let currentCustomer = order.bill_to_customer;
+                        let currentCustomer = {
+                            id: order?.bill_to_customer_id,
+                            code: order?.code,
+                            code_number: order?.code_number,
+                            name: order?.name,
+                            city: order?.city,
+                            state: order?.state
+                        };
                         currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                         currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
 
@@ -570,10 +575,15 @@ const RevenueInformation = (props) => {
                 let currentOrderGroup = [];
                 let lastCustomer = { id: 0 };
 
-                newOrders.sort((a, b) => (a.bill_to_customer.code.localeCompare(b.bill_to_customer.code)) || (a.bill_to_customer.code_number - b.bill_to_customer.code_number) || (moment(b.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix() - (moment(a.order_date_time, 'YYYY-MM-DD HH:mm:ss').unix())));
-
                 newOrders.map((order, index) => {
-                    let currentCustomer = order.bill_to_customer;
+                    let currentCustomer = {
+                        id: order?.bill_to_customer_id,
+                        code: order?.code,
+                        code_number: order?.code_number,
+                        name: order?.name,
+                        city: order?.city,
+                        state: order?.state
+                    };
                     currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                     currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
 
@@ -2096,7 +2106,7 @@ const RevenueInformation = (props) => {
                                                                                             <div
                                                                                                 className="order-info-col order-number">
                                                                                                 Total <span
-                                                                                                    style={{ fontWeight: 'bold' }}>{group.month}</span>
+                                                                                                style={{fontWeight: 'bold'}}>{group.month}</span>
                                                                                             </div>
                                                                                             <div
                                                                                                 className="order-info-col order-totals">
@@ -2206,6 +2216,7 @@ const RevenueInformation = (props) => {
                                                                                                     readOnly={true}
                                                                                                 />
                                                                                             </div>
+                                                                                            <div className='order-info-col paid'></div>
                                                                                         </div>
                                                                                     }
                                                                                 </div>
