@@ -34,6 +34,9 @@ import {
     setAdminReportPanels,
     setCompanyReportPanels
 } from './../../../actions';
+import ReportCustomer from '../panels/report-customer/ReportCustomer';
+import ReportCarrier from '../panels/report-carrier/ReportCarrier';
+import ReportAgent from '../panels/report-agent/ReportAgent';
 
 const Reports = (props) => {
 
@@ -200,7 +203,6 @@ const Reports = (props) => {
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
         }}>
-
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style} >
@@ -210,6 +212,68 @@ const Reports = (props) => {
                     </animated.div>
                 )
             }
+
+            <div className="button-container">
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-customers`,
+                        component: (
+                            <ReportCustomer
+                                panelName={`${props.panelName}-customers`}
+                                title="Customer Report"
+                                tabTimes={39050 + props.tabTimes}
+                                origin={props.origin}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Customers</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-carriers`,
+                        component: (
+                            <ReportCarrier
+                                panelName={`${props.panelName}-carriers`}
+                                title="Carrier Report"
+                                tabTimes={39060 + props.tabTimes}
+                                origin={props.origin}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Carriers</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-agents`,
+                        component: (
+                            <ReportAgent
+                                panelName={`${props.panelName}-agents`}
+                                title="Agent Report"
+                                tabTimes={39070 + props.tabTimes}
+                                origin={props.origin}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Agents</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+            </div>
         </div>
     )
 }

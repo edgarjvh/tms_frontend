@@ -129,7 +129,12 @@ export const adminReducers = (state = {
             case adminConstants.SET_ADMIN_HOME_PANELS:
             state = {
                 ...state,
-                adminHomePanels: action.payload
+                adminHomePanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         default:

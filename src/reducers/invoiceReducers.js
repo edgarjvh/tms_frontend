@@ -198,14 +198,24 @@ export const invoiceReducers = (state = {
         case invoiceConstants.SET_ADMIN_INVOICE_PANELS:
             state = {
                 ...state,
-                adminInvoicePanels: action.payload
+                adminInvoicePanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
             
         case invoiceConstants.SET_COMPANY_INVOICE_PANELS:
             state = {
                 ...state,
-                companyInvoicePanels: action.payload
+                companyInvoicePanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         default:

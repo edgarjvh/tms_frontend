@@ -477,7 +477,6 @@ select:focus {
   position: fixed;
   display: flex;
   flex-direction: column;
-  right: 0;
 }
 .main-panel-container .panel.pro {
   /* Old browsers */
@@ -886,4 +885,3 @@ select:focus {
     opacity: 0;
   }
 }
-/*# sourceMappingURL=App.css.map */

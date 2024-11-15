@@ -1736,14 +1736,24 @@ export const customerReducers = (state = {
         case customersConstants.SET_ADMIN_CUSTOMER_PANELS:
             state = {
                 ...state,
-                adminCustomerPanels: action.payload
+                adminCustomerPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
 
         case customersConstants.SET_COMPANY_CUSTOMER_PANELS:
             state = {
                 ...state,
-                companyCustomerPanels: action.payload
+                companyCustomerPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
 

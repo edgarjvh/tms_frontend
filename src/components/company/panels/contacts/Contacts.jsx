@@ -1292,6 +1292,7 @@ const Contacts = (props) => {
 
                             </div>
                         </div>
+                        
                         <div className="contact-form-fields">
                             <div className="col-contact-form">
                                 <div className="contact-form-wrapper">

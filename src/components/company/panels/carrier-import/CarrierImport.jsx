@@ -401,29 +401,7 @@ const CustomerImport = (props) => {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            {/* <div style={{
-                                position: 'relative',
-                                width: '90%',
-                                maxWidth: '600px',
-                                height: 15,
-                                borderRadius: 10,
-                                overflow: 'hidden',
-                                marginTop: 15,
-                                display: 'flex',
-                                backgroundColor: 'lightgray',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <div style={{fontSize: '12px', zIndex: 1}}>{carrierCurrentListLength} of {carrierTotalListLength} | {Math.floor((carrierCurrentListLength / carrierTotalListLength) * 100)}%</div>
-                                <div style={{
-                                    background: 'linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 50%,rgba(64,150,238,1) 100%)',
-                                    position: 'absolute',
-                                    height: '100%',
-                                    top: 0,
-                                    left: 0,
-                                    width: (Math.floor((carrierCurrentListLength / carrierTotalListLength) * 100)) + '%'
-                                }}></div>
-                            </div> */}
+                            
                         </div>
                     </animated.div>
                 )
@@ -452,13 +430,6 @@ const CustomerImport = (props) => {
                         <div className="mochi-button-base">Clear</div>
                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                     </div>
-
-                    {/* <div className="input-checkbox">
-                        <input type="checkbox" id='cbox-duplicates-shown' onChange={(e) => {
-                            setDuplicatesShown(e.target.checked);
-                        }} checked={duplicatesShown}/>
-                        <label htmlFor="cbox-duplicates-shown">Show duplicates only</label>
-                    </div> */}
                 </div>
 
                 <div>

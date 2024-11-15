@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import { companySetupConstants } from './../constants';
 
 export const companySetupReducers = (state = {
@@ -20,77 +21,87 @@ export const companySetupReducers = (state = {
                 ...state,
                 companySetupOpenedPanels: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_COMPANY:
             state = {
                 ...state,
                 selectedCompany: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_EMPLOYEE:
             state = {
                 ...state,
                 selectedEmployee: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_AGENT:
             state = {
                 ...state,
                 selectedAgent: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_COMPANY_DRIVER:
             state = {
                 ...state,
                 selectedDriver: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_AGENT_DRIVER:
             state = {
                 ...state,
                 selectedAgentDriver: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_DRIVER_CONTACT:
             state = {
                 ...state,
                 selectedDriverContact: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_COMPANY_OPERATOR:
             state = {
                 ...state,
                 selectedOperator: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_SELECTED_OPERATOR_CONTACT:
             state = {
                 ...state,
                 selectedOperatorContact: action.payload
             }
-        break;
+            break;
 
         case companySetupConstants.SET_ADMIN_COMPANY_SETUP_PANELS:
             state = {
                 ...state,
-                adminCompanySetupPanels: action.payload
+                adminCompanySetupPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
-        break;
+            break;
 
         case companySetupConstants.SET_COMPANY_COMPANY_SETUP_PANELS:
             state = {
                 ...state,
-                companyCompanySetupPanels: action.payload
+                companyCompanySetupPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
-        break;
+            break;
     }
     return state;
 }

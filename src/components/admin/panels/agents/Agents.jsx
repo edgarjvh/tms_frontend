@@ -30,21 +30,21 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import ToPrint from './ToPrint.jsx';
 import {
     setAdminHomePanels,
-setCompanyHomePanels,
-setAdminCarrierPanels,
-setCompanyCarrierPanels,
-setAdminCompanySetupPanels,
-setCompanyCompanySetupPanels,
-setAdminCustomerPanels,
-setCompanyCustomerPanels,
-setAdminDispatchPanels,
-setCompanyDispatchPanels,
-setAdminInvoicePanels,
-setCompanyInvoicePanels,
-setAdminLoadBoardPanels,
-setCompanyLoadBoardPanels,
-setAdminReportPanels,
-setCompanyReportPanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
 
     setSelectedCompany,
     setSelectedCompanyDriver as setSelectedDriver
@@ -390,7 +390,7 @@ const Agents = (props) => {
         }
     }, [selectedAgent?.contacts])
 
-    useEffect(async () => {
+    useEffect(() => {
         let phones = [];
         (selectedContact?.phone_work || '') !== '' && phones.push({
             id: 1,
@@ -418,7 +418,7 @@ const Agents = (props) => {
             phone: selectedContact.phone_other
         });
 
-        await setAgentContactPhoneItems(phones);
+        setAgentContactPhoneItems(phones);
     }, [
         selectedContact?.phone_work,
         selectedContact?.phone_work_fax,
@@ -428,7 +428,7 @@ const Agents = (props) => {
         selectedContact?.primary_phone
     ]);
 
-    useEffect(async () => {
+    useEffect(() => {
         let emails = [];
         (selectedContact?.email_work || '') !== '' && emails.push({
             id: 1,
@@ -446,7 +446,7 @@ const Agents = (props) => {
             email: selectedContact.email_other
         });
 
-        await setAgentContactEmailItems(emails);
+        setAgentContactEmailItems(emails);
     }, [
         selectedContact?.email_work,
         selectedContact?.email_personal,
@@ -463,7 +463,7 @@ const Agents = (props) => {
             }
 
             if (fromLast) {
-                refAgentName.current.focus();
+                refAgentName.current.focus({ preventScroll: true });
             }
         }
     }
@@ -648,7 +648,7 @@ const Agents = (props) => {
         mywindow.document.write(data);
         mywindow.document.write('</body></html>');
         mywindow.document.close();
-        mywindow.focus();
+        mywindow.focus({ preventScroll: true });
         setTimeout(function () {
             mywindow.print();
         }, 1000);
@@ -663,7 +663,7 @@ const Agents = (props) => {
         setContactSearch({});
         setShowingContactList(true);
 
-        refAgentCode.current.focus();
+        refAgentCode.current.focus({ preventScroll: true });
 
         setSelectedAgent({ id: 0, code: clearCode ? '' : selectedAgent?.code });
     }
@@ -686,7 +686,7 @@ const Agents = (props) => {
 
                             getAgentOrders(res.data.agents[0]);
 
-                            refAgentName.current.focus();
+                            refAgentName.current.focus({ preventScroll: true });
                         } else {
                             setInitialValues(false);
                         }
@@ -775,8 +775,8 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-agent-search`}
                 origin={props.origin}
                 suborigin='agent'
-                
-                
+
+
                 componentId={moment().format('x')}
                 customerSearch={agentSearch}
 
@@ -786,7 +786,7 @@ const Agents = (props) => {
                             axios.post(props.serverUrl + '/getAgentById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
                                     setSelectedAgent(res.data.agent);
-                                    setSelectedContact((res.data.agent.contacts || []).find(c => c.is_primary === 1) || {});
+                                    setSelectedContact((res.data.agent?.contacts || []).find(c => c.is_primary === 1) || {});
 
                                     getAgentOrders(res.data.agent);
 
@@ -798,10 +798,10 @@ const Agents = (props) => {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-agent-search`, props.origin);
-                        refAgentName.current.focus();
+                        refAgentName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-agent-search`, props.origin);
-                        refAgentCode.current.focus();
+                        refAgentCode.current.focus({ preventScroll: true });
                     })
 
                 }}
@@ -860,8 +860,8 @@ const Agents = (props) => {
                 owner='agent'
                 origin={props.origin}
                 suborigin='agent'
-                
-                
+
+
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
 
@@ -878,10 +878,10 @@ const Agents = (props) => {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        refAgentName.current.focus();
+                        refAgentName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        refAgentCode.current.focus();
+                        refAgentCode.current.focus({ preventScroll: true });
                     })
                 }}
             />
@@ -1006,7 +1006,7 @@ const Agents = (props) => {
                 }
             })
         }
-        refAgentMailingCode.current.focus();
+        refAgentMailingCode.current.focus({ preventScroll: true });
     }
 
     const saveMailingAddress = (e) => {
@@ -1228,8 +1228,8 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'agent'}
-                
-                
+
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedAgent={selectedAgent}
@@ -1248,8 +1248,8 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'agent'}
-                
-                
+
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedAgent={selectedAgent}
@@ -1269,8 +1269,8 @@ const Agents = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'company-agent'}
-                    
-                    
+
+
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedAgent }}
                     isAdmin={props.isAdmin}
@@ -1313,7 +1313,7 @@ const Agents = (props) => {
 
             if ((selectedAgent?.id || 0) === 0) {
                 setIsSavingDriver(false);
-                refAddedDate.current.inputElement.focus();
+                refAddedDate.current.inputElement.focus({ preventScroll: true });
                 return;
             }
 
@@ -1350,7 +1350,7 @@ const Agents = (props) => {
                                 }
                             });
 
-                            refDriverName.current.focus();
+                            refDriverName.current.focus({ preventScroll: true });
                         }
                         setIsSavingDriver(false);
                     } else {
@@ -1361,7 +1361,7 @@ const Agents = (props) => {
                     setIsSavingDriver(false);
                 })
             } else {
-                refAddedDate.current.inputElement.focus();
+                refAddedDate.current.inputElement.focus({ preventScroll: true });
             }
 
             setIsSavingDriver(false);
@@ -1387,7 +1387,7 @@ const Agents = (props) => {
 
                     setSelectedDriver({ ...res.data.driver });
 
-                    refDriverName.current.focus();
+                    refDriverName.current.focus({ preventScroll: true });
                 }
             }).catch(e => {
                 console.log('error getting driver by code', e);
@@ -1538,13 +1538,13 @@ const Agents = (props) => {
             props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
         }
     }
-    
+
     return (
         <div className="panel-content" tabIndex={0} ref={refAgentsContainer} onKeyDown={(e) => {
             let key = e.keyCode || e.which;
 
-            if (key === 27){
-                if ((selectedAgent?.id || 0) > 0){
+            if (key === 27) {
+                if ((selectedAgent?.id || 0) > 0) {
                     e.stopPropagation();
 
                     setInitialValues();
@@ -2316,7 +2316,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactNames(false);
-                                                    refMailingContactName.current.focus();
+                                                    refMailingContactName.current.focus({ preventScroll: true });
                                                 }
                                                 break;
 
@@ -2345,7 +2345,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactNames(false);
-                                                    refMailingContactName.current.focus();
+                                                    refMailingContactName.current.focus({ preventScroll: true });
                                                 } else {
                                                     saveMailingAddress({ keyCode: 9 });
                                                 }
@@ -2405,7 +2405,7 @@ const Agents = (props) => {
                                                 }
                                             }
 
-                                            refMailingContactName.current.focus();
+                                            refMailingContactName.current.focus({ preventScroll: true });
                                         }} />
                                 }
                             </div>
@@ -2460,7 +2460,7 @@ const Agents = (props) => {
 
                                                                         saveMailingAddress({ keyCode: 9 });
                                                                         setShowMailingContactNames(false);
-                                                                        refMailingContactName.current.focus();
+                                                                        refMailingContactName.current.focus({ preventScroll: true });
                                                                     }}
                                                                     ref={ref => refMailingContactNamePopupItems.current.push(ref)}
                                                                 >
@@ -2626,7 +2626,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactPhones(false);
-                                                    refMailingContactPhone.current.inputElement.focus();
+                                                    refMailingContactPhone.current.inputElement.focus({ preventScroll: true });
                                                 }
                                                 break;
 
@@ -2643,7 +2643,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactPhones(false);
-                                                    refMailingContactPhone.current.inputElement.focus();
+                                                    refMailingContactPhone.current.inputElement.focus({ preventScroll: true });
                                                 } else {
                                                     saveMailingAddress({ keyCode: 9 });
                                                 }
@@ -2721,7 +2721,7 @@ const Agents = (props) => {
                                                 }
                                             }
 
-                                            refMailingContactPhone.current.inputElement.focus();
+                                            refMailingContactPhone.current.inputElement.focus({ preventScroll: true });
                                         }} />
                                 }
                             </div>
@@ -2764,7 +2764,7 @@ const Agents = (props) => {
 
                                                                         saveMailingAddress({ keyCode: 9 });
                                                                         setShowMailingContactPhones(false);
-                                                                        refMailingContactPhone.current.inputElement.focus();
+                                                                        refMailingContactPhone.current.inputElement.focus({ preventScroll: true });
                                                                     }}
                                                                     ref={ref => refMailingContactPhonePopupItems.current.push(ref)}
                                                                 >
@@ -2975,7 +2975,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactEmails(false);
-                                                    refMailingContactEmail.current.focus();
+                                                    refMailingContactEmail.current.focus({ preventScroll: true });
                                                 }
                                                 break;
 
@@ -2992,7 +2992,7 @@ const Agents = (props) => {
 
                                                     saveMailingAddress({ keyCode: 9 });
                                                     setShowMailingContactEmails(false);
-                                                    refMailingContactEmail.current.focus();
+                                                    refMailingContactEmail.current.focus({ preventScroll: true });
                                                 } else {
                                                     saveMailingAddress({ keyCode: 9 });
                                                 }
@@ -3075,7 +3075,7 @@ const Agents = (props) => {
                                                 }
                                             }
 
-                                            refMailingContactEmail.current.focus();
+                                            refMailingContactEmail.current.focus({ preventScroll: true });
                                         }} />
                                 }
                             </div>
@@ -3118,7 +3118,7 @@ const Agents = (props) => {
 
                                                                         saveMailingAddress({ keyCode: 9 });
                                                                         setShowMailingContactEmails(false);
-                                                                        refMailingContactEmail.current.focus();
+                                                                        refMailingContactEmail.current.focus({ preventScroll: true });
                                                                     }}
                                                                     ref={ref => refMailingContactEmailPopupItems.current.push(ref)}
                                                                 >
@@ -3298,7 +3298,7 @@ const Agents = (props) => {
                                             resolve('OK');
                                         }).then(res => {
                                             setIsAddedDateCalendarShown(true);
-                                            refAddedDate.current.inputElement.focus();
+                                            refAddedDate.current.inputElement.focus({ preventScroll: true });
                                         }).catch(e => {
 
                                         });
@@ -3489,7 +3489,7 @@ const Agents = (props) => {
                                             resolve('OK');
                                         }).then(res => {
                                             setIsTerminationDateCalendarShown(true);
-                                            refTerminationDate.current.inputElement.focus();
+                                            refTerminationDate.current.inputElement.focus({ preventScroll: true });
                                         }).catch(e => {
 
                                         });
@@ -3730,7 +3730,7 @@ const Agents = (props) => {
 
                                                     // saveAgent({ keyCode: 9 });
                                                     setDivisionItems([]);
-                                                    refDivision.current.focus();
+                                                    refDivision.current.focus({ preventScroll: true });
                                                 }
                                                 break;
 
@@ -3747,7 +3747,7 @@ const Agents = (props) => {
 
                                                     // saveAgent({ keyCode: 9 });
                                                     setDivisionItems([]);
-                                                    refDivision.current.focus();
+                                                    refDivision.current.focus({ preventScroll: true });
                                                 }
                                                 break;
 
@@ -3880,7 +3880,7 @@ const Agents = (props) => {
                                             }
                                         }
 
-                                        refDivision.current.focus();
+                                        refDivision.current.focus({ preventScroll: true });
                                     }}
                                 />
                             }
@@ -3928,7 +3928,7 @@ const Agents = (props) => {
                                                                 window.setTimeout(() => {
                                                                     // saveAgent({ keyCode: 9 });
                                                                     setDivisionItems([]);
-                                                                    refDivision.current.focus();
+                                                                    refDivision.current.focus({ preventScroll: true });
                                                                 }, 0);
                                                             }}
                                                             ref={(ref) => refDivisionPopupItems.current.push(ref)}
@@ -4057,8 +4057,8 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
 
                                             contactSearchCustomer={{
@@ -4102,8 +4102,8 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-                                            
-                                            
+
+
                                             componentId={moment().format('x')}
                                             isEditingContact={true}
 
@@ -4126,7 +4126,7 @@ const Agents = (props) => {
                                 </div>
                                 <div className="mochi-button" onClick={() => {
                                     setSelectedContact({});
-                                    refAgentContactFirstName.current.focus();
+                                    refAgentContactFirstName.current.focus({ preventScroll: true });
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
@@ -4297,7 +4297,7 @@ const Agents = (props) => {
 
                                                         // validateContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactPhones(false);
-                                                        refAgentContactPhone.current.inputElement.focus();
+                                                        refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -4311,7 +4311,7 @@ const Agents = (props) => {
 
                                                         // validateContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactPhones(false);
-                                                        refAgentContactPhone.current.inputElement.focus();
+                                                        refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                     } else {
                                                         // validateContactForSaving({ keyCode: 9 });
                                                     }
@@ -4477,7 +4477,7 @@ const Agents = (props) => {
                                                     }
                                                 }
 
-                                                refAgentContactPhone.current.inputElement.focus();
+                                                refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -4517,7 +4517,7 @@ const Agents = (props) => {
 
                                                                             // validateContactForSaving({ keyCode: 9 });
                                                                             setShowAgentContactPhones(false);
-                                                                            refAgentContactPhone.current.inputElement.focus();
+                                                                            refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refAgentContactPhonePopupItems.current.push(ref)}
                                                                     >
@@ -4752,7 +4752,7 @@ const Agents = (props) => {
 
                                                         // validateContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactEmails(false);
-                                                        refAgentContactEmail.current.focus();
+                                                        refAgentContactEmail.current.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -4766,7 +4766,7 @@ const Agents = (props) => {
 
                                                         // validateContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactEmails(false);
-                                                        refAgentContactEmail.current.focus();
+                                                        refAgentContactEmail.current.focus({ preventScroll: true });
                                                     } else {
                                                         // validateContactForSaving({ keyCode: 9 });
                                                     }
@@ -4923,7 +4923,7 @@ const Agents = (props) => {
                                                     }
                                                 }
 
-                                                refAgentContactEmail.current.focus();
+                                                refAgentContactEmail.current.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -4963,7 +4963,7 @@ const Agents = (props) => {
 
                                                                             // validateContactForSaving({ keyCode: 9 });
                                                                             setShowAgentContactEmails(false);
-                                                                            refAgentContactEmail.current.focus();
+                                                                            refAgentContactEmail.current.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refAgentContactEmailPopupItems.current.push(ref)}
                                                                     >
@@ -5088,8 +5088,8 @@ const Agents = (props) => {
                                                                     removeAvatarUrl='/removeAvatar'
                                                                     origin={props.origin}
                                                                     owner='agent'
-                                                                    
-                                                                    
+
+
                                                                     componentId={moment().format('x')}
 
                                                                     contactSearchCustomer={{
@@ -5239,7 +5239,7 @@ const Agents = (props) => {
 
                                                         for (var i = elems.length; i--;) {
                                                             if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus();
+                                                                elems[i].focus({ preventScroll: true });
                                                                 break;
                                                             }
                                                         }
@@ -5292,8 +5292,8 @@ const Agents = (props) => {
                                         subOrigin='agent'
                                         owner='agent'
                                         isEditingDriver={true}
-                                        
-                                        
+
+
                                         componentId={moment().format('x')}
                                         selectedDriverId={selectedDriver.id}
                                         selectedParent={selectedAgent}
@@ -5331,8 +5331,8 @@ const Agents = (props) => {
                                         subOrigin='agent'
                                         owner='agent'
                                         isEditingDriver={true}
-                                        
-                                        
+
+
                                         componentId={moment().format('x')}
                                         selectedParent={selectedAgent}
 
@@ -5365,7 +5365,7 @@ const Agents = (props) => {
                                             });
 
                                             setSelectedDriver({});
-                                            refDriverCode.current.focus();
+                                            refDriverCode.current.focus({ preventScroll: true });
                                         }
                                     }).catch(e => {
                                         console.log('error deleting driver');
@@ -5378,7 +5378,7 @@ const Agents = (props) => {
                             title: "Clear",
                             onClick: () => {
                                 setSelectedDriver({});
-                                refDriverCode.current.focus();
+                                refDriverCode.current.focus({ preventScroll: true });
                             },
                             isEnabled: true,
                         },
@@ -5461,7 +5461,7 @@ const Agents = (props) => {
 
                             <div className="mochi-button" onClick={() => {
                                 setSelectedDriver({});
-                                refDriverCode.current.focus();
+                                refDriverCode.current.focus({preventScroll: true});
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Clear</div>
@@ -5488,10 +5488,10 @@ const Agents = (props) => {
                                             axios.post(props.serverUrl + '/getAgentDriverByCode', { code: e.target.value.trim() }).then(res => {
                                                 if (res.data.result === 'OK') {
                                                     setSelectedDriver({ ...res.data.driver });
-                                                    refDriverName.current.focus();
+                                                    refDriverName.current.focus({preventScroll: true});
                                                 } else {
                                                     e.preventDefault();
-                                                    refDriverCode.current.focus();
+                                                    refDriverCode.current.focus({preventScroll: true});
                                                 }
                                             }).catch(e => {
                                                 console.log(e);
@@ -5780,7 +5780,7 @@ const Agents = (props) => {
                                                     });
                                                     validateDriverForSaving({ keyCode: 9 });
                                                     setDriverEquipmentDropdownItems([]);
-                                                    refEquipment.current.focus();
+                                                    refEquipment.current.focus({preventScroll: true});
                                                 }
                                                 break;
 
@@ -5794,7 +5794,7 @@ const Agents = (props) => {
                                                     });
                                                     validateDriverForSaving({ keyCode: 9 });
                                                     setDriverEquipmentDropdownItems([]);
-                                                    refEquipment.current.focus();
+                                                    refEquipment.current.focus({preventScroll: true});
                                                 }
                                                 break;
 
@@ -5901,7 +5901,7 @@ const Agents = (props) => {
                                             }
                                         }
 
-                                        refEquipment.current.focus();
+                                        refEquipment.current.focus({preventScroll: true});
                                     }} />
                                 }
                             </div>
@@ -5943,7 +5943,7 @@ const Agents = (props) => {
                                                                         });
                                                                         validateDriverForSaving({ keyCode: 9 });
                                                                         setDriverEquipmentDropdownItems([]);
-                                                                        refEquipment.current.focus();
+                                                                        refEquipment.current.focus({preventScroll: true});
                                                                     }}
                                                                     ref={ref => refDriverEquipmentPopupItems.current.push(ref)}
                                                                 >
@@ -6040,7 +6040,7 @@ const Agents = (props) => {
                                                         });
                                                         setSelectedDriver({});
 
-                                                        refDriverCode.current.focus();
+                                                        refDriverCode.current.focus({preventScroll: true});
                                                     }
 
                                                     setIsSavingDriver(false);
@@ -6051,12 +6051,12 @@ const Agents = (props) => {
                                             } else {
                                                 e.preventDefault();
                                                 setIsSavingDriver(false);
-                                                refAgentCode.current.focus();
+                                                refAgentCode.current.focus({preventScroll: true});
                                             }
                                         } else {
                                             e.preventDefault();
                                             setIsSavingDriver(false);
-                                            refAgentCode.current.focus();
+                                            refAgentCode.current.focus({preventScroll: true});
                                         }
                                     }
                                 }}
@@ -6284,7 +6284,7 @@ const Agents = (props) => {
                                         if (key === 9) {
                                             saveAgent(e);
 
-                                            refAgentName.current.focus();
+                                            refAgentName.current.focus({ preventScroll: true });
                                         }
                                     }}
                                     onInput={(e) => {
@@ -6412,7 +6412,7 @@ const Agents = (props) => {
 
                     <div className="drivers-list-container">
                         {
-                            (selectedAgent.drivers || []).length > 0 &&
+                            (selectedAgent?.drivers || []).length > 0 &&
                             <div className="drivers-list-header">
                                 <div className="driver-list-col tcol first-name">First Name</div>
                                 <div className="driver-list-col tcol last-name">Last Name</div>
@@ -6423,47 +6423,47 @@ const Agents = (props) => {
 
                         <div className="drivers-list-wrapper">
                             {
-                                (selectedAgent.drivers || []).map((driver, index) => {
+                                (selectedAgent?.drivers || []).map((driver, index) => {
                                     return (
-                                        <div className="drivers-list-item" key={index} 
-                                        onDoubleClick={async () => {
-                                            let panel = {
-                                                panelName: `${props.panelName}-agent-drivers`,
-                                                component: <CompanyDrivers
-                                                    title='Agent Driver'
-                                                    tabTimes={322500 + props.tabTimes}
-                                                    panelName={`${props.panelName}-agent-drivers`}
-                                                    savingDriverUrl='/saveDriver'
-                                                    deletingDriverUrl='/deleteDriver'
-                                                    uploadAvatarUrl='/uploadDriverAvatar'
-                                                    removeAvatarUrl='/removeDriverAvatar'
-                                                    origin={props.origin}
-                                                    subOrigin='agent'
-                                                    owner='agent'
-                                                    isEditingDriver={true}
-                                                    
-                                                    
-                                                    componentId={moment().format('x')}
-                                                    selectedDriverId={driver.id}
-                                                    selectedParent={selectedAgent}
+                                        <div className="drivers-list-item" key={index}
+                                            onDoubleClick={async () => {
+                                                let panel = {
+                                                    panelName: `${props.panelName}-agent-drivers`,
+                                                    component: <CompanyDrivers
+                                                        title='Agent Driver'
+                                                        tabTimes={322500 + props.tabTimes}
+                                                        panelName={`${props.panelName}-agent-drivers`}
+                                                        savingDriverUrl='/saveDriver'
+                                                        deletingDriverUrl='/deleteDriver'
+                                                        uploadAvatarUrl='/uploadDriverAvatar'
+                                                        removeAvatarUrl='/removeDriverAvatar'
+                                                        origin={props.origin}
+                                                        subOrigin='agent'
+                                                        owner='agent'
+                                                        isEditingDriver={true}
 
-                                                    driverSearchAgent={{
-                                                        ...selectedAgent,
-                                                        selectedDriver: { id: 0, carrier_id: selectedAgent?.id }
-                                                    }}
-                                                />
-                                            }
 
-                                            openPanel(panel, props.origin);
-                                        }}
-                                        onClick={() => {
-                                            if ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 1 &&
-                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 1)) {
-                                                setSelectedDriver({ ...driver });
-                                                refDriverName.current.focus();
-                                            }
-                                        }}>
+                                                        componentId={moment().format('x')}
+                                                        selectedDriverId={driver.id}
+                                                        selectedParent={selectedAgent}
+
+                                                        driverSearchAgent={{
+                                                            ...selectedAgent,
+                                                            selectedDriver: { id: 0, carrier_id: selectedAgent?.id }
+                                                        }}
+                                                    />
+                                                }
+
+                                                openPanel(panel, props.origin);
+                                            }}
+                                            onClick={() => {
+                                                if ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    (((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.save || 0) === 1 &&
+                                                        ((props.user?.user_code?.permissions || []).find(x => x.name === 'carrier drivers')?.pivot?.edit || 0) === 1)) {
+                                                    setSelectedDriver({ ...driver });
+                                                    refDriverName.current.focus({ preventScroll: true });
+                                                }
+                                            }}>
                                             <div
                                                 className="driver-list-col tcol first-name">{driver.first_name || ''}</div>
                                             <div className="driver-list-col tcol last-name">{driver.last_name || ''}</div>
@@ -6482,12 +6482,12 @@ const Agents = (props) => {
                                             }</div>
                                             <div className="driver-list-col tcol email">{
                                                 ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'work'
-                                                ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_work || ''
-                                                : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'personal'
-                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_personal || ''
-                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'other'
-                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_other || ''
-                                                        : (driver?.email || '')
+                                                    ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_work || ''
+                                                    : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'personal'
+                                                        ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_personal || ''
+                                                        : ((driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.primary_email || '') === 'other'
+                                                            ? (driver.contacts || []).find(x => (x.is_primary || 0) === 1)?.email_other || ''
+                                                            : (driver?.email || '')
                                             }</div>
                                             {
                                                 (driver.id === (selectedDriver?.id || 0)) &&
@@ -6527,8 +6527,8 @@ const Agents = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-                                                    
-                                                    
+
+
                                                     componentId={moment().format('x')}
 
                                                     order_id={order.id}
@@ -6608,42 +6608,42 @@ const mapStateToProps = (state) => {
         user: state.systemReducers.user,
 
         adminHomePanels: state.adminReducers.adminHomePanels,
-companyHomePanels: state.companyReducers.companyHomePanels,
-adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
-companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
-adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
-companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
-adminCustomerPanels: state.customerReducers.adminCustomerPanels,
-companyCustomerPanels: state.customerReducers.companyCustomerPanels,
-adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
-companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
-adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
-companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
-adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
-companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
-adminReportPanels: state.reportReducers.adminReportPanels,
-companyReportPanels: state.reportReducers.companyReportPanels,
+        companyHomePanels: state.companyReducers.companyHomePanels,
+        adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+        companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+        adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+        companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+        adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+        companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+        adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+        companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+        adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+        companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+        adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+        companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+        adminReportPanels: state.reportReducers.adminReportPanels,
+        companyReportPanels: state.reportReducers.companyReportPanels,
 
     }
 }
 
 export default connect(mapStateToProps, {
     setAdminHomePanels,
-setCompanyHomePanels,
-setAdminCarrierPanels,
-setCompanyCarrierPanels,
-setAdminCompanySetupPanels,
-setCompanyCompanySetupPanels,
-setAdminCustomerPanels,
-setCompanyCustomerPanels,
-setAdminDispatchPanels,
-setCompanyDispatchPanels,
-setAdminInvoicePanels,
-setCompanyInvoicePanels,
-setAdminLoadBoardPanels,
-setCompanyLoadBoardPanels,
-setAdminReportPanels,
-setCompanyReportPanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
 
     setSelectedCompany,
     setSelectedDriver

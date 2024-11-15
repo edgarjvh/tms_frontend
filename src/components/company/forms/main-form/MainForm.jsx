@@ -54,6 +54,8 @@ function MainForm(props) {
                                 id="txt-parent-code"
                                 ref={refCode}
                                 autoFocus={true}
+                                disabled={props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee'}
+                                readOnly={props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee'}
                                 onKeyDown={(e) => {
                                     let key = e.keyCode || e.which;
 

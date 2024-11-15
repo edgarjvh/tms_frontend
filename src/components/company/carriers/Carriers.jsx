@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-keys */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
@@ -789,6 +790,8 @@ const Carriers = props => {
 
                     setSelectedDriver({});
                     setSelectedInsurance({});
+
+                    getCarrierOrders(res.data.carrier);
                 }
                 if (props.isOnPanel) {
                     if (refCarrierCode?.current) {
@@ -2489,24 +2492,20 @@ const Carriers = props => {
 
     const getCarrierOrders = carrier => {
         setIsLoadingCarrierOrders(true);
-        axios
-            .post(props.serverUrl + "/getCarrierOrders", {
-                id: carrier.id,
-            })
-            .then(res => {
-                if (res.data.result === "OK") {
-                    setSelectedCarrier({
-                        ...carrier,
-                        orders: res.data.orders,
-                    });
-                }
-            })
-            .catch(e => {
-                console.log("error getting carrier orders", e);
-            })
-            .finally(() => {
-                setIsLoadingCarrierOrders(false);
-            });
+        axios.post(props.serverUrl + "/getCarrierOrders", {
+            id: carrier.id,
+        }).then(res => {
+            if (res.data.result === "OK") {
+                setSelectedCarrier({
+                    ...carrier,
+                    orders: res.data.orders,
+                });
+            }
+        }).catch(e => {
+            console.log("error getting carrier orders", e);
+        }).finally(() => {
+            setIsLoadingCarrierOrders(false);
+        });
     };
 
     const searchDriverInfoByCode = () => {
@@ -2743,15 +2742,13 @@ const Carriers = props => {
 
             <div className="fields-container-row">
                 <div className="fields-container-col">
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            padding: "15px 10px",
-                        }}
-                    >
+                    {/* CARRIER */}
+                    <div className="form-bordered-box" style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        padding: "15px 10px"
+                    }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Carrier</div>
@@ -3144,21 +3141,6 @@ const Carriers = props => {
                             </label>
                         </div>
 
-                        {/* <ReactStars {...carrierStars} /> */}
-                        <Rating
-                            name="simple-controlled"
-                            value={selectedCarrier?.rating || 0}
-                            disabled={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
-                            onChange={(e, newValue) => {
-                                setSelectedCarrier({
-                                    ...selectedCarrier,
-                                    rating: newValue,
-                                });
-
-                                validateCarrierForSaving({ keyCode: 9 });
-                            }}
-                        />
-
                         <div className="input-box-container" style={{ width: "100%", position: "relative" }}>
                             <input
                                 tabIndex={76 + props.tabTimes}
@@ -3320,2191 +3302,14 @@ const Carriers = props => {
                     </div>
                 </div>
 
-                <div
-                    className="fields-container-col"
-                    style={{
+                <div className="fields-container-col" style={{ display: "flex", flexDirection: "column" }}>
+                    {/* MAILING ADDRESS */}
+                    <div className="form-bordered-box" style={{
                         display: "flex",
                         flexDirection: "column",
-                    }}
-                >
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            flexGrow: 0,
-                            marginBottom: 10,
-                        }}
-                    >
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Contacts</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={async () => {
-                                        if (selectedCarrier.id === undefined) {
-                                            window.alert("You must select a contact first!");
-                                            return;
-                                        }
-
-                                        if (selectedContact.id === undefined) {
-                                            window.alert("You must select a contact");
-                                            return;
-                                        }
-
-                                        let panel = {
-                                            panelName: `${props.panelName}-contacts`,
-                                            component: (
-                                                <Contacts
-                                                    title="Contacts"
-                                                    tabTimes={22000 + props.tabTimes}
-                                                    panelName={`${props.panelName}-contacts`}
-                                                    savingContactUrl="/saveCarrierContact"
-                                                    deletingContactUrl="/deleteCarrierContact"
-                                                    uploadAvatarUrl="/uploadCarrierAvatar"
-                                                    removeAvatarUrl="/removeCarrierAvatar"
-                                                    permissionName="carrier contacts"
-                                                    origin={props.origin}
-                                                    owner="carrier"
-
-
-                                                    componentId={moment().format("x")}
-                                                    contactSearchCustomer={{
-                                                        ...selectedCarrier,
-                                                        selectedContact: {
-                                                            ...selectedContact,
-                                                            company: (selectedContact?.company || "") === "" ? selectedCarrier?.name || "" : selectedContact.company,
-                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (selectedContact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : selectedContact?.address1 || "",
-                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (selectedContact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : selectedContact?.address2 || "",
-                                                            city: (selectedCarrier?.city || "").toLowerCase() === (selectedContact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : selectedContact?.city || "",
-                                                            state: (selectedCarrier?.state || "").toLowerCase() === (selectedContact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : selectedContact?.state || "",
-                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (selectedContact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : selectedContact?.zip_code || "",
-                                                        },
-                                                    }}
-                                                />
-                                            ),
-                                        };
-
-                                        openPanel(panel, props.origin);
-                                    }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">More</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={() => {
-                                        if (selectedCarrier.id === undefined || selectedCarrier.id <= 0) {
-                                            window.alert("You must select a carrier");
-                                            return;
-                                        }
-
-                                        let panel = {
-                                            panelName: `${props.panelName}-contacts`,
-                                            component: (
-                                                <Contacts
-                                                    title="Contacts"
-                                                    tabTimes={22000 + props.tabTimes}
-                                                    panelName={`${props.panelName}-contacts`}
-                                                    savingContactUrl="/saveCarrierContact"
-                                                    deletingContactUrl="/deleteCarrierContact"
-                                                    uploadAvatarUrl="/uploadCarrierAvatar"
-                                                    removeAvatarUrl="/removeCarrierAvatar"
-                                                    permissionName="carrier contacts"
-                                                    origin={props.origin}
-                                                    owner="carrier"
-                                                    isEditingContact={true}
-
-
-                                                    componentId={moment().format("x")}
-                                                    contactSearchCustomer={{
-                                                        ...selectedCarrier,
-                                                        selectedContact: { id: 0, carrier_id: selectedCarrier?.id },
-                                                    }}
-                                                />
-                                            ),
-                                        };
-
-                                        openPanel(panel, props.origin);
-                                    }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add Contact</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div className="mochi-button" onClick={() => setSelectedContact({})}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Clear</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                            </div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={80 + props.tabTimes}
-                                    type="text"
-                                    placeholder="First Name"
-                                    style={{
-                                        textTransform: "capitalize",
-                                    }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                    ref={refCarrierContactFirstName}
-                                    onChange={e => {
-                                        setSelectedContact({ ...selectedContact, first_name: e.target.value });
-                                    }}
-                                    value={selectedContact.first_name || ""}
-                                />
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={81 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Last Name"
-                                    style={{
-                                        textTransform: "capitalize",
-                                    }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                    onChange={e =>
-                                        setSelectedContact({
-                                            ...selectedContact,
-                                            last_name: e.target.value,
-                                        })
-                                    }
-                                    value={selectedContact.last_name || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="select-box-container" style={{ width: "50%" }}>
-                                <div className="select-box-wrapper">
-                                    <MaskedInput
-                                        tabIndex={82 + props.tabTimes}
-                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                        ref={refCarrierContactPhone}
-                                        mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
-                                        guide={true}
-                                        type="text"
-                                        placeholder="Phone"
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
-
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showCarrierContactPhones) {
-                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        } else {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === carrierContactPhoneItems.length - 1;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex - 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactPhoneItems.length > 1) {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_phone || "");
-                                                                    return item;
-                                                                })
-                                                            );
-
-                                                            setShowCarrierContactPhones(true);
-
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showCarrierContactPhones) {
-                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        } else {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    if (selectedIndex === carrierContactPhoneItems.length - 1) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex + 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactPhoneItems.length > 1) {
-                                                            await setCarrierContactPhoneItems(
-                                                                carrierContactPhoneItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_phone || "");
-                                                                    return item;
-                                                                })
-                                                            );
-
-                                                            setShowCarrierContactPhones(true);
-
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setShowCarrierContactPhones(false);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
-                                                        });
-
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactPhones(false);
-                                                        refCarrierContactPhone.current.inputElement.focus();
-                                                    }
-                                                    break;
-                                                case 9: // tab
-                                                    if (showCarrierContactPhones) {
-                                                        e.preventDefault();
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
-                                                        });
-
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactPhones(false);
-                                                        refCarrierContactPhone.current.inputElement.focus();
-                                                    } else {
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            if ((selectedContact?.id || 0) === 0) {
-                                                setSelectedContact({
-                                                    ...selectedContact,
-                                                    phone_work: e.target.value,
-                                                    primary_phone: "work",
-                                                });
-                                            } else {
-                                                if ((selectedContact?.primary_phone || "") === "") {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: "work",
-                                                    });
-                                                } else {
-                                                    switch (selectedContact?.primary_phone) {
-                                                        case "work":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "fax":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work_fax: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "mobile":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_mobile: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "direct":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_direct: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "other":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_other: e.target.value,
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            if ((selectedContact?.id || 0) === 0) {
-                                                setSelectedContact({
-                                                    ...selectedContact,
-                                                    phone_work: e.target.value,
-                                                    primary_phone: "work",
-                                                });
-                                            } else {
-                                                if ((selectedContact?.primary_phone || "") === "") {
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        phone_work: e.target.value,
-                                                        primary_phone: "work",
-                                                    });
-                                                } else {
-                                                    switch (selectedContact?.primary_phone) {
-                                                        case "work":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "fax":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_work_fax: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "mobile":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_mobile: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "direct":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_direct: e.target.value,
-                                                            });
-                                                            break;
-                                                        case "other":
-                                                            setSelectedContact({
-                                                                ...selectedContact,
-                                                                phone_other: e.target.value,
-                                                            });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                        value={
-                                            (selectedContact?.primary_phone || "") === "work" ? selectedContact?.phone_work || "" : (selectedContact?.primary_phone || "") === "fax" ? selectedContact?.phone_work_fax || "" : (selectedContact?.primary_phone || "") === "mobile" ? selectedContact?.phone_mobile || "" : (selectedContact?.primary_phone || "") === "direct" ? selectedContact?.phone_direct || "" : (selectedContact?.primary_phone || "") === "other" ? selectedContact?.phone_other || "" : ""
-                                        }
-                                    />
-
-                                    {(selectedContact?.id || 0) > 0 && (
-                                        <div
-                                            className={classnames({
-                                                "selected-carrier-contact-primary-phone": true,
-                                                pushed: carrierContactPhoneItems.length > 1,
-                                            })}
-                                        >
-                                            {selectedContact?.primary_phone || ""}
-                                        </div>
-                                    )}
-
-                                    {carrierContactPhoneItems.length > 1 && (selectedContact?.id || 0) > 0 && ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 1)) && (
-                                        <FontAwesomeIcon
-                                            className="dropdown-button"
-                                            icon={faCaretDown}
-                                            onClick={async () => {
-                                                if (showCarrierContactPhones) {
-                                                    setShowCarrierContactPhones(false);
-                                                } else {
-                                                    if (carrierContactPhoneItems.length > 1) {
-                                                        await setCarrierContactPhoneItems(
-                                                            carrierContactPhoneItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_phone || "");
-                                                                return item;
-                                                            })
-                                                        );
-
-                                                        window.setTimeout(async () => {
-                                                            await setShowCarrierContactPhones(true);
-
-                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }, 0);
-                                                    }
-                                                }
-
-                                                refCarrierContactPhone.current.inputElement.focus();
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                                {carrierContactPhonesTransition(
-                                    (style, item) =>
-                                        item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-phone"
-                                                style={{
-                                                    ...style,
-                                                    left: "0",
-                                                    display: "block",
-                                                }}
-                                                ref={refCarrierContactPhoneDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {carrierContactPhoneItems.map((item, index) => {
-                                                                const mochiItemClasses = classnames({
-                                                                    "mochi-item": true,
-                                                                    selected: item.selected,
-                                                                });
-
-                                                                return (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={mochiItemClasses}
-                                                                        id={item.id}
-                                                                        onClick={async () => {
-                                                                            await setSelectedContact(selectedContact => {
-                                                                                return {
-                                                                                    ...selectedContact,
-                                                                                    primary_phone: item.type,
-                                                                                };
-                                                                            });
-
-                                                                            validateContactForSaving({ keyCode: 9 });
-                                                                            setShowCarrierContactPhones(false);
-                                                                            refCarrierContactPhone.current.inputElement.focus();
-                                                                        }}
-                                                                        ref={ref => refCarrierContactPhonePopupItems.current.push(ref)}
-                                                                    >
-                                                                        {item.type === "work" ? `Phone Work ` : item.type === "fax" ? `Phone Work Fax ` : item.type === "mobile" ? `Phone Mobile ` : item.type === "direct" ? `Phone Direct ` : item.type === "other" ? `Phone Other ` : ""}(<b>{item.type === "work" ? item.phone : item.type === "fax" ? item.phone : item.type === "mobile" ? item.phone : item.type === "direct" ? item.phone : item.type === "other" ? item.phone : ""}</b>)
-                                                                        {item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected"
-                                                                                icon={faCaretRight} />}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        )
-                                )}
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div style={{ width: "50%", display: "flex", justifyContent: "space-between" }}>
-                                <div className="input-box-container input-phone-ext">
-                                    <input
-                                        tabIndex={83 + props.tabTimes}
-                                        type="text"
-                                        placeholder="Ext"
-                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                        onChange={e =>
-                                            setSelectedContact({
-                                                ...selectedContact,
-                                                phone_ext: e.target.value,
-                                            })
-                                        }
-                                        value={(selectedContact?.primary_phone || "") === "work" ? selectedContact.phone_ext || "" : ""}
-                                    />
-                                </div>
-                                <div className="input-toggle-container">
-                                    <input
-                                        type="checkbox"
-                                        id={props.panelName + "cbox-carrier-contacts-primary-btn"}
-                                        disabled={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                        onChange={e => {
-                                            setSelectedContact({
-                                                ...selectedContact,
-                                                is_primary: e.target.checked ? 1 : 0,
-                                            });
-                                            validateContactForSaving({ keyCode: 9 });
-                                        }}
-                                        checked={(selectedContact.is_primary || 0) === 1}
-                                    />
-                                    <label htmlFor={props.panelName + "cbox-carrier-contacts-primary-btn"}>
-                                        <div className="label-text">Primary</div>
-                                        <div className="input-toggle-btn"></div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div
-                                className="select-box-container"
-                                style={{ flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedContact?.email_work || "") !== "" || (selectedContact?.email_personal || "") !== "" || (selectedContact?.email_other || "") !== "") {
-                                        setShowCarrierContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedContact?.email_work || "") !== "" || (selectedContact?.email_personal || "") !== "" || (selectedContact?.email_other || "") !== "") {
-                                        setShowCarrierContactEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowCarrierContactEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowCarrierContactEmailCopyBtn(false);
-                                }}
-                            >
-                                <div className="select-box-wrapper">
-                                    <input
-                                        tabIndex={84 + props.tabTimes}
-                                        type="text"
-                                        placeholder="E-Mail"
-                                        style={{
-                                            width: "calc(100% - 25px)",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                            whiteSpace: "nowrap",
-                                        }}
-                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                        ref={refCarrierContactEmail}
-                                        onKeyDown={async e => {
-                                            let key = e.keyCode || e.which;
-
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (showCarrierContactEmails) {
-                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        } else {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected = index === carrierContactEmailItems.length - 1;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex - 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactEmailItems.length > 1) {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || "");
-                                                                    return item;
-                                                                })
-                                                            );
-
-                                                            setShowCarrierContactEmails(true);
-
-                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (showCarrierContactEmails) {
-                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
-
-                                                        if (selectedIndex === -1) {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        } else {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    if (selectedIndex === carrierContactEmailItems.length - 1) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex + 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        if (carrierContactEmailItems.length > 1) {
-                                                            await setCarrierContactEmailItems(
-                                                                carrierContactEmailItems.map((item, index) => {
-                                                                    item.selected = item.type === (selectedContact?.primary_email || "");
-                                                                    return item;
-                                                                })
-                                                            );
-
-                                                            setShowCarrierContactEmails(true);
-
-                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setShowCarrierContactEmails(false);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (showCarrierContactEmails && carrierContactEmailItems.findIndex(item => item.selected) > -1) {
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
-                                                        });
-
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactEmails(false);
-                                                        refCarrierContactEmail.current.focus();
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (showCarrierContactEmails) {
-                                                        e.preventDefault();
-                                                        await setSelectedContact({
-                                                            ...selectedContact,
-                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
-                                                        });
-
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                        setShowCarrierContactEmails(false);
-                                                        refCarrierContactEmail.current.focus();
-                                                    } else {
-                                                        validateContactForSaving({ keyCode: 9 });
-                                                    }
-                                                    break;
-
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onInput={e => {
-                                            switch (selectedContact?.primary_email) {
-                                                case "work":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value,
-                                                    });
-                                                    break;
-                                                case "personal":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_personal: e.target.value,
-                                                    });
-                                                    break;
-                                                case "other":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_other: e.target.value,
-                                                    });
-                                                    break;
-                                            }
-                                        }}
-                                        onChange={e => {
-                                            switch (selectedContact?.primary_email) {
-                                                case "work":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_work: e.target.value,
-                                                    });
-                                                    break;
-                                                case "personal":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_personal: e.target.value,
-                                                    });
-                                                    break;
-                                                case "other":
-                                                    setSelectedContact({
-                                                        ...selectedContact,
-                                                        email_other: e.target.value,
-                                                    });
-                                                    break;
-                                            }
-                                        }}
-                                        value={(selectedContact?.primary_email || "") === "work" ? selectedContact?.email_work || "" : (selectedContact?.primary_email || "") === "personal" ? selectedContact?.email_personal || "" : (selectedContact?.primary_email || "") === "other" ? selectedContact?.email_other || "" : ""}
-                                    />
-
-                                    {(selectedContact?.id || 0) > 0 && (
-                                        <div
-                                            className={classnames({
-                                                "selected-carrier-contact-primary-email": true,
-                                                pushed: carrierContactEmailItems.length > 1,
-                                            })}
-                                        >
-                                            {selectedContact?.primary_email || ""}
-                                        </div>
-                                    )}
-
-                                    {showCarrierContactEmailCopyBtn && (
-                                        <FontAwesomeIcon
-                                            style={{
-                                                position: "absolute",
-                                                top: "50%",
-                                                right: 30,
-                                                zIndex: 1,
-                                                cursor: "pointer",
-                                                transform: "translateY(-50%)",
-                                                color: "#2bc1ff",
-                                                margin: 0,
-                                                transition: "ease 0.2s",
-                                                fontSize: "1rem",
-                                            }}
-                                            icon={faCopy}
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                                navigator.clipboard.writeText(refCarrierContactEmail.current.value);
-                                            }}
-                                        />
-                                    )}
-
-                                    {carrierContactEmailItems.length > 1 && (selectedContact?.id || 0) > 0 && ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 1)) && (
-                                        <FontAwesomeIcon
-                                            className="dropdown-button"
-                                            icon={faCaretDown}
-                                            onClick={async () => {
-                                                if (showCarrierContactEmails) {
-                                                    setShowCarrierContactEmails(false);
-                                                } else {
-                                                    if (carrierContactEmailItems.length > 1) {
-                                                        await setCarrierContactEmailItems(
-                                                            carrierContactEmailItems.map((item, index) => {
-                                                                item.selected = item.type === (selectedContact?.primary_email || "");
-                                                                return item;
-                                                            })
-                                                        );
-
-                                                        window.setTimeout(async () => {
-                                                            await setShowCarrierContactEmails(true);
-
-                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
-                                                                if (r && r.classList.contains("selected")) {
-                                                                    r.scrollIntoView({
-                                                                        behavior: "auto",
-                                                                        block: "center",
-                                                                        inline: "nearest",
-                                                                    });
-                                                                }
-                                                                return true;
-                                                            });
-                                                        }, 0);
-                                                    }
-                                                }
-
-                                                refCarrierContactEmail.current.focus();
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                                {carrierContactEmailsTransition(
-                                    (style, item) =>
-                                        item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-contact-email"
-                                                style={{
-                                                    ...style,
-                                                    left: "0",
-                                                    display: "block",
-                                                }}
-                                                ref={refCarrierContactEmailDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below right"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {carrierContactEmailItems.map((item, index) => {
-                                                                const mochiItemClasses = classnames({
-                                                                    "mochi-item": true,
-                                                                    selected: item.selected,
-                                                                });
-
-                                                                return (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={mochiItemClasses}
-                                                                        id={item.id}
-                                                                        onClick={async () => {
-                                                                            await setSelectedContact({
-                                                                                ...selectedContact,
-                                                                                primary_email: item.type,
-                                                                            });
-
-                                                                            validateContactForSaving({ keyCode: 9 });
-                                                                            setShowCarrierContactEmails(false);
-                                                                            refCarrierContactEmail.current.focus();
-                                                                        }}
-                                                                        ref={ref => refCarrierContactEmailPopupItems.current.push(ref)}
-                                                                    >
-                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected &&
-                                                                            <FontAwesomeIcon className="dropdown-selected"
-                                                                                icon={faCaretRight} />}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        )
-                                )}
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={85 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Notes"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateContactForSaving}
-                                    onChange={e => setSelectedContact({ ...selectedContact, notes: e.target.value })}
-                                    value={selectedContact.notes || ""}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            flexGrow: 1,
-                        }}
-                    >
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
-                                {showingContactList && (
-                                    <div className="mochi-button" onClick={() => setShowingContactList(false)}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Search</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                )}
-                                {!showingContactList && (
-                                    <div className="mochi-button" onClick={() => setShowingContactList(true)}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Cancel</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                )}
-
-                                {!showingContactList && (
-                                    <div className="mochi-button" onClick={searchContactBtnClick}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Send</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="form-slider">
-                            <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : "-100%" }}>
-                                <div className="contact-list-box">
-                                    {(selectedCarrier.contacts || []).length > 0 && (
-                                        <div className="contact-list-header">
-                                            <div className="contact-list-col tcol first-name">First Name</div>
-                                            <div className="contact-list-col tcol last-name">Last Name</div>
-                                            <div className="contact-list-col tcol phone-work">Phone</div>
-                                            <div className="contact-list-col tcol email-work">E-Mail</div>
-                                            <div className="contact-list-col tcol pri"></div>
-                                        </div>
-                                    )}
-
-                                    <div className="contact-list-wrapper">
-                                        {(selectedCarrier.contacts || []).map((contact, index) => {
-                                            return (
-                                                <div
-                                                    className="contact-list-item"
-                                                    key={index}
-                                                    onDoubleClick={async () => {
-                                                        if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0) {
-                                                            return;
-                                                        }
-
-                                                        let panel = {
-                                                            panelName: `${props.panelName}-contacts`,
-                                                            component: (
-                                                                <Contacts
-                                                                    title="Contacts"
-                                                                    tabTimes={22000 + props.tabTimes}
-                                                                    panelName={`${props.panelName}-contacts`}
-                                                                    savingContactUrl="/saveCarrierContact"
-                                                                    deletingContactUrl="/deleteCarrierContact"
-                                                                    uploadAvatarUrl="/uploadCarrierAvatar"
-                                                                    removeAvatarUrl="/removeCarrierAvatar"
-                                                                    permissionName="carrier contacts"
-                                                                    origin={props.origin}
-                                                                    owner="carrier"
-
-
-                                                                    componentId={moment().format("x")}
-                                                                    contactSearchCustomer={{
-                                                                        ...selectedCarrier,
-                                                                        selectedContact: {
-                                                                            ...selectedContact,
-                                                                            company: (contact?.company || "") === "" ? selectedCarrier?.name || "" : contact.company,
-                                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (contact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : contact?.address1 || "",
-                                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (contact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : contact?.address2 || "",
-                                                                            city: (selectedCarrier?.city || "").toLowerCase() === (contact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : contact?.city || "",
-                                                                            state: (selectedCarrier?.state || "").toLowerCase() === (contact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : contact?.state || "",
-                                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (contact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : contact?.zip_code || "",
-                                                                        },
-                                                                    }}
-                                                                />
-                                                            ),
-                                                        };
-
-                                                        openPanel(panel, props.origin);
-                                                    }}
-                                                    onClick={() => {
-                                                        setSelectedContact(contact);
-                                                        refCarrierContactFirstName.current.focus();
-                                                    }}
-                                                >
-                                                    <div className="contact-list-col tcol first-name"
-                                                        style={{ textTransform: "capitalize" }}>
-                                                        {contact.first_name}
-                                                    </div>
-                                                    <div className="contact-list-col tcol last-name"
-                                                        style={{ textTransform: "capitalize" }}>
-                                                        {contact.last_name}
-                                                    </div>
-                                                    <div
-                                                        className="contact-list-col tcol phone-work">{contact.primary_phone === "work" ? contact.phone_work : contact.primary_phone === "fax" ? contact.phone_work_fax : contact.primary_phone === "mobile" ? contact.phone_mobile : contact.primary_phone === "direct" ? contact.phone_direct : contact.primary_phone === "other" ? contact.phone_other : ""}</div>
-                                                    <div className="contact-list-col tcol email-work"
-                                                        style={{ textTransform: "lowercase" }}>
-                                                        {contact.primary_email === "work" ? contact.email_work : contact.primary_email === "personal" ? contact.email_personal : contact.primary_email === "other" ? contact.email_other : ""}
-                                                    </div>
-                                                    {contact.id === (selectedContact?.id || 0) && (
-                                                        <div className="contact-list-col tcol contact-selected">
-                                                            <FontAwesomeIcon icon={faPencilAlt} />
-                                                        </div>
-                                                    )}
-                                                    {contact.is_primary === 1 && (
-                                                        <div className="contact-list-col tcol pri">
-                                                            <FontAwesomeIcon icon={faCheck} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                                <div className="contact-search-box">
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="First Name"
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        first_name: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.first_name || ""}
-                                            />
-                                        </div>
-                                        <div className="form-h-sep"></div>
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="Last Name"
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        last_name: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.last_name || ""}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="Address 1"
-                                                style={{ textTransform: "capitalize" }}
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        address1: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.address1 || ""}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="Address 2"
-                                                style={{ textTransform: "capitalize" }}
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        address2: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.address2 || ""}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="City"
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        city: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.city || ""}
-                                            />
-                                        </div>
-                                        <div className="form-h-sep"></div>
-                                        <div className="input-box-container input-state">
-                                            <input
-                                                type="text"
-                                                placeholder="State"
-                                                maxLength="2"
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        state: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.state || ""}
-                                            />
-                                        </div>
-                                        <div className="form-h-sep"></div>
-                                        <div className="input-box-container grow">
-                                            <MaskedInput
-                                                mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
-                                                guide={true}
-                                                type="text"
-                                                placeholder="Phone (Work/Mobile/Fax)"
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        phone: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.phone || ""}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-v-sep"></div>
-                                    <div className="form-row">
-                                        <div className="input-box-container grow">
-                                            <input
-                                                type="text"
-                                                placeholder="E-Mail"
-                                                style={{ textTransform: "lowercase" }}
-                                                onFocus={() => {
-                                                    setShowingContactList(false);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    let key = e.keyCode || e.which;
-
-                                                    if (key === 9) {
-                                                        e.preventDefault();
-                                                        refInsuranceType.current.focus();
-                                                        setShowingContactList(true);
-                                                    }
-                                                }}
-                                                onChange={e =>
-                                                    setContactSearch({
-                                                        ...contactSearch,
-                                                        email: e.target.value,
-                                                    })
-                                                }
-                                                value={contactSearch.email || ""}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
-                    <div className="form-bordered-box" style={{ gap: 2 }}>
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Driver Information</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
-                                <div className="mochi-button" onClick={() => {
-                                    if ((selectedCarrier?.id || 0) === 0) {
-                                        window.alert('You must select a carrier first!');
-                                        return;
-                                    }
-
-                                    if ((selectedDriver?.id || 0) === 0) {
-                                        window.alert('You must select a driver first!');
-                                        return;
-                                    }
-
-                                    let panel = {
-                                        panelName: `${props.panelName}-carrier-drivers`,
-                                        component: <CompanyDrivers
-                                            title='Carrier Driver'
-                                            tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-carrier-drivers`}
-                                            savingDriverUrl='/saveDriver'
-                                            deletingDriverUrl='/deleteDriver'
-                                            uploadAvatarUrl='/uploadDriverAvatar'
-                                            removeAvatarUrl='/removeDriverAvatar'
-                                            origin={props.origin}
-                                            subOrigin='carrier'
-                                            owner='carrier'
-                                            isEditingDriver={true}
-
-
-                                            componentId={moment().format('x')}
-                                            selectedDriverId={selectedDriver.id}
-                                            selectedParent={selectedCarrier}
-
-                                            driverSearchCarrier={{
-                                                ...selectedCarrier,
-                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
-                                            }}
-                                        />
-                                    }
-
-                                    openPanel(panel, props.origin);
-                                }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">More</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-
-                                <div className="mochi-button" onClick={() => {
-                                    if ((selectedCarrier?.id || 0) === 0) {
-                                        window.alert('You must select a carrier first!');
-                                        return;
-                                    }
-
-                                    let panel = {
-                                        panelName: `${props.panelName}-carrier-drivers`,
-                                        component: <CompanyDrivers
-                                            title='Carrier Driver'
-                                            tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-carrier-drivers`}
-                                            savingDriverUrl='/saveDriver'
-                                            deletingDriverUrl='/deleteDriver'
-                                            uploadAvatarUrl='/uploadDriverAvatar'
-                                            removeAvatarUrl='/removeDriverAvatar'
-                                            origin={props.origin}
-                                            subOrigin='carrier'
-                                            owner='carrier'
-                                            isEditingDriver={true}
-
-
-                                            componentId={moment().format('x')}
-                                            selectedParent={selectedCarrier}
-
-                                            driverSearchCarrier={{
-                                                ...selectedCarrier,
-                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
-                                            }}
-                                        />
-                                    }
-
-                                    openPanel(panel, props.origin);
-                                }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add Driver</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-
-                                <div className="mochi-button" onClick={() => {
-                                    if (window.confirm("Are you sure you want to proceed?")) {
-
-                                        axios.post(props.serverUrl + '/deleteDriver', {
-                                            id: selectedDriver.id,
-                                            sub_origin: 'carrier'
-                                        }).then(res => {
-                                            if (res.data.result === 'OK') {
-                                                setSelectedCarrier(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
-                                                    }
-                                                });
-
-                                                setSelectedDriver({});
-                                                refDriverCode.current.focus();
-                                            }
-                                        }).catch(e => {
-                                            console.log('error deleting driver');
-                                        });
-                                    }
-                                }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Delete</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-
-                                <div className="mochi-button" onClick={() => {
-                                    setSelectedDriver({});
-                                    refDriverCode.current.focus();
-                                }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Clear</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                            </div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="form-row" style={{ gap: 2 }}>
-                            <div className="input-box-container input-code">
-                                <input
-                                    tabIndex={92 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Code"
-                                    maxLength="8"
-                                    ref={refDriverCode}
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (key === 9) {
-                                            searchDriverInfoByCode();
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                code: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.code || ''}
-                                />
-                            </div>
-
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={93 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Name"
-                                    style={{ textTransform: 'capitalize' }}
-                                    ref={refDriverName}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                name: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.name || ''}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row" style={{ gap: 2 }}>
-                            <div className="input-box-container input-phone"
-                                style={{ width: '40%', position: 'relative' }}>
-                                <MaskedInput
-                                    tabIndex={94 + props.tabTimes}
-                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text" placeholder="Phone"
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                contact_phone: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.contact_phone || ''}
-                                />
-                            </div>
-
-                            <div className="input-box-container grow" style={{ position: 'relative' }}
-                                onMouseEnter={() => {
-                                    if ((selectedDriver?.email || '').trim() !== '') {
-                                        setShowCarrierDriverEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedDriver?.email || '').trim() !== '') {
-                                        setShowCarrierDriverEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowCarrierDriverEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowCarrierDriverEmailCopyBtn(false);
-                                }}
-                            >
-                                <input
-                                    tabIndex={95 + props.tabTimes}
-                                    type="text"
-                                    placeholder="E-Mail"
-                                    style={{ textTransform: 'lowercase' }}
-                                    ref={refDriverEmail}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                email: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.email || ''}
-                                />
-                            </div>
-
-                            {
-                                showCarrierDriverEmailCopyBtn &&
-                                <FontAwesomeIcon style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    right: 30,
-                                    zIndex: 1,
-                                    cursor: 'pointer',
-                                    transform: 'translateY(-50%)',
-                                    color: '#2bc1ff',
-                                    margin: 0,
-                                    transition: 'ease 0.2s',
-                                    fontSize: '1rem'
-                                }} icon={faCopy} onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigator.clipboard.writeText(refDriverEmail.current.value);
-                                }} />
-                            }
-                        </div>
-
-                        <div className="form-row" style={{ gap: 2 }}>
-                            <div className="select-box-container" style={{ flexGrow: 1 }}>
-                                <div className="select-box-wrapper">
-                                    <input
-                                        type="text"
-                                        tabIndex={95 + props.tabTimes}
-                                        placeholder="Equipment"
-                                        ref={refEquipment}
-                                        readOnly={(selectedCarrier?.id || 0) === 0}
-                                        onKeyDown={(e) => {
-                                            let key = e.keyCode || e.which;
-
-                                            switch (key) {
-                                                case 37:
-                                                case 38: // arrow left | arrow up
-                                                    e.preventDefault();
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
-                                                            (item) => item.selected
-                                                        );
-
-                                                        if (selectedIndex === -1) {
-                                                            setDriverEquipmentDropdownItems(
-                                                                driverEquipmentDropdownItems.map((item, index) => {
-                                                                    item.selected = index === 0;
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        } else {
-                                                            setDriverEquipmentDropdownItems(
-                                                                driverEquipmentDropdownItems.map((item, index) => {
-                                                                    if (selectedIndex === 0) {
-                                                                        item.selected =
-                                                                            index === driverEquipmentDropdownItems.length - 1;
-                                                                    } else {
-                                                                        item.selected =
-                                                                            index === selectedIndex - 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
-                                                                    item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
-                                                                        ? index === 0
-                                                                        : item.id === selectedDriver.tractor.type.id;
-                                                                    return item;
-                                                                })
-                                                                );
-
-                                                                refDriverEquipmentPopupItems.current.map(
-                                                                    (r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    }
-                                                                );
-                                                            }
-                                                        })
-                                                            .catch(async (e) => {
-                                                                console.log("error getting equipments", e);
-                                                            });
-                                                    }
-                                                    break;
-
-                                                case 39:
-                                                case 40: // arrow right | arrow down
-                                                    e.preventDefault();
-                                                    if (driverEquipmentDropdownItems.length > 0) {
-                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
-                                                            (item) => item.selected
-                                                        );
-
-                                                        if (selectedIndex === -1) {
-                                                            setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
-                                                                item.selected = index === 0;
-                                                                return item;
-                                                            })
-                                                            );
-                                                        } else {
-                                                            setDriverEquipmentDropdownItems(
-                                                                driverEquipmentDropdownItems.map((item, index) => {
-                                                                    if (selectedIndex === driverEquipmentDropdownItems.length - 1) {
-                                                                        item.selected = index === 0;
-                                                                    } else {
-                                                                        item.selected = index === selectedIndex + 1;
-                                                                    }
-                                                                    return item;
-                                                                })
-                                                            );
-                                                        }
-
-                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                            if (r && r.classList.contains("selected")) {
-                                                                r.scrollIntoView({
-                                                                    behavior: "auto",
-                                                                    block: "center",
-                                                                    inline: "nearest",
-                                                                });
-                                                            }
-                                                            return true;
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setDriverEquipmentDropdownItems(
-                                                                    res.data.equipments.map((item, index) => {
-                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
-                                                                            ? index === 0
-                                                                            : item.id === selectedDriver.tractor.type.id;
-                                                                        return item;
-                                                                    })
-                                                                );
-
-                                                                refDriverEquipmentPopupItems.current.map(
-                                                                    (r, i) => {
-                                                                        if (r && r.classList.contains("selected")) {
-                                                                            r.scrollIntoView({
-                                                                                behavior: "auto",
-                                                                                block: "center",
-                                                                                inline: "nearest",
-                                                                            });
-                                                                        }
-                                                                        return true;
-                                                                    }
-                                                                );
-                                                            }
-                                                        })
-                                                            .catch((e) => {
-                                                                console.log("error getting equipments", e);
-                                                            });
-                                                    }
-                                                    break;
-
-                                                case 27: // escape
-                                                    setDriverEquipmentDropdownItems([]);
-                                                    break;
-
-                                                case 13: // enter
-                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
-                                                        setSelectedDriver(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                tractor: {
-                                                                    ...(selectedDriver?.tractor || {}),
-                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
-                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
-                                                                }
-                                                            }
-                                                        })
-
-                                                        setDriverEquipmentDropdownItems([]);
-                                                        refEquipment.current.focus();
-                                                    }
-                                                    break;
-
-                                                case 9: // tab
-                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
-                                                        setSelectedDriver(prev => {
-                                                            return {
-                                                                ...prev,
-                                                                tractor: {
-                                                                    ...(selectedDriver?.tractor || {}),
-                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
-                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
-                                                                }
-                                                            }
-                                                        })
-
-                                                        setDriverEquipmentDropdownItems([]);
-                                                        refEquipment.current.focus();
-                                                    }
-                                                    break;
-                                                default:
-                                                    break;
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            if ((selectedDriver?.tractor?.type_id || 0) === 0) {
-                                                setSelectedDriver(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        tractor: {
-                                                            ...(selectedDriver?.tractor || {}),
-                                                            type: {},
-                                                            type_id: null
-                                                        }
-                                                    }
-                                                })
-                                            }
-                                        }}
-                                        onInput={(e) => {
-                                            let type = selectedDriver?.tractor?.type || {};
-                                            type.id = 0;
-                                            type.name = e.target.value;
-
-                                            setSelectedDriver(prev => {
-                                                return {
-                                                    ...prev,
-                                                    tractor: {
-                                                        ...(selectedDriver?.tractor || {}),
-                                                        type: type,
-                                                        type_id: type.id
-                                                    }
-                                                }
-                                            })
-
-                                            if (e.target.value.trim() === "") {
-                                                setDriverEquipmentDropdownItems([]);
-                                            } else {
-                                                axios.post(props.serverUrl + "/getEquipments", { name: e.target.value.trim() }).then((res) => {
-                                                    if (res.data.result === "OK") {
-                                                        setDriverEquipmentDropdownItems(
-                                                            res.data.equipments.map((item, index) => {
-                                                                item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
-                                                                    ? index === 0
-                                                                    : item.id === selectedDriver.tractor.type.id;
-                                                                return item;
-                                                            })
-                                                        );
-                                                    }
-                                                }).catch((e) => {
-                                                    console.log("error getting equipments", e);
-                                                });
-                                            }
-                                        }}
-                                        onChange={(e) => {
-                                            let type = selectedDriver?.tractor?.type || {};
-                                            type.id = 0;
-                                            type.name = e.target.value;
-
-                                            setSelectedDriver(prev => {
-                                                return {
-                                                    ...prev,
-                                                    tractor: {
-                                                        ...(selectedDriver?.tractor || {}),
-                                                        type: type,
-                                                        type_id: type.id
-                                                    }
-                                                }
-                                            })
-                                        }}
-                                        value={selectedDriver?.tractor?.type?.name || ""}
-                                    />
-                                    {
-                                        (selectedCarrier?.id || 0) > 0 &&
-                                        <FontAwesomeIcon
-                                            className="dropdown-button"
-                                            icon={faCaretDown}
-                                            onClick={() => {
-                                                if (driverEquipmentDropdownItems.length > 0) {
-                                                    setDriverEquipmentDropdownItems([]);
-                                                } else {
-                                                    if ((selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== "") {
-                                                        axios.post(props.serverUrl + "/getEquipments", {
-                                                            name: selectedDriver?.tractor?.type.name,
-                                                        }).then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setDriverEquipmentDropdownItems(
-                                                                    res.data.equipments.map((item, index) => {
-                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
-                                                                            ? index === 0
-                                                                            : item.id === selectedDriver.tractor.type.id;
-                                                                        return item;
-                                                                    })
-                                                                );
-
-                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
-                                                                        });
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch((e) => {
-                                                            console.log("error getting equipments", e);
-                                                        });
-                                                    } else {
-                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
-                                                            if (res.data.result === "OK") {
-                                                                setDriverEquipmentDropdownItems(
-                                                                    res.data.equipments.map((item, index) => {
-                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
-                                                                            ? index === 0
-                                                                            : item.id === selectedDriver.tractor.type.id;
-                                                                        return item;
-                                                                    })
-                                                                );
-
-                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
-                                                                    if (r && r.classList.contains("selected")) {
-                                                                        r.scrollIntoView({
-                                                                            behavior: "auto",
-                                                                            block: "center",
-                                                                            inline: "nearest",
-                                                                        });
-                                                                    }
-                                                                    return true;
-                                                                });
-                                                            }
-                                                        }).catch(async (e) => {
-                                                            console.log("error getting equipments", e);
-                                                        });
-                                                    }
-                                                }
-
-                                                refEquipment.current.focus();
-                                            }}
-                                        />
-                                    }
-                                </div>
-                                {equipmentTransition(
-                                    (style, item) =>
-                                        item && (
-                                            <animated.div
-                                                className="mochi-contextual-container"
-                                                id="mochi-contextual-container-equipment"
-                                                style={{
-                                                    ...style,
-                                                    left: "-50px",
-                                                    display: "block",
-                                                }}
-                                                ref={refDriverEquipmentDropDown}
-                                            >
-                                                <div className="mochi-contextual-popup vertical below"
-                                                    style={{ height: 150 }}>
-                                                    <div className="mochi-contextual-popup-content">
-                                                        <div className="mochi-contextual-popup-wrapper">
-                                                            {driverEquipmentDropdownItems.map((item, index) => {
-                                                                const mochiItemClasses = classnames({
-                                                                    "mochi-item": true,
-                                                                    selected: item.selected,
-                                                                });
-
-                                                                const searchValue = (selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== ""
-                                                                    ? selectedDriver?.tractor?.type?.name
-                                                                    : undefined;
-
-                                                                return (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={mochiItemClasses}
-                                                                        id={item.id}
-                                                                        onClick={() => {
-                                                                            setSelectedDriver(prev => {
-                                                                                return {
-                                                                                    ...prev,
-                                                                                    tractor: {
-                                                                                        ...(selectedDriver?.tractor || {}),
-                                                                                        type: item,
-                                                                                        type_id: item.id
-                                                                                    }
-                                                                                }
-                                                                            })
-
-                                                                            setDriverEquipmentDropdownItems([]);
-                                                                            refEquipment.current.focus();
-                                                                        }}
-                                                                        ref={(ref) =>
-                                                                            refDriverEquipmentPopupItems.current.push(ref)
-                                                                        }
-                                                                    >
-                                                                        {searchValue === undefined
-                                                                            ? item.name
-                                                                            : (
-                                                                                <Highlighter
-                                                                                    highlightClassName="mochi-item-highlight-text"
-                                                                                    searchWords={[searchValue]}
-                                                                                    autoEscape={true}
-                                                                                    textToHighlight={item.name}
-                                                                                />
-                                                                            )}
-                                                                        {item.selected && (
-                                                                            <FontAwesomeIcon
-                                                                                className="dropdown-selected"
-                                                                                icon={faCaretRight}
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </animated.div>
-                                        )
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="form-row" style={{ gap: 2 }}>
-                            <div className="input-box-container" style={{ width: '50%' }}>
-                                <input
-                                    tabIndex={96 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Truck"
-                                    style={{ textTransform: 'uppercase' }}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                tractor: {
-                                                    ...(selectedDriver?.tractor || {}),
-                                                    number: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.tractor?.number || ''}
-                                />
-                            </div>
-
-                            <div className="input-box-container" style={{ width: '50%' }}>
-                                <input
-                                    tabIndex={97 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Trailer"
-                                    style={{ textTransform: 'uppercase' }}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                trailer: {
-                                                    ...(selectedDriver?.trailer || {}),
-                                                    number: e.target.value
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.trailer?.number || ''}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row" style={{ gap: 2 }}>
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={97 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Notes"
-                                    onKeyDown={(e) => {
-                                        let key = e.keyCode || e.which;
-
-                                        if (key === 9) {
-                                            e.preventDefault();
-                                            validateDriverForSaving(e);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        setSelectedDriver(prev => {
-                                            return {
-                                                ...prev,
-                                                notes: e.target.value
-                                            }
-                                        })
-                                    }}
-                                    value={selectedDriver?.notes || ''}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row" style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "flex-end",
-                            flexGrow: 1,
-                            paddingBottom: 10,
-                        }}
-                        >
-                            <div
-                                className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}>
-                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                <div className="mochi-button-base">E-Mail Driver</div>
-                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* <MainForm
-                        formTitle={`Driver Information`}
-                        formButtons={[
-                            {
-                                title: "More",
-                                onClick: () => {
-                                    if ((selectedCarrier?.id || 0) === 0) {
-                                        window.alert('You must select a carrier first!');
-                                        return;
-                                    }
-
-                                    if ((selectedDriver?.id || 0) === 0) {
-                                        window.alert('You must select a driver first!');
-                                        return;
-                                    }
-
-                                    let panel = {
-                                        panelName: `${props.panelName}-carrier-drivers`,
-                                        component: <CompanyDrivers
-                                            title='Carrier Driver'
-                                            tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-carrier-drivers`}
-                                            savingDriverUrl='/saveDriver'
-                                            deletingDriverUrl='/deleteDriver'
-                                            uploadAvatarUrl='/uploadDriverAvatar'
-                                            removeAvatarUrl='/removeDriverAvatar'
-                                            origin={props.origin}
-                                            subOrigin='carrier'
-                                            owner='carrier'
-                                            isEditingDriver={true}
-                                            
-                                            
-                                            componentId={moment().format('x')}
-                                            selectedDriverId={selectedDriver.id}
-                                            selectedParent={selectedCarrier}
-
-                                            driverSearchCarrier={{
-                                                ...selectedCarrier,
-                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
-                                            }}
-                                        />
-                                    }
-
-                                    openPanel(panel, props.origin);
-                                },
-                                isEnabled: true,
-                            },
-                            {
-                                title: "Add Driver",
-                                onClick: () => {
-                                    if ((selectedCarrier?.id || 0) === 0) {
-                                        window.alert('You must select a carrier first!');
-                                        return;
-                                    }
-
-                                    let panel = {
-                                        panelName: `${props.panelName}-carrier-drivers`,
-                                        component: <CompanyDrivers
-                                            title='Carrier Driver'
-                                            tabTimes={322000 + props.tabTimes}
-                                            panelName={`${props.panelName}-carrier-drivers`}
-                                            savingDriverUrl='/saveDriver'
-                                            deletingDriverUrl='/deleteDriver'
-                                            uploadAvatarUrl='/uploadDriverAvatar'
-                                            removeAvatarUrl='/removeDriverAvatar'
-                                            origin={props.origin}
-                                            subOrigin='carrier'
-                                            owner='carrier'
-                                            isEditingDriver={true}
-                                            
-                                            
-                                            componentId={moment().format('x')}
-                                            selectedParent={selectedCarrier}
-
-                                            driverSearchCarrier={{
-                                                ...selectedCarrier,
-                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
-                                            }}
-                                        />
-                                    }
-
-                                    openPanel(panel, props.origin);
-                                },
-                                isEnabled: true,
-                            },
-                            {
-                                title: "Delete",
-                                onClick: () => {
-                                    if (window.confirm("Are you sure you want to proceed?")) {
-
-                                        axios.post(props.serverUrl + '/deleteDriver', {
-                                            id: selectedDriver.id,
-                                            sub_origin: 'carrier'
-                                        }).then(res => {
-                                            if (res.data.result === 'OK') {
-                                                setSelectedCarrier(prev => {
-                                                    return {
-                                                        ...prev,
-                                                        drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
-                                                    }
-                                                });
-
-                                                setSelectedDriver({});
-                                                refDriverCode.current.focus();
-                                            }
-                                        }).catch(e => {
-                                            console.log('error deleting driver');
-                                        });
-                                    }
-                                },
-                                isEnabled: (selectedDriver?.id || 0) > 0,
-                            },
-                            {
-                                title: "Clear",
-                                onClick: () => {
-                                    setSelectedDriver({});
-                                    refDriverCode.current.focus();
-                                },
-                                isEnabled: true,
-                            },
-                        ]}
-                        refs={{
-                            refCode: refDriverCode,
-                            refName: refDriverName,
-                            refEmail: refDriverEmail,
-                            refFieldLastTab: props.refCarrierCode
-                        }}
-                        tabTimesFrom={92}
-                        tabTimes={props.tabTimes}
-                        searchByCode={searchDriverInfoByCode}
-                        validateForSaving={validateDriverForSaving}
-                        selectedParent={selectedDriver}
-                        setSelectedParent={setSelectedDriver}
-                        fields={[
-                            'email_driver_btn',
-                            'code',
-                            'name',
-                            'address1',
-                            'address2',
-                            'city',
-                            'state',
-                            'zip',
-                            'contact',
-                            'phone',
-                            'ext',
-                            'email',
-                            'notes'
-                        ]}
-                        triggerFields={['notes']}
-                        refFieldLastTab={props.refCarrierCode}
-                    /> */}
-                </div>
-            </div>
-
-            <div className="fields-container-row" style={{ marginTop: 10 }}>
-                <div className="fields-container-col">
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            padding: "15px 10px",
-                        }}
-                    >
+                        justifyContent: "space-between",
+                        padding: "15px 10px",
+                    }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Mailing Address</div>
@@ -7009,6 +4814,1714 @@ const Carriers = props => {
                     </div>
                 </div>
 
+                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
+                    {/* FACTORING COMPANY */}
+                    <div className="form-bordered-box" style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        padding: "15px 10px"
+                    }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Factoring Company</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={addFactoringCompanyBtnClick}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Factoring Company</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={searchFactoringCompanyBtnClick}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Search</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={moreFactoringCompanyBtnClick}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">More</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={clearFactoringCompanyBtnClick}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Clear</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="input-box-container input-code">
+                                <input
+                                    tabIndex={65 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Code"
+                                    maxLength="8"
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
+                                    ref={refFactoringCompanyCode}
+                                    onKeyDown={getFactoringCompanyByCode}
+                                    onInput={e => {
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: {
+                                                ...selectedCarrier.factoring_company,
+                                                code_number: 0,
+                                                code: e.target.value,
+                                            },
+                                        });
+                                    }}
+                                    onChange={e => {
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: {
+                                                ...selectedCarrier.factoring_company,
+                                                code: e.target.value,
+                                            },
+                                        });
+                                    }}
+                                    value={(selectedCarrier?.factoring_company?.code_number || 0) === 0 ? selectedCarrier?.factoring_company?.code || "" : selectedCarrier?.factoring_company?.code + selectedCarrier?.factoring_company?.code_number}
+                                />
+                            </div>
+
+                            <div className="form-h-sep"></div>
+
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={66 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Name"
+                                    style={{
+                                        textTransform: "capitalize",
+                                    }}
+                                    ref={refFactoringCompanyName}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.name = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.name || ""}
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={67 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Address 1"
+                                    style={{ textTransform: "capitalize" }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.address1 = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.address1 || ""}
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={68 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Address 2"
+                                    style={{ textTransform: "capitalize" }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.address2 = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.address2 || ""}
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={69 + props.tabTimes}
+                                    type="text"
+                                    placeholder="City"
+                                    style={{
+                                        textTransform: "capitalize",
+                                    }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.city = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.city || ""}
+                                />
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container input-state">
+                                <input
+                                    tabIndex={70 + props.tabTimes}
+                                    type="text"
+                                    placeholder="State"
+                                    maxLength="2"
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.state = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.state || ""}
+                                />
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container input-zip-code">
+                                <input
+                                    tabIndex={71 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Postal Code"
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onKeyDown={validateFactoringCompanyToSave}
+                                    onChange={e => {
+                                        let factoring_company = selectedCarrier.factoring_company || {};
+                                        factoring_company.zip = e.target.value;
+                                        setSelectedCarrier({
+                                            ...selectedCarrier,
+                                            factoring_company: factoring_company,
+                                        });
+                                    }}
+                                    value={selectedCarrier.factoring_company?.zip || ""}
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={72 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Contact Name"
+                                    style={{
+                                        textTransform: "capitalize",
+                                    }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onInput={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier(selectedCarrier => {
+                                                return {
+                                                    ...selectedCarrier,
+                                                    factoring_company: {
+                                                        ...(selectedCarrier?.factoring_company || {}),
+                                                        contact_name: e.target.value,
+                                                    },
+                                                };
+                                            });
+                                        }
+                                    }}
+                                    onChange={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier(selectedCarrier => {
+                                                return {
+                                                    ...selectedCarrier,
+                                                    factoring_company: {
+                                                        ...(selectedCarrier?.factoring_company || {}),
+                                                        contact_name: e.target.value,
+                                                    },
+                                                };
+                                            });
+                                        }
+                                    }}
+                                    value={
+                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                            ? selectedCarrier?.factoring_company?.contact_name || ""
+                                            : // ? ''
+                                            selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).last_name
+                                    }
+                                />
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container input-phone" style={{ position: "relative" }}>
+                                <MaskedInput
+                                    tabIndex={73 + props.tabTimes}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
+                                    guide={true}
+                                    type="text"
+                                    placeholder="Contact Phone"
+                                    onInput={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    contact_phone: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    onChange={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    contact_phone: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    value={
+                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                            ? selectedCarrier?.factoring_company?.contact_phone || ""
+                                            : // ? ''
+                                            selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "work"
+                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
+                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
+                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
+                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
+                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
+                                                        : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
+                                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
+                                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
+                                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
+                                                                : ""
+                                    }
+                                />
+
+                                {(selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) !== undefined && (
+                                    <div
+                                        className={classnames({
+                                            "selected-factoring-company-contact-primary-phone": true,
+                                            pushed: false,
+                                        })}
+                                    >
+                                        {selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container input-phone-ext">
+                                <input
+                                    tabIndex={74 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Ext"
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    onInput={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    ext: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    onChange={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    ext: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    value={
+                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                            ? selectedCarrier?.factoring_company?.ext || ""
+                                            : // ? ''
+                                            (selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1)?.primary_phone || "") === "work"
+                                                ? selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
+                                                : ""
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div
+                                className="input-box-container"
+                                style={{ position: "relative", flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedCarrier?.factoring_company?.email || "") !== "") {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedCarrier?.factoring_company?.email || "") !== "") {
+                                        setShowFactoringCompanyEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowFactoringCompanyEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowFactoringCompanyEmailCopyBtn(false);
+                                }}
+                            >
+                                <input
+                                    tabIndex={75 + props.tabTimes}
+                                    type="text"
+                                    placeholder="E-Mail"
+                                    style={{ textTransform: "lowercase" }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
+                                    ref={refFactoringCompanyEmail}
+                                    onKeyDown={validateFactoringCompanyToSave}
+                                    onInput={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    email: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    onChange={e => {
+                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
+                                            setSelectedCarrier({
+                                                ...selectedCarrier,
+                                                factoring_company: {
+                                                    ...(selectedCarrier?.factoring_company || {}),
+                                                    email: e.target.value,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    value={
+                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
+                                            ? selectedCarrier?.factoring_company?.email || ""
+                                            : // ? ''
+                                            selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "work"
+                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
+                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
+                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
+                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "other"
+                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
+                                                        : ""
+                                    }
+                                />
+
+                                {(selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) !== undefined && (
+                                    <div
+                                        className={classnames({
+                                            "selected-factoring-company-contact-primary-email": true,
+                                            pushed: false,
+                                        })}
+                                    >
+                                        {selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email}
+                                    </div>
+                                )}
+
+                                {showFactoringCompanyEmailCopyBtn && (
+                                    <FontAwesomeIcon
+                                        style={{
+                                            position: "absolute",
+                                            top: "50%",
+                                            right: 30,
+                                            zIndex: 1,
+                                            cursor: "pointer",
+                                            transform: "translateY(-50%)",
+                                            color: "#2bc1ff",
+                                            margin: 0,
+                                            transition: "ease 0.2s",
+                                            fontSize: "1rem",
+                                        }}
+                                        icon={faCopy}
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(refFactoringCompanyEmail.current.value);
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="fields-container-row" style={{ flexGrow: 1, flexBasis: '100%' }}>
+                <div className="fields-container-col" style={{ display: 'flex', flexDirection: 'column' }}>
+                    {/* CONTACTS */}
+                    <div className="form-bordered-box" style={{
+                        flexGrow: 0,
+                        marginBottom: 10,
+                    }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Contacts</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={async () => {
+                                        if (selectedCarrier.id === undefined) {
+                                            window.alert("You must select a contact first!");
+                                            return;
+                                        }
+
+                                        if (selectedContact.id === undefined) {
+                                            window.alert("You must select a contact");
+                                            return;
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-contacts`,
+                                            component: (
+                                                <Contacts
+                                                    title="Contacts"
+                                                    tabTimes={22000 + props.tabTimes}
+                                                    panelName={`${props.panelName}-contacts`}
+                                                    savingContactUrl="/saveCarrierContact"
+                                                    deletingContactUrl="/deleteCarrierContact"
+                                                    uploadAvatarUrl="/uploadCarrierAvatar"
+                                                    removeAvatarUrl="/removeCarrierAvatar"
+                                                    permissionName="carrier contacts"
+                                                    origin={props.origin}
+                                                    owner="carrier"
+
+
+                                                    componentId={moment().format("x")}
+                                                    contactSearchCustomer={{
+                                                        ...selectedCarrier,
+                                                        selectedContact: {
+                                                            ...selectedContact,
+                                                            company: (selectedContact?.company || "") === "" ? selectedCarrier?.name || "" : selectedContact.company,
+                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (selectedContact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : selectedContact?.address1 || "",
+                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (selectedContact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : selectedContact?.address2 || "",
+                                                            city: (selectedCarrier?.city || "").toLowerCase() === (selectedContact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : selectedContact?.city || "",
+                                                            state: (selectedCarrier?.state || "").toLowerCase() === (selectedContact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : selectedContact?.state || "",
+                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (selectedContact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : selectedContact?.zip_code || "",
+                                                        },
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">More</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={() => {
+                                        if (selectedCarrier.id === undefined || selectedCarrier.id <= 0) {
+                                            window.alert("You must select a carrier");
+                                            return;
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-contacts`,
+                                            component: (
+                                                <Contacts
+                                                    title="Contacts"
+                                                    tabTimes={22000 + props.tabTimes}
+                                                    panelName={`${props.panelName}-contacts`}
+                                                    savingContactUrl="/saveCarrierContact"
+                                                    deletingContactUrl="/deleteCarrierContact"
+                                                    uploadAvatarUrl="/uploadCarrierAvatar"
+                                                    removeAvatarUrl="/removeCarrierAvatar"
+                                                    permissionName="carrier contacts"
+                                                    origin={props.origin}
+                                                    owner="carrier"
+                                                    isEditingContact={true}
+
+
+                                                    componentId={moment().format("x")}
+                                                    contactSearchCustomer={{
+                                                        ...selectedCarrier,
+                                                        selectedContact: { id: 0, carrier_id: selectedCarrier?.id },
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Contact</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div className="mochi-button" onClick={() => setSelectedContact({})}>
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Clear</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={80 + props.tabTimes}
+                                    type="text"
+                                    placeholder="First Name"
+                                    style={{
+                                        textTransform: "capitalize",
+                                    }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                    ref={refCarrierContactFirstName}
+                                    onChange={e => {
+                                        setSelectedContact({ ...selectedContact, first_name: e.target.value });
+                                    }}
+                                    value={selectedContact.first_name || ""}
+                                />
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={81 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Last Name"
+                                    style={{
+                                        textTransform: "capitalize",
+                                    }}
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                    onChange={e =>
+                                        setSelectedContact({
+                                            ...selectedContact,
+                                            last_name: e.target.value,
+                                        })
+                                    }
+                                    value={selectedContact.last_name || ""}
+                                />
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div className="select-box-container" style={{ width: "50%" }}>
+                                <div className="select-box-wrapper">
+                                    <MaskedInput
+                                        tabIndex={82 + props.tabTimes}
+                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                        ref={refCarrierContactPhone}
+                                        mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
+                                        guide={true}
+                                        type="text"
+                                        placeholder="Phone"
+                                        onKeyDown={async e => {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (showCarrierContactPhones) {
+                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        } else {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === carrierContactPhoneItems.length - 1;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex - 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (carrierContactPhoneItems.length > 1) {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_phone || "");
+                                                                    return item;
+                                                                })
+                                                            );
+
+                                                            setShowCarrierContactPhones(true);
+
+                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (showCarrierContactPhones) {
+                                                        let selectedIndex = carrierContactPhoneItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        } else {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    if (selectedIndex === carrierContactPhoneItems.length - 1) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex + 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (carrierContactPhoneItems.length > 1) {
+                                                            await setCarrierContactPhoneItems(
+                                                                carrierContactPhoneItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_phone || "");
+                                                                    return item;
+                                                                })
+                                                            );
+
+                                                            setShowCarrierContactPhones(true);
+
+                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 27: // escape
+                                                    setShowCarrierContactPhones(false);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (showCarrierContactPhones && carrierContactPhoneItems.findIndex(item => item.selected) > -1) {
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
+                                                        });
+
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                        setShowCarrierContactPhones(false);
+                                                        refCarrierContactPhone.current.inputElement.focus();
+                                                    }
+                                                    break;
+                                                case 9: // tab
+                                                    if (showCarrierContactPhones) {
+                                                        e.preventDefault();
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_phone: carrierContactPhoneItems[carrierContactPhoneItems.findIndex(item => item.selected)].type,
+                                                        });
+
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                        setShowCarrierContactPhones(false);
+                                                        refCarrierContactPhone.current.inputElement.focus();
+                                                    } else {
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                    }
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }}
+                                        onInput={e => {
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    phone_work: e.target.value,
+                                                    primary_phone: "work",
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_phone || "") === "") {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: "work",
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_phone) {
+                                                        case "work":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "fax":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work_fax: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "mobile":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_mobile: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "direct":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_direct: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "other":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_other: e.target.value,
+                                                            });
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        onChange={e => {
+                                            if ((selectedContact?.id || 0) === 0) {
+                                                setSelectedContact({
+                                                    ...selectedContact,
+                                                    phone_work: e.target.value,
+                                                    primary_phone: "work",
+                                                });
+                                            } else {
+                                                if ((selectedContact?.primary_phone || "") === "") {
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        phone_work: e.target.value,
+                                                        primary_phone: "work",
+                                                    });
+                                                } else {
+                                                    switch (selectedContact?.primary_phone) {
+                                                        case "work":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "fax":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_work_fax: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "mobile":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_mobile: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "direct":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_direct: e.target.value,
+                                                            });
+                                                            break;
+                                                        case "other":
+                                                            setSelectedContact({
+                                                                ...selectedContact,
+                                                                phone_other: e.target.value,
+                                                            });
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        value={
+                                            (selectedContact?.primary_phone || "") === "work" ? selectedContact?.phone_work || "" : (selectedContact?.primary_phone || "") === "fax" ? selectedContact?.phone_work_fax || "" : (selectedContact?.primary_phone || "") === "mobile" ? selectedContact?.phone_mobile || "" : (selectedContact?.primary_phone || "") === "direct" ? selectedContact?.phone_direct || "" : (selectedContact?.primary_phone || "") === "other" ? selectedContact?.phone_other || "" : ""
+                                        }
+                                    />
+
+                                    {(selectedContact?.id || 0) > 0 && (
+                                        <div
+                                            className={classnames({
+                                                "selected-carrier-contact-primary-phone": true,
+                                                pushed: carrierContactPhoneItems.length > 1,
+                                            })}
+                                        >
+                                            {selectedContact?.primary_phone || ""}
+                                        </div>
+                                    )}
+
+                                    {carrierContactPhoneItems.length > 1 && (selectedContact?.id || 0) > 0 && ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 1)) && (
+                                        <FontAwesomeIcon
+                                            className="dropdown-button"
+                                            icon={faCaretDown}
+                                            onClick={async () => {
+                                                if (showCarrierContactPhones) {
+                                                    setShowCarrierContactPhones(false);
+                                                } else {
+                                                    if (carrierContactPhoneItems.length > 1) {
+                                                        await setCarrierContactPhoneItems(
+                                                            carrierContactPhoneItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_phone || "");
+                                                                return item;
+                                                            })
+                                                        );
+
+                                                        window.setTimeout(async () => {
+                                                            await setShowCarrierContactPhones(true);
+
+                                                            refCarrierContactPhonePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }, 0);
+                                                    }
+                                                }
+
+                                                refCarrierContactPhone.current.inputElement.focus();
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                                {carrierContactPhonesTransition(
+                                    (style, item) =>
+                                        item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-contact-phone"
+                                                style={{
+                                                    ...style,
+                                                    left: "0",
+                                                    display: "block",
+                                                }}
+                                                ref={refCarrierContactPhoneDropDown}
+                                            >
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup-content">
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {carrierContactPhoneItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    "mochi-item": true,
+                                                                    selected: item.selected,
+                                                                });
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={async () => {
+                                                                            await setSelectedContact(selectedContact => {
+                                                                                return {
+                                                                                    ...selectedContact,
+                                                                                    primary_phone: item.type,
+                                                                                };
+                                                                            });
+
+                                                                            validateContactForSaving({ keyCode: 9 });
+                                                                            setShowCarrierContactPhones(false);
+                                                                            refCarrierContactPhone.current.inputElement.focus();
+                                                                        }}
+                                                                        ref={ref => refCarrierContactPhonePopupItems.current.push(ref)}
+                                                                    >
+                                                                        {item.type === "work" ? `Phone Work ` : item.type === "fax" ? `Phone Work Fax ` : item.type === "mobile" ? `Phone Mobile ` : item.type === "direct" ? `Phone Direct ` : item.type === "other" ? `Phone Other ` : ""}(<b>{item.type === "work" ? item.phone : item.type === "fax" ? item.phone : item.type === "mobile" ? item.phone : item.type === "direct" ? item.phone : item.type === "other" ? item.phone : ""}</b>)
+                                                                        {item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        )
+                                )}
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div style={{ width: "50%", display: "flex", justifyContent: "space-between" }}>
+                                <div className="input-box-container input-phone-ext">
+                                    <input
+                                        tabIndex={83 + props.tabTimes}
+                                        type="text"
+                                        placeholder="Ext"
+                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                        onChange={e =>
+                                            setSelectedContact({
+                                                ...selectedContact,
+                                                phone_ext: e.target.value,
+                                            })
+                                        }
+                                        value={(selectedContact?.primary_phone || "") === "work" ? selectedContact.phone_ext || "" : ""}
+                                    />
+                                </div>
+                                <div className="input-toggle-container">
+                                    <input
+                                        type="checkbox"
+                                        id={props.panelName + "cbox-carrier-contacts-primary-btn"}
+                                        disabled={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                        onChange={e => {
+                                            setSelectedContact({
+                                                ...selectedContact,
+                                                is_primary: e.target.checked ? 1 : 0,
+                                            });
+                                            validateContactForSaving({ keyCode: 9 });
+                                        }}
+                                        checked={(selectedContact.is_primary || 0) === 1}
+                                    />
+                                    <label htmlFor={props.panelName + "cbox-carrier-contacts-primary-btn"}>
+                                        <div className="label-text">Primary</div>
+                                        <div className="input-toggle-btn"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="form-v-sep"></div>
+                        <div className="form-row">
+                            <div
+                                className="select-box-container"
+                                style={{ flexGrow: 1 }}
+                                onMouseEnter={() => {
+                                    if ((selectedContact?.email_work || "") !== "" || (selectedContact?.email_personal || "") !== "" || (selectedContact?.email_other || "") !== "") {
+                                        setShowCarrierContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedContact?.email_work || "") !== "" || (selectedContact?.email_personal || "") !== "" || (selectedContact?.email_other || "") !== "") {
+                                        setShowCarrierContactEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowCarrierContactEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowCarrierContactEmailCopyBtn(false);
+                                }}
+                            >
+                                <div className="select-box-wrapper">
+                                    <input
+                                        tabIndex={84 + props.tabTimes}
+                                        type="text"
+                                        placeholder="E-Mail"
+                                        style={{
+                                            width: "calc(100% - 25px)",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                        readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                        ref={refCarrierContactEmail}
+                                        onKeyDown={async e => {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (showCarrierContactEmails) {
+                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        } else {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === carrierContactEmailItems.length - 1;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex - 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (carrierContactEmailItems.length > 1) {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_email || "");
+                                                                    return item;
+                                                                })
+                                                            );
+
+                                                            setShowCarrierContactEmails(true);
+
+                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (showCarrierContactEmails) {
+                                                        let selectedIndex = carrierContactEmailItems.findIndex(item => item.selected);
+
+                                                        if (selectedIndex === -1) {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        } else {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    if (selectedIndex === carrierContactEmailItems.length - 1) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex + 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        if (carrierContactEmailItems.length > 1) {
+                                                            await setCarrierContactEmailItems(
+                                                                carrierContactEmailItems.map((item, index) => {
+                                                                    item.selected = item.type === (selectedContact?.primary_email || "");
+                                                                    return item;
+                                                                })
+                                                            );
+
+                                                            setShowCarrierContactEmails(true);
+
+                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+                                                    break;
+
+                                                case 27: // escape
+                                                    setShowCarrierContactEmails(false);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (showCarrierContactEmails && carrierContactEmailItems.findIndex(item => item.selected) > -1) {
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
+                                                        });
+
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                        setShowCarrierContactEmails(false);
+                                                        refCarrierContactEmail.current.focus();
+                                                    }
+                                                    break;
+
+                                                case 9: // tab
+                                                    if (showCarrierContactEmails) {
+                                                        e.preventDefault();
+                                                        await setSelectedContact({
+                                                            ...selectedContact,
+                                                            primary_email: carrierContactEmailItems[carrierContactEmailItems.findIndex(item => item.selected)].type,
+                                                        });
+
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                        setShowCarrierContactEmails(false);
+                                                        refCarrierContactEmail.current.focus();
+                                                    } else {
+                                                        validateContactForSaving({ keyCode: 9 });
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }}
+                                        onInput={e => {
+                                            switch (selectedContact?.primary_email) {
+                                                case "work":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value,
+                                                    });
+                                                    break;
+                                                case "personal":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_personal: e.target.value,
+                                                    });
+                                                    break;
+                                                case "other":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_other: e.target.value,
+                                                    });
+                                                    break;
+                                            }
+                                        }}
+                                        onChange={e => {
+                                            switch (selectedContact?.primary_email) {
+                                                case "work":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_work: e.target.value,
+                                                    });
+                                                    break;
+                                                case "personal":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_personal: e.target.value,
+                                                    });
+                                                    break;
+                                                case "other":
+                                                    setSelectedContact({
+                                                        ...selectedContact,
+                                                        email_other: e.target.value,
+                                                    });
+                                                    break;
+                                            }
+                                        }}
+                                        value={(selectedContact?.primary_email || "") === "work" ? selectedContact?.email_work || "" : (selectedContact?.primary_email || "") === "personal" ? selectedContact?.email_personal || "" : (selectedContact?.primary_email || "") === "other" ? selectedContact?.email_other || "" : ""}
+                                    />
+
+                                    {(selectedContact?.id || 0) > 0 && (
+                                        <div
+                                            className={classnames({
+                                                "selected-carrier-contact-primary-email": true,
+                                                pushed: carrierContactEmailItems.length > 1,
+                                            })}
+                                        >
+                                            {selectedContact?.primary_email || ""}
+                                        </div>
+                                    )}
+
+                                    {showCarrierContactEmailCopyBtn && (
+                                        <FontAwesomeIcon
+                                            style={{
+                                                position: "absolute",
+                                                top: "50%",
+                                                right: 30,
+                                                zIndex: 1,
+                                                cursor: "pointer",
+                                                transform: "translateY(-50%)",
+                                                color: "#2bc1ff",
+                                                margin: 0,
+                                                transition: "ease 0.2s",
+                                                fontSize: "1rem",
+                                            }}
+                                            icon={faCopy}
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(refCarrierContactEmail.current.value);
+                                            }}
+                                        />
+                                    )}
+
+                                    {carrierContactEmailItems.length > 1 && (selectedContact?.id || 0) > 0 && ((props.user?.user_code?.is_admin || 0) === 1 || (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 1 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 1)) && (
+                                        <FontAwesomeIcon
+                                            className="dropdown-button"
+                                            icon={faCaretDown}
+                                            onClick={async () => {
+                                                if (showCarrierContactEmails) {
+                                                    setShowCarrierContactEmails(false);
+                                                } else {
+                                                    if (carrierContactEmailItems.length > 1) {
+                                                        await setCarrierContactEmailItems(
+                                                            carrierContactEmailItems.map((item, index) => {
+                                                                item.selected = item.type === (selectedContact?.primary_email || "");
+                                                                return item;
+                                                            })
+                                                        );
+
+                                                        window.setTimeout(async () => {
+                                                            await setShowCarrierContactEmails(true);
+
+                                                            refCarrierContactEmailPopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }, 0);
+                                                    }
+                                                }
+
+                                                refCarrierContactEmail.current.focus();
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                                {carrierContactEmailsTransition(
+                                    (style, item) =>
+                                        item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-contact-email"
+                                                style={{
+                                                    ...style,
+                                                    left: "0",
+                                                    display: "block",
+                                                }}
+                                                ref={refCarrierContactEmailDropDown}
+                                            >
+                                                <div className="mochi-contextual-popup vertical below right"
+                                                    style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup-content">
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {carrierContactEmailItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    "mochi-item": true,
+                                                                    selected: item.selected,
+                                                                });
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={async () => {
+                                                                            await setSelectedContact({
+                                                                                ...selectedContact,
+                                                                                primary_email: item.type,
+                                                                            });
+
+                                                                            validateContactForSaving({ keyCode: 9 });
+                                                                            setShowCarrierContactEmails(false);
+                                                                            refCarrierContactEmail.current.focus();
+                                                                        }}
+                                                                        ref={ref => refCarrierContactEmailPopupItems.current.push(ref)}
+                                                                    >
+                                                                        {item.type === "work" ? `Email Work ` : item.type === "personal" ? `Email Personal ` : item.type === "other" ? `Email Other ` : ""}(<b>{item.type === "work" ? item.email : item.type === "personal" ? item.email : item.type === "other" ? item.email : ""}</b>){item.selected &&
+                                                                            <FontAwesomeIcon className="dropdown-selected"
+                                                                                icon={faCaretRight} />}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        )
+                                )}
+                            </div>
+                            <div className="form-h-sep"></div>
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={85 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Notes"
+                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0}
+                                    onKeyDown={validateContactForSaving}
+                                    onChange={e => setSelectedContact({ ...selectedContact, notes: e.target.value })}
+                                    value={selectedContact.notes || ""}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CONTACT LIST */}
+                    <div className="form-bordered-box" style={{ flexGrow: 1 }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                {showingContactList && (
+                                    <div className="mochi-button" onClick={() => setShowingContactList(false)}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Search</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                )}
+                                {!showingContactList && (
+                                    <div className="mochi-button" onClick={() => setShowingContactList(true)}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Cancel</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                )}
+
+                                {!showingContactList && (
+                                    <div className="mochi-button" onClick={searchContactBtnClick}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Send</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-slider">
+                            <div className="form-slider-wrapper" style={{ left: showingContactList ? 0 : "-100%" }}>
+                                <div className="contact-list-box">
+                                    {(selectedCarrier.contacts || []).length > 0 && (
+                                        <div className="contact-list-header">
+                                            <div className="contact-list-col tcol first-name">First Name</div>
+                                            <div className="contact-list-col tcol last-name">Last Name</div>
+                                            <div className="contact-list-col tcol phone-work">Phone</div>
+                                            <div className="contact-list-col tcol email-work">E-Mail</div>
+                                            <div className="contact-list-col tcol pri"></div>
+                                        </div>
+                                    )}
+
+                                    <div className="contact-list-wrapper">
+                                        {(selectedCarrier.contacts || []).map((contact, index) => {
+                                            return (
+                                                <div
+                                                    className="contact-list-item"
+                                                    key={index}
+                                                    onDoubleClick={async () => {
+                                                        if (((props.user?.user_code?.permissions || []).find(x => x.name === "carrier contacts")?.pivot?.edit || 0) === 0) {
+                                                            return;
+                                                        }
+
+                                                        let panel = {
+                                                            panelName: `${props.panelName}-contacts`,
+                                                            component: (
+                                                                <Contacts
+                                                                    title="Contacts"
+                                                                    tabTimes={22000 + props.tabTimes}
+                                                                    panelName={`${props.panelName}-contacts`}
+                                                                    savingContactUrl="/saveCarrierContact"
+                                                                    deletingContactUrl="/deleteCarrierContact"
+                                                                    uploadAvatarUrl="/uploadCarrierAvatar"
+                                                                    removeAvatarUrl="/removeCarrierAvatar"
+                                                                    permissionName="carrier contacts"
+                                                                    origin={props.origin}
+                                                                    owner="carrier"
+
+
+                                                                    componentId={moment().format("x")}
+                                                                    contactSearchCustomer={{
+                                                                        ...selectedCarrier,
+                                                                        selectedContact: {
+                                                                            ...selectedContact,
+                                                                            company: (contact?.company || "") === "" ? selectedCarrier?.name || "" : contact.company,
+                                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (contact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : contact?.address1 || "",
+                                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (contact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : contact?.address2 || "",
+                                                                            city: (selectedCarrier?.city || "").toLowerCase() === (contact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : contact?.city || "",
+                                                                            state: (selectedCarrier?.state || "").toLowerCase() === (contact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : contact?.state || "",
+                                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (contact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : contact?.zip_code || "",
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            ),
+                                                        };
+
+                                                        openPanel(panel, props.origin);
+                                                    }}
+                                                    onClick={() => {
+                                                        setSelectedContact(contact);
+                                                        refCarrierContactFirstName.current.focus();
+                                                    }}
+                                                >
+                                                    <div className="contact-list-col tcol first-name"
+                                                        style={{ textTransform: "capitalize" }}>
+                                                        {contact.first_name}
+                                                    </div>
+                                                    <div className="contact-list-col tcol last-name"
+                                                        style={{ textTransform: "capitalize" }}>
+                                                        {contact.last_name}
+                                                    </div>
+                                                    <div
+                                                        className="contact-list-col tcol phone-work">{contact.primary_phone === "work" ? contact.phone_work : contact.primary_phone === "fax" ? contact.phone_work_fax : contact.primary_phone === "mobile" ? contact.phone_mobile : contact.primary_phone === "direct" ? contact.phone_direct : contact.primary_phone === "other" ? contact.phone_other : ""}</div>
+                                                    <div className="contact-list-col tcol email-work"
+                                                        style={{ textTransform: "lowercase" }}>
+                                                        {contact.primary_email === "work" ? contact.email_work : contact.primary_email === "personal" ? contact.email_personal : contact.primary_email === "other" ? contact.email_other : ""}
+                                                    </div>
+                                                    {contact.id === (selectedContact?.id || 0) && (
+                                                        <div className="contact-list-col tcol contact-selected">
+                                                            <FontAwesomeIcon icon={faPencilAlt} />
+                                                        </div>
+                                                    )}
+                                                    {contact.is_primary === 1 && (
+                                                        <div className="contact-list-col tcol pri">
+                                                            <FontAwesomeIcon icon={faCheck} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className="contact-search-box">
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="First Name"
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        first_name: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.first_name || ""}
+                                            />
+                                        </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="Last Name"
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        last_name: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.last_name || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="Address 1"
+                                                style={{ textTransform: "capitalize" }}
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        address1: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.address1 || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="Address 2"
+                                                style={{ textTransform: "capitalize" }}
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        address2: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.address2 || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="City"
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        city: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.city || ""}
+                                            />
+                                        </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container input-state">
+                                            <input
+                                                type="text"
+                                                placeholder="State"
+                                                maxLength="2"
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        state: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.state || ""}
+                                            />
+                                        </div>
+                                        <div className="form-h-sep"></div>
+                                        <div className="input-box-container grow">
+                                            <MaskedInput
+                                                mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
+                                                guide={true}
+                                                type="text"
+                                                placeholder="Phone (Work/Mobile/Fax)"
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        phone: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.phone || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-v-sep"></div>
+                                    <div className="form-row">
+                                        <div className="input-box-container grow">
+                                            <input
+                                                type="text"
+                                                placeholder="E-Mail"
+                                                style={{ textTransform: "lowercase" }}
+                                                onFocus={() => {
+                                                    setShowingContactList(false);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
+
+                                                    if (key === 9) {
+                                                        e.preventDefault();
+                                                        refInsuranceType.current.focus();
+                                                        setShowingContactList(true);
+                                                    }
+                                                }}
+                                                onChange={e =>
+                                                    setContactSearch({
+                                                        ...contactSearch,
+                                                        email: e.target.value,
+                                                    })
+                                                }
+                                                value={contactSearch.email || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="fields-container-col grow">
                     <div
                         className="form-borderless-box"
@@ -7059,20 +6572,9 @@ const Carriers = props => {
                     </div>
                 </div>
 
-                <div
-                    className="fields-container-col"
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            flexGrow: 0,
-                            marginBottom: 10,
-                        }}
-                    >
+                <div className="fields-container-col" style={{ display: "flex", flexDirection: "column" }}>
+                    {/* INSURANCES */}
+                    <div className="form-bordered-box" style={{ flexGrow: 0, marginBottom: 10 }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Insurances</div>
@@ -7773,12 +7275,8 @@ const Carriers = props => {
                         </div>
                     </div>
 
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            flexGrow: 1,
-                        }}
-                    >
+                    {/* INSURANCE LIST */}
+                    <div className="form-bordered-box" style={{ flexGrow: 1 }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="top-border top-border-middle"></div>
@@ -7834,12 +7332,905 @@ const Carriers = props => {
                 </div>
 
                 <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
-                    <div
-                        className="form-bordered-box"
-                        style={{
+                    {/* DRIVER INFORMATION */}
+                    <div className="form-bordered-box" style={{ gap: 2 }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Driver Information</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                <div className="mochi-button" onClick={() => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
+
+                                    if ((selectedDriver?.id || 0) === 0) {
+                                        window.alert('You must select a driver first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+
+
+                                            componentId={moment().format('x')}
+                                            selectedDriverId={selectedDriver.id}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">More</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div className="mochi-button" onClick={() => {
+                                    if ((selectedCarrier?.id || 0) === 0) {
+                                        window.alert('You must select a carrier first!');
+                                        return;
+                                    }
+
+                                    let panel = {
+                                        panelName: `${props.panelName}-carrier-drivers`,
+                                        component: <CompanyDrivers
+                                            title='Carrier Driver'
+                                            tabTimes={322000 + props.tabTimes}
+                                            panelName={`${props.panelName}-carrier-drivers`}
+                                            savingDriverUrl='/saveDriver'
+                                            deletingDriverUrl='/deleteDriver'
+                                            uploadAvatarUrl='/uploadDriverAvatar'
+                                            removeAvatarUrl='/removeDriverAvatar'
+                                            origin={props.origin}
+                                            subOrigin='carrier'
+                                            owner='carrier'
+                                            isEditingDriver={true}
+
+
+                                            componentId={moment().format('x')}
+                                            selectedParent={selectedCarrier}
+
+                                            driverSearchCarrier={{
+                                                ...selectedCarrier,
+                                                selectedDriver: { id: 0, carrier_id: selectedCarrier?.id }
+                                            }}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add Driver</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div className="mochi-button" onClick={() => {
+                                    if (window.confirm("Are you sure you want to proceed?")) {
+
+                                        axios.post(props.serverUrl + '/deleteDriver', {
+                                            id: selectedDriver.id,
+                                            sub_origin: 'carrier'
+                                        }).then(res => {
+                                            if (res.data.result === 'OK') {
+                                                setSelectedCarrier(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        drivers: (res.data.drivers || []).filter(x => x.owner_type === 'carrier')
+                                                    }
+                                                });
+
+                                                setSelectedDriver({});
+                                                refDriverCode.current.focus();
+                                            }
+                                        }).catch(e => {
+                                            console.log('error deleting driver');
+                                        });
+                                    }
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Delete</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+
+                                <div className="mochi-button" onClick={() => {
+                                    setSelectedDriver({});
+                                    refDriverCode.current.focus();
+                                }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Clear</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container input-code">
+                                <input
+                                    tabIndex={92 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Code"
+                                    maxLength="8"
+                                    ref={refDriverCode}
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            searchDriverInfoByCode();
+                                        }
+                                    }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                code: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.code || ''}
+                                />
+                            </div>
+
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={93 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Name"
+                                    style={{ textTransform: 'capitalize' }}
+                                    ref={refDriverName}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                name: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.name || ''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container input-phone"
+                                style={{ width: '40%', position: 'relative' }}>
+                                <MaskedInput
+                                    tabIndex={94 + props.tabTimes}
+                                    mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                    guide={true}
+                                    type="text" placeholder="Phone"
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                contact_phone: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.contact_phone || ''}
+                                />
+                            </div>
+
+                            <div className="input-box-container grow" style={{ position: 'relative' }}
+                                onMouseEnter={() => {
+                                    if ((selectedDriver?.email || '').trim() !== '') {
+                                        setShowCarrierDriverEmailCopyBtn(true);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if ((selectedDriver?.email || '').trim() !== '') {
+                                        setShowCarrierDriverEmailCopyBtn(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    window.setTimeout(() => {
+                                        setShowCarrierDriverEmailCopyBtn(false);
+                                    }, 1000);
+                                }}
+                                onMouseLeave={() => {
+                                    setShowCarrierDriverEmailCopyBtn(false);
+                                }}
+                            >
+                                <input
+                                    tabIndex={95 + props.tabTimes}
+                                    type="text"
+                                    placeholder="E-Mail"
+                                    style={{ textTransform: 'lowercase' }}
+                                    ref={refDriverEmail}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                email: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.email || ''}
+                                />
+                            </div>
+
+                            {
+                                showCarrierDriverEmailCopyBtn &&
+                                <FontAwesomeIcon style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    right: 30,
+                                    zIndex: 1,
+                                    cursor: 'pointer',
+                                    transform: 'translateY(-50%)',
+                                    color: '#2bc1ff',
+                                    margin: 0,
+                                    transition: 'ease 0.2s',
+                                    fontSize: '1rem'
+                                }} icon={faCopy} onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(refDriverEmail.current.value);
+                                }} />
+                            }
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                                <div className="select-box-wrapper">
+                                    <input
+                                        type="text"
+                                        tabIndex={95 + props.tabTimes}
+                                        placeholder="Equipment"
+                                        ref={refEquipment}
+                                        readOnly={(selectedCarrier?.id || 0) === 0}
+                                        onKeyDown={(e) => {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (driverEquipmentDropdownItems.length > 0) {
+                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
+                                                            (item) => item.selected
+                                                        );
+
+                                                        if (selectedIndex === -1) {
+                                                            setDriverEquipmentDropdownItems(
+                                                                driverEquipmentDropdownItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        } else {
+                                                            setDriverEquipmentDropdownItems(
+                                                                driverEquipmentDropdownItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected =
+                                                                            index === driverEquipmentDropdownItems.length - 1;
+                                                                    } else {
+                                                                        item.selected =
+                                                                            index === selectedIndex - 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(res.data.equipments.map((item, index) => {
+                                                                    item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                        ? index === 0
+                                                                        : item.id === selectedDriver.tractor.type.id;
+                                                                    return item;
+                                                                })
+                                                                );
+
+                                                                refDriverEquipmentPopupItems.current.map(
+                                                                    (r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    }
+                                                                );
+                                                            }
+                                                        })
+                                                            .catch(async (e) => {
+                                                                console.log("error getting equipments", e);
+                                                            });
+                                                    }
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (driverEquipmentDropdownItems.length > 0) {
+                                                        let selectedIndex = driverEquipmentDropdownItems.findIndex(
+                                                            (item) => item.selected
+                                                        );
+
+                                                        if (selectedIndex === -1) {
+                                                            setDriverEquipmentDropdownItems(driverEquipmentDropdownItems.map((item, index) => {
+                                                                item.selected = index === 0;
+                                                                return item;
+                                                            })
+                                                            );
+                                                        } else {
+                                                            setDriverEquipmentDropdownItems(
+                                                                driverEquipmentDropdownItems.map((item, index) => {
+                                                                    if (selectedIndex === driverEquipmentDropdownItems.length - 1) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex + 1;
+                                                                    }
+                                                                    return item;
+                                                                })
+                                                            );
+                                                        }
+
+                                                        refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                            if (r && r.classList.contains("selected")) {
+                                                                r.scrollIntoView({
+                                                                    behavior: "auto",
+                                                                    block: "center",
+                                                                    inline: "nearest",
+                                                                });
+                                                            }
+                                                            return true;
+                                                        });
+                                                    } else {
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
+
+                                                                refDriverEquipmentPopupItems.current.map(
+                                                                    (r, i) => {
+                                                                        if (r && r.classList.contains("selected")) {
+                                                                            r.scrollIntoView({
+                                                                                behavior: "auto",
+                                                                                block: "center",
+                                                                                inline: "nearest",
+                                                                            });
+                                                                        }
+                                                                        return true;
+                                                                    }
+                                                                );
+                                                            }
+                                                        })
+                                                            .catch((e) => {
+                                                                console.log("error getting equipments", e);
+                                                            });
+                                                    }
+                                                    break;
+
+                                                case 27: // escape
+                                                    setDriverEquipmentDropdownItems([]);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
+                                                        setSelectedDriver(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                tractor: {
+                                                                    ...(selectedDriver?.tractor || {}),
+                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
+                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
+                                                                }
+                                                            }
+                                                        })
+
+                                                        setDriverEquipmentDropdownItems([]);
+                                                        refEquipment.current.focus();
+                                                    }
+                                                    break;
+
+                                                case 9: // tab
+                                                    if (driverEquipmentDropdownItems.length > 0 && driverEquipmentDropdownItems.findIndex((item) => item.selected) > -1) {
+                                                        setSelectedDriver(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                tractor: {
+                                                                    ...(selectedDriver?.tractor || {}),
+                                                                    type: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)],
+                                                                    type_id: driverEquipmentDropdownItems[driverEquipmentDropdownItems.findIndex((item) => item.selected)].id,
+                                                                }
+                                                            }
+                                                        })
+
+                                                        setDriverEquipmentDropdownItems([]);
+                                                        refEquipment.current.focus();
+                                                    }
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if ((selectedDriver?.tractor?.type_id || 0) === 0) {
+                                                setSelectedDriver(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        tractor: {
+                                                            ...(selectedDriver?.tractor || {}),
+                                                            type: {},
+                                                            type_id: null
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                        }}
+                                        onInput={(e) => {
+                                            let type = selectedDriver?.tractor?.type || {};
+                                            type.id = 0;
+                                            type.name = e.target.value;
+
+                                            setSelectedDriver(prev => {
+                                                return {
+                                                    ...prev,
+                                                    tractor: {
+                                                        ...(selectedDriver?.tractor || {}),
+                                                        type: type,
+                                                        type_id: type.id
+                                                    }
+                                                }
+                                            })
+
+                                            if (e.target.value.trim() === "") {
+                                                setDriverEquipmentDropdownItems([]);
+                                            } else {
+                                                axios.post(props.serverUrl + "/getEquipments", { name: e.target.value.trim() }).then((res) => {
+                                                    if (res.data.result === "OK") {
+                                                        setDriverEquipmentDropdownItems(
+                                                            res.data.equipments.map((item, index) => {
+                                                                item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                    ? index === 0
+                                                                    : item.id === selectedDriver.tractor.type.id;
+                                                                return item;
+                                                            })
+                                                        );
+                                                    }
+                                                }).catch((e) => {
+                                                    console.log("error getting equipments", e);
+                                                });
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            let type = selectedDriver?.tractor?.type || {};
+                                            type.id = 0;
+                                            type.name = e.target.value;
+
+                                            setSelectedDriver(prev => {
+                                                return {
+                                                    ...prev,
+                                                    tractor: {
+                                                        ...(selectedDriver?.tractor || {}),
+                                                        type: type,
+                                                        type_id: type.id
+                                                    }
+                                                }
+                                            })
+                                        }}
+                                        value={selectedDriver?.tractor?.type?.name || ""}
+                                    />
+                                    {
+                                        (selectedCarrier?.id || 0) > 0 &&
+                                        <FontAwesomeIcon
+                                            className="dropdown-button"
+                                            icon={faCaretDown}
+                                            onClick={() => {
+                                                if (driverEquipmentDropdownItems.length > 0) {
+                                                    setDriverEquipmentDropdownItems([]);
+                                                } else {
+                                                    if ((selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== "") {
+                                                        axios.post(props.serverUrl + "/getEquipments", {
+                                                            name: selectedDriver?.tractor?.type.name,
+                                                        }).then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
+
+                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch((e) => {
+                                                            console.log("error getting equipments", e);
+                                                        });
+                                                    } else {
+                                                        axios.post(props.serverUrl + "/getEquipments").then((res) => {
+                                                            if (res.data.result === "OK") {
+                                                                setDriverEquipmentDropdownItems(
+                                                                    res.data.equipments.map((item, index) => {
+                                                                        item.selected = (selectedDriver?.tractor?.type?.id || 0) === 0
+                                                                            ? index === 0
+                                                                            : item.id === selectedDriver.tractor.type.id;
+                                                                        return item;
+                                                                    })
+                                                                );
+
+                                                                refDriverEquipmentPopupItems.current.map((r, i) => {
+                                                                    if (r && r.classList.contains("selected")) {
+                                                                        r.scrollIntoView({
+                                                                            behavior: "auto",
+                                                                            block: "center",
+                                                                            inline: "nearest",
+                                                                        });
+                                                                    }
+                                                                    return true;
+                                                                });
+                                                            }
+                                                        }).catch(async (e) => {
+                                                            console.log("error getting equipments", e);
+                                                        });
+                                                    }
+                                                }
+
+                                                refEquipment.current.focus();
+                                            }}
+                                        />
+                                    }
+                                </div>
+                                {equipmentTransition(
+                                    (style, item) =>
+                                        item && (
+                                            <animated.div
+                                                className="mochi-contextual-container"
+                                                id="mochi-contextual-container-equipment"
+                                                style={{
+                                                    ...style,
+                                                    left: "-50px",
+                                                    display: "block",
+                                                }}
+                                                ref={refDriverEquipmentDropDown}
+                                            >
+                                                <div className="mochi-contextual-popup vertical below"
+                                                    style={{ height: 150 }}>
+                                                    <div className="mochi-contextual-popup-content">
+                                                        <div className="mochi-contextual-popup-wrapper">
+                                                            {driverEquipmentDropdownItems.map((item, index) => {
+                                                                const mochiItemClasses = classnames({
+                                                                    "mochi-item": true,
+                                                                    selected: item.selected,
+                                                                });
+
+                                                                const searchValue = (selectedDriver?.tractor?.type?.id || 0) === 0 && (selectedDriver?.tractor?.type?.name || "") !== ""
+                                                                    ? selectedDriver?.tractor?.type?.name
+                                                                    : undefined;
+
+                                                                return (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={mochiItemClasses}
+                                                                        id={item.id}
+                                                                        onClick={() => {
+                                                                            setSelectedDriver(prev => {
+                                                                                return {
+                                                                                    ...prev,
+                                                                                    tractor: {
+                                                                                        ...(selectedDriver?.tractor || {}),
+                                                                                        type: item,
+                                                                                        type_id: item.id
+                                                                                    }
+                                                                                }
+                                                                            })
+
+                                                                            setDriverEquipmentDropdownItems([]);
+                                                                            refEquipment.current.focus();
+                                                                        }}
+                                                                        ref={(ref) =>
+                                                                            refDriverEquipmentPopupItems.current.push(ref)
+                                                                        }
+                                                                    >
+                                                                        {searchValue === undefined
+                                                                            ? item.name
+                                                                            : (
+                                                                                <Highlighter
+                                                                                    highlightClassName="mochi-item-highlight-text"
+                                                                                    searchWords={[searchValue]}
+                                                                                    autoEscape={true}
+                                                                                    textToHighlight={item.name}
+                                                                                />
+                                                                            )}
+                                                                        {item.selected && (
+                                                                            <FontAwesomeIcon
+                                                                                className="dropdown-selected"
+                                                                                icon={faCaretRight}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </animated.div>
+                                        )
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container" style={{ width: '50%' }}>
+                                <input
+                                    tabIndex={96 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Truck"
+                                    style={{ textTransform: 'uppercase' }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                tractor: {
+                                                    ...(selectedDriver?.tractor || {}),
+                                                    number: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.tractor?.number || ''}
+                                />
+                            </div>
+
+                            <div className="input-box-container" style={{ width: '50%' }}>
+                                <input
+                                    tabIndex={97 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Trailer"
+                                    style={{ textTransform: 'uppercase' }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                trailer: {
+                                                    ...(selectedDriver?.trailer || {}),
+                                                    number: e.target.value
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.trailer?.number || ''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{ gap: 2 }}>
+                            <div className="input-box-container grow">
+                                <input
+                                    tabIndex={97 + props.tabTimes}
+                                    type="text"
+                                    placeholder="Notes"
+                                    onKeyDown={(e) => {
+                                        let key = e.keyCode || e.which;
+
+                                        if (key === 9) {
+                                            e.preventDefault();
+                                            validateDriverForSaving(e);
+                                        }
+                                    }}
+                                    onChange={(e) => {
+                                        setSelectedDriver(prev => {
+                                            return {
+                                                ...prev,
+                                                notes: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedDriver?.notes || ''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row" style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
                             flexGrow: 1,
+                            paddingBottom: 10,
                         }}
-                    >
+                        >
+                            <div
+                                className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier drivers")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">E-Mail Driver</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="fields-container-row" style={{ flexGrow: 1, flexBasis: '100%' }}>
+                <div className="fields-container-col">
+                    {/* NOTES */}
+                    <div className="form-bordered-box">
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Notes</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="form-buttons">
+                                <div
+                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier notes")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier notes")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
+                                    onClick={() => {
+                                        if ((selectedCarrier.id || 0) === 0) {
+                                            window.alert("You must select a carrier first!");
+                                            return;
+                                        }
+
+                                        setSelectedNote({ id: 0, carrier_id: selectedCarrier.id });
+                                    }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Add note</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                                <div
+                                    className="mochi-button"
+                                    onClick={() => {
+                                        if (selectedCarrier.id === undefined || selectedCarrier.notes.length === 0) {
+                                            window.alert("There is nothing to print!");
+                                            return;
+                                        }
+
+                                        let html = ``;
+
+                                        selectedCarrier.notes.map((note, index) => {
+                                            html += `<div><b>${note.user}:${moment(note.date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}</b> ${note.text}</div>`;
+
+                                            return true;
+                                        });
+
+                                        printWindow(html);
+                                    }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base">Print</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
+                            </div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="notes-list-container">
+                            <div className="notes-list-wrapper">
+                                {(selectedCarrier.notes || []).map((note, index) => {
+                                    return (
+                                        <div className="notes-list-item" key={index}
+                                            onClick={() => setSelectedNote(note)}>
+                                            <div className="notes-list-col tcol note-text">{note.text}</div>
+                                            {note.id === (selectedNote?.id || 0) && (
+                                                <div className="notes-list-col tcol notes-selected">
+                                                    <FontAwesomeIcon icon={faPencilAlt} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="fields-container-col grow"></div>
+                <div className="fields-container-col">
+                    {/* PAST ORDERS */}
+                    <div className="form-bordered-box">
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Past Orders</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="orders-list-container">
+                            <div className="orders-list-wrapper">
+                                {(selectedCarrier?.orders || []).map((order, index) => {
+                                    return (
+                                        <div
+                                            className="orders-list-item"
+                                            key={index}
+                                            onClick={() => {
+                                                let panel = {
+                                                    panelName: `${props.panelName}-dispatch`,
+                                                    component: <Dispatch title="Dispatch"
+                                                        tabTimes={22000 + props.tabTimes}
+                                                        panelName={`${props.panelName}-dispatch`}
+                                                        origin={props.origin} isOnPanel={true}
+                                                        isAdmin={props.isAdmin}
+                                                        componentId={moment().format("x")}
+                                                        order_id={order.id} />,
+                                                };
+
+                                                openPanel(panel, props.origin);
+                                            }}
+                                        >
+                                            <span style={{
+                                                color: "#4682B4",
+                                                fontWeight: "bold",
+                                                marginRight: 5,
+                                            }}
+                                            >{order.order_number}</span>
+                                            {
+                                                `${order?.from_pickup_city || order?.from_delivery_city}, 
+                                                    ${order?.from_pickup_state || order?.from_delivery_state} - 
+                                                 ${order?.to_pickup_city || order?.to_delivery_city}, 
+                                                    ${order?.to_pickup_state || order?.to_delivery_state}`
+                                            }
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {loadingCarrierOrdersTransition(
+                            (style, item) =>
+                                item && (
+                                    <animated.div className="loading-container" style={{ ...style, zIndex: 0 }}>
+                                        <div className="loading-container-wrapper">
+                                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+                                        </div>
+                                    </animated.div>
+                                )
+                        )}
+                    </div>
+                </div>
+                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
+                    {/* DRIVER LIST */}
+                    <div className="form-bordered-box" style={{ flexGrow: 1 }}>
                         <div className="form-header">
                             <div className="top-border top-border-left"></div>
                             <div className="form-title">Drivers</div>
@@ -7991,595 +8382,6 @@ const Carriers = props => {
                                 })}
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="fields-container-row" style={{ marginTop: 10 }}>
-                <div className="fields-container-col">
-                    <div
-                        className="form-bordered-box"
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            padding: "15px 10px",
-                        }}
-                    >
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Factoring Company</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={addFactoringCompanyBtnClick}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add Factoring Company</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={searchFactoringCompanyBtnClick}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Search</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={moreFactoringCompanyBtnClick}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">More</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={clearFactoringCompanyBtnClick}>
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Clear</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                            </div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="input-box-container input-code">
-                                <input
-                                    tabIndex={65 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Code"
-                                    maxLength="8"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier info")?.pivot?.edit || 0) === 0}
-                                    ref={refFactoringCompanyCode}
-                                    onKeyDown={getFactoringCompanyByCode}
-                                    onInput={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: {
-                                                ...selectedCarrier.factoring_company,
-                                                code_number: 0,
-                                                code: e.target.value,
-                                            },
-                                        });
-                                    }}
-                                    onChange={e => {
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: {
-                                                ...selectedCarrier.factoring_company,
-                                                code: e.target.value,
-                                            },
-                                        });
-                                    }}
-                                    value={(selectedCarrier?.factoring_company?.code_number || 0) === 0 ? selectedCarrier?.factoring_company?.code || "" : selectedCarrier?.factoring_company?.code + selectedCarrier?.factoring_company?.code_number}
-                                />
-                            </div>
-
-                            <div className="form-h-sep"></div>
-
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={66 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Name"
-                                    style={{
-                                        textTransform: "capitalize",
-                                    }}
-                                    ref={refFactoringCompanyName}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.name = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.name || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={67 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Address 1"
-                                    style={{ textTransform: "capitalize" }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.address1 = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.address1 || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={68 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Address 2"
-                                    style={{ textTransform: "capitalize" }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.address2 = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.address2 || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={69 + props.tabTimes}
-                                    type="text"
-                                    placeholder="City"
-                                    style={{
-                                        textTransform: "capitalize",
-                                    }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.city = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.city || ""}
-                                />
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container input-state">
-                                <input
-                                    tabIndex={70 + props.tabTimes}
-                                    type="text"
-                                    placeholder="State"
-                                    maxLength="2"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.state = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.state || ""}
-                                />
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container input-zip-code">
-                                <input
-                                    tabIndex={71 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Postal Code"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onKeyDown={validateFactoringCompanyToSave}
-                                    onChange={e => {
-                                        let factoring_company = selectedCarrier.factoring_company || {};
-                                        factoring_company.zip = e.target.value;
-                                        setSelectedCarrier({
-                                            ...selectedCarrier,
-                                            factoring_company: factoring_company,
-                                        });
-                                    }}
-                                    value={selectedCarrier.factoring_company?.zip || ""}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div className="input-box-container grow">
-                                <input
-                                    tabIndex={72 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Contact Name"
-                                    style={{
-                                        textTransform: "capitalize",
-                                    }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onInput={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier(selectedCarrier => {
-                                                return {
-                                                    ...selectedCarrier,
-                                                    factoring_company: {
-                                                        ...(selectedCarrier?.factoring_company || {}),
-                                                        contact_name: e.target.value,
-                                                    },
-                                                };
-                                            });
-                                        }
-                                    }}
-                                    onChange={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier(selectedCarrier => {
-                                                return {
-                                                    ...selectedCarrier,
-                                                    factoring_company: {
-                                                        ...(selectedCarrier?.factoring_company || {}),
-                                                        contact_name: e.target.value,
-                                                    },
-                                                };
-                                            });
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? selectedCarrier?.factoring_company?.contact_name || ""
-                                            : // ? ''
-                                            selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).first_name + " " + selectedCarrier.factoring_company.contacts.find(c => c.is_primary === 1).last_name
-                                    }
-                                />
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone" style={{ position: "relative" }}>
-                                <MaskedInput
-                                    tabIndex={73 + props.tabTimes}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    mask={[/[0-9]/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/]}
-                                    guide={true}
-                                    type="text"
-                                    placeholder="Contact Phone"
-                                    onInput={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    contact_phone: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    onChange={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    contact_phone: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? selectedCarrier?.factoring_company?.contact_phone || ""
-                                            : // ? ''
-                                            selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "work"
-                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work
-                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "fax"
-                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_work_fax
-                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "mobile"
-                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_mobile
-                                                        : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "direct"
-                                                            ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_direct
-                                                            : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone === "other"
-                                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).phone_other
-                                                                : ""
-                                    }
-                                />
-
-                                {(selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) !== undefined && (
-                                    <div
-                                        className={classnames({
-                                            "selected-factoring-company-contact-primary-phone": true,
-                                            pushed: false,
-                                        })}
-                                    >
-                                        {selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_phone}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="form-h-sep"></div>
-                            <div className="input-box-container input-phone-ext">
-                                <input
-                                    tabIndex={74 + props.tabTimes}
-                                    type="text"
-                                    placeholder="Ext"
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    onInput={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    ext: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    onChange={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    ext: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? selectedCarrier?.factoring_company?.ext || ""
-                                            : // ? ''
-                                            (selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1)?.primary_phone || "") === "work"
-                                                ? selectedCarrier?.factoring_company.contacts.find(c => c.is_primary === 1).phone_ext
-                                                : ""
-                                    }
-                                />
-                            </div>
-                        </div>
-                        <div className="form-v-sep"></div>
-                        <div className="form-row">
-                            <div
-                                className="input-box-container"
-                                style={{ position: "relative", flexGrow: 1 }}
-                                onMouseEnter={() => {
-                                    if ((selectedCarrier?.factoring_company?.email || "") !== "") {
-                                        setShowFactoringCompanyEmailCopyBtn(true);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if ((selectedCarrier?.factoring_company?.email || "") !== "") {
-                                        setShowFactoringCompanyEmailCopyBtn(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    window.setTimeout(() => {
-                                        setShowFactoringCompanyEmailCopyBtn(false);
-                                    }, 1000);
-                                }}
-                                onMouseLeave={() => {
-                                    setShowFactoringCompanyEmailCopyBtn(false);
-                                }}
-                            >
-                                <input
-                                    tabIndex={75 + props.tabTimes}
-                                    type="text"
-                                    placeholder="E-Mail"
-                                    style={{ textTransform: "lowercase" }}
-                                    readOnly={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "factoring company")?.pivot?.edit || 0) === 0}
-                                    ref={refFactoringCompanyEmail}
-                                    onKeyDown={validateFactoringCompanyToSave}
-                                    onInput={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    email: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    onChange={e => {
-                                        if ((selectedCarrier?.factoring_company?.contacts || []).length === 0) {
-                                            setSelectedCarrier({
-                                                ...selectedCarrier,
-                                                factoring_company: {
-                                                    ...(selectedCarrier?.factoring_company || {}),
-                                                    email: e.target.value,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                    value={
-                                        (selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) === undefined
-                                            ? selectedCarrier?.factoring_company?.email || ""
-                                            : // ? ''
-                                            selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "work"
-                                                ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_work
-                                                : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "personal"
-                                                    ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_personal
-                                                    : selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email === "other"
-                                                        ? selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).email_other
-                                                        : ""
-                                    }
-                                />
-
-                                {(selectedCarrier?.factoring_company?.contacts || []).find(c => c.is_primary === 1) !== undefined && (
-                                    <div
-                                        className={classnames({
-                                            "selected-factoring-company-contact-primary-email": true,
-                                            pushed: false,
-                                        })}
-                                    >
-                                        {selectedCarrier?.factoring_company?.contacts.find(c => c.is_primary === 1).primary_email}
-                                    </div>
-                                )}
-
-                                {showFactoringCompanyEmailCopyBtn && (
-                                    <FontAwesomeIcon
-                                        style={{
-                                            position: "absolute",
-                                            top: "50%",
-                                            right: 30,
-                                            zIndex: 1,
-                                            cursor: "pointer",
-                                            transform: "translateY(-50%)",
-                                            color: "#2bc1ff",
-                                            margin: 0,
-                                            transition: "ease 0.2s",
-                                            fontSize: "1rem",
-                                        }}
-                                        icon={faCopy}
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            navigator.clipboard.writeText(refFactoringCompanyEmail.current.value);
-                                        }}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="fields-container-col grow"></div>
-                <div className="fields-container-col">
-                    <div className="form-bordered-box">
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Notes</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="form-buttons">
-                                <div
-                                    className={(props.user?.user_code?.is_admin || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier notes")?.pivot?.save || 0) === 0 && ((props.user?.user_code?.permissions || []).find(x => x.name === "carrier notes")?.pivot?.edit || 0) === 0 ? "mochi-button disabled" : "mochi-button"}
-                                    onClick={() => {
-                                        if ((selectedCarrier.id || 0) === 0) {
-                                            window.alert("You must select a carrier first!");
-                                            return;
-                                        }
-
-                                        setSelectedNote({ id: 0, carrier_id: selectedCarrier.id });
-                                    }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Add note</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                                <div
-                                    className="mochi-button"
-                                    onClick={() => {
-                                        if (selectedCarrier.id === undefined || selectedCarrier.notes.length === 0) {
-                                            window.alert("There is nothing to print!");
-                                            return;
-                                        }
-
-                                        let html = ``;
-
-                                        selectedCarrier.notes.map((note, index) => {
-                                            html += `<div><b>${note.user}:${moment(note.date_time, "YYYY-MM-DD HH:mm:ss").format("MM/DD/YYYY:HHmm")}</b> ${note.text}</div>`;
-
-                                            return true;
-                                        });
-
-                                        printWindow(html);
-                                    }}
-                                >
-                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">Print</div>
-                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                </div>
-                            </div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="notes-list-container">
-                            <div className="notes-list-wrapper">
-                                {(selectedCarrier.notes || []).map((note, index) => {
-                                    return (
-                                        <div className="notes-list-item" key={index}
-                                            onClick={() => setSelectedNote(note)}>
-                                            <div className="notes-list-col tcol note-text">{note.text}</div>
-                                            {note.id === (selectedNote?.id || 0) && (
-                                                <div className="notes-list-col tcol notes-selected">
-                                                    <FontAwesomeIcon icon={faPencilAlt} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="fields-container-col" style={{ minWidth: "28%", maxWidth: "28%" }}>
-                    <div className="form-bordered-box">
-                        <div className="form-header">
-                            <div className="top-border top-border-left"></div>
-                            <div className="form-title">Past Orders</div>
-                            <div className="top-border top-border-middle"></div>
-                            <div className="top-border top-border-right"></div>
-                        </div>
-
-                        <div className="orders-list-container">
-                            <div className="orders-list-wrapper">
-                                {(selectedCarrier?.orders || []).map((order, index) => {
-                                    return (
-                                        <div
-                                            className="orders-list-item"
-                                            key={index}
-                                            onClick={() => {
-                                                let panel = {
-                                                    panelName: `${props.panelName}-dispatch`,
-                                                    component: <Dispatch title="Dispatch"
-                                                        tabTimes={22000 + props.tabTimes}
-                                                        panelName={`${props.panelName}-dispatch`}
-                                                        origin={props.origin} isOnPanel={true}
-                                                        isAdmin={props.isAdmin}
-                                                        componentId={moment().format("x")}
-                                                        order_id={order.id} />,
-                                                };
-
-                                                openPanel(panel, props.origin);
-                                            }}
-                                        >
-                                            <span style={{
-                                                color: "#4682B4",
-                                                fontWeight: "bold",
-                                                marginRight: 5,
-                                            }}
-                                            >{order.order_number}</span>
-                                            {
-                                                `${order?.from_pickup_city || order?.from_delivery_city}, 
-                                                    ${order?.from_pickup_state || order?.from_delivery_state} - 
-                                                 ${order?.to_pickup_city || order?.to_delivery_city}, 
-                                                    ${order?.to_pickup_state || order?.to_delivery_state}`
-                                            }
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {loadingCarrierOrdersTransition(
-                            (style, item) =>
-                                item && (
-                                    <animated.div className="loading-container" style={{ ...style, zIndex: 0 }}>
-                                        <div className="loading-container-wrapper">
-                                            <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                                        </div>
-                                    </animated.div>
-                                )
-                        )}
                     </div>
                 </div>
             </div>

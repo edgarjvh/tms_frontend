@@ -43,7 +43,13 @@ import {
     setAdminLoadBoardPanels,
     setCompanyLoadBoardPanels,
     setAdminReportPanels,
-    setCompanyReportPanels
+    setCompanyReportPanels,
+
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 } from "./../../../actions";
 import {
     ChangeCarrier,
@@ -68,7 +74,7 @@ import {
 } from "./../../company";
 import ModalTemplate from "./modal-template/ModalTemplate";
 
-const Dispatch = (props) => {    
+const Dispatch = (props) => {
     const refOrderNumber = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -250,7 +256,7 @@ const Dispatch = (props) => {
                         refDispatchEvents.current.focus();
                     }
 
-                    if (props.isOnPanel && refOrderNumber?.current){
+                    if (props.isOnPanel && refOrderNumber?.current) {
                         refOrderNumber.current.focus({
                             preventScroll: true,
                         });
@@ -262,7 +268,7 @@ const Dispatch = (props) => {
             });
         }
 
-        if (props.isOnPanel && refOrderNumber?.current){
+        if (props.isOnPanel && refOrderNumber?.current) {
             refOrderNumber.current.focus({
                 preventScroll: true,
             });
@@ -270,9 +276,9 @@ const Dispatch = (props) => {
 
         updateSystemDateTime();
     }, []);
-    
+
     useEffect(() => {
-        if (props.refOrderNumber?.current){
+        if (props.refOrderNumber?.current) {
             props.refOrderNumber.current.focus({
                 preventScroll: true,
             });
@@ -281,11 +287,11 @@ const Dispatch = (props) => {
 
     useEffect(() => {
         if (props.screenFocused) {
-            if (props.isOnPanel){
+            if (props.isOnPanel) {
                 refOrderNumber.current.focus({
                     preventScroll: true,
                 });
-            }else{
+            } else {
                 props.refOrderNumber.current.focus({
                     preventScroll: true,
                 });
@@ -673,6 +679,9 @@ const Dispatch = (props) => {
         }
     });
     const refCarrierContactPhonePopupItems = useRef([]);
+
+    const [isAddingNewShipper, setIsAddingNewShipper] = useState(false)
+    const [isAddingNewConsignee, setIsAddingNewConsignee] = useState(false)
 
     const loadingTransition = useTransition(isLoading, {
         from: { opacity: 0, display: "block" },
@@ -1144,14 +1153,14 @@ const Dispatch = (props) => {
         setIsCreatingTemplate(false);
         setIsEditingTemplate(false);
 
-        if (props.isOnPanel){
-            if (refOrderNumber?.current){
+        if (props.isOnPanel) {
+            if (refOrderNumber?.current) {
                 refOrderNumber.current.focus({
                     preventScroll: true,
                 });
             }
-        }else{
-            if (props.refOrderNumber?.current){
+        } else {
+            if (props.refOrderNumber?.current) {
                 props.refOrderNumber.current.focus({
                     preventScroll: true,
                 });
@@ -1224,11 +1233,14 @@ const Dispatch = (props) => {
                                                 p.customer = res.data.customers[0];
                                                 p.customer_id = res.data.customers[0].id;
 
-                                                setSelectedShipperCustomer({
-                                                    ...res.data.customers[0],
-                                                    ...p,
-                                                    customer: {},
-                                                    pickup_id: p.id,
+                                                setSelectedShipperCustomer(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        ...res.data.customers[0],
+                                                        ...p,
+                                                        customer: {},
+                                                        pickup_id: p.id
+                                                    }
                                                 });
 
                                                 setSelectedShipperCustomerContact((res.data.customers[0].contacts || []).find((c) => c.is_primary === 1) || {});
@@ -1358,7 +1370,12 @@ const Dispatch = (props) => {
                                         consignee.customer = {};
                                         consignee.delivery_id = d.id;
 
-                                        setSelectedConsigneeCustomer(consignee);
+                                        setSelectedConsigneeCustomer(prev => {
+                                            return {
+                                                ...prev,
+                                                ...consignee
+                                            }
+                                        });
                                         setSelectedConsigneeCustomerContact(
                                             (consignee.contacts || []).find(
                                                 (c) => c.is_primary === 1
@@ -1553,8 +1570,6 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-
-
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
                     callback={(id) => {
@@ -1893,7 +1908,16 @@ const Dispatch = (props) => {
                         setSelectedCarrierContact({});
 
                         if (res.data.carrier) {
-                            let carrier = { ...res.data.carrier };
+                            const carrier = { ...res.data.carrier };
+
+                            if ((carrier?.insurance_status || '') !== 'active') {
+                                window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                                return;
+                            }else if ((carrier?.insurance_flag || 0) === 1) {
+                                window.alert("This carrier isn't allowed to be assigned to an order because the insurance document must be uploaded first.");
+                                return;
+                            }
+
                             let driver = null;
                             let contact = null;
 
@@ -2039,6 +2063,8 @@ const Dispatch = (props) => {
                                                     console.log(e);
                                                 })
                                             }
+
+                                            getLoadBoardOrders()
                                         } else if (res.data.result === "ORDER ID NOT VALID") {
                                             window.alert("The order number is not valid!");
                                             refEventDate.current.inputElement.focus();
@@ -2354,9 +2380,14 @@ const Dispatch = (props) => {
                         new Promise((resolve, reject) => {
                             axios.post(props.serverUrl + '/getCarrierById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
-                                    let carrier = res.data.carrier;
+                                    const carrier = res.data.carrier;
 
                                     if (carrier) {
+                                        if ((carrier?.insurance_status || '') !== 'active') {
+                                            window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                                            return;
+                                        }
+
                                         let selected_order = { ...selectedOrder, carrier_contact_id: null } || {
                                             order_number: 0,
                                         };
@@ -2478,6 +2509,8 @@ const Dispatch = (props) => {
                                                                 console.log(e);
                                                             })
                                                         }
+
+                                                        getLoadBoardOrders()
                                                     } else if (res.data.result === "ORDER ID NOT VALID") {
                                                         window.alert("The order number is not valid!");
                                                         refEventDate.current.inputElement.focus();
@@ -2572,51 +2605,12 @@ const Dispatch = (props) => {
             selected_order.carrier_id = (selectedCarrier?.id || 0) === 0 ? null : selectedCarrier.id;
             selected_order.carrier_driver_id = (selectedCarrierDriver?.id || 0) === 0 ? null : selectedCarrierDriver.id;
 
-            // if ((selected_order?.id || 0) === 0 &&
-            //     (selected_order.pickups || []).length === 1 &&
-            //     selected_order.pickups[0].id === 0 &&
-            //     (selected_order.pickups[0].customer_id || 0) > 0
-            // ) {
-            //     selected_order.pickups = (selected_order.pickups || []).map((pu, i) => {
-            //         pu.pu_date1 = getFormattedDates(pu.pu_date1 || "");
-            //         pu.pu_date2 = getFormattedDates(pu.pu_date2 || "");
-            //         pu.pu_time1 = getFormattedHours(pu.pu_time1 || "");
-            //         pu.pu_time2 = getFormattedHours(pu.pu_time2 || "");
-            //         return pu;
-            //     });
-            // } else {
-            //     selected_order.pickups = []; // se envia vacio para no tocarlo
-            // }
-            //
-            // if ((selected_order?.id || 0) === 0 &&
-            //     (selected_order.deliveries || []).length === 1 &&
-            //     selected_order.deliveries[0].id === 0 &&
-            //     (selected_order.deliveries[0].customer_id || 0) > 0
-            // ) {
-            //     selected_order.deliveries = (selected_order.deliveries || []).map((delivery, i) => {
-            //         delivery.delivery_date1 = getFormattedDates(delivery.delivery_date1 || "");
-            //         delivery.delivery_date2 = getFormattedDates(delivery.delivery_date2 || "");
-            //         delivery.delivery_time1 = getFormattedHours(delivery.delivery_time1 || "");
-            //         delivery.delivery_time2 = getFormattedHours(delivery.delivery_time2 || "");
-            //         return delivery;
-            //     });
-            // } else {
-            //     selected_order.deliveries = []; // se envia vacio para no tocarlo
-            // }
-
             let toSavePickup = (selected_order.pickups || []).find((p) => (p.toSave || false) === true) !== undefined;
 
             if (!selected_order?.user_code) {
                 selected_order.user_code_id = props.user.user_code.id;
                 selected_order.agent_code = props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
             }
-
-            // setSelectedOrder(prev => {
-            //     return {
-            //         ...prev,
-            //         ...selected_order
-            //     }
-            // });
 
             if (!isCreatingTemplate && !isEditingTemplate) {
                 axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
@@ -2645,7 +2639,11 @@ const Dispatch = (props) => {
                         }
 
                         if ((selected_order?.id || 0) === 0 && res.data.order.id > 0) {
-                            refShipperCompanyCode.current.focus();
+                            if (!isAddingNewShipper && !isAddingNewConsignee) {
+                                refShipperCompanyCode.current.focus();
+                            }
+                            
+                            getLoadBoardOrders()
                         }
                     } else {
 
@@ -2725,9 +2723,11 @@ const Dispatch = (props) => {
                                                         }
                                                     };
 
-                                                    setSelectedShipperCustomer({
-                                                        ...selectedShipperCustomer,
-                                                        pickup_id: res.data.pickup.id,
+                                                    setSelectedShipperCustomer(prev => {
+                                                        return {
+                                                            ...prev,
+                                                            pickup_id: res.data.pickup.id
+                                                        }
                                                     });
                                                 }
                                                 return p;
@@ -3073,9 +3073,11 @@ const Dispatch = (props) => {
                                             if (d.id === isSavingDeliveryId) {
                                                 d = res.data.delivery;
 
-                                                setSelectedConsigneeCustomer({
-                                                    ...selectedConsigneeCustomer,
-                                                    delivery_id: res.data.delivery.id,
+                                                setSelectedConsigneeCustomer(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        delivery_id: res.data.delivery.id
+                                                    }
                                                 });
                                             }
                                             return d;
@@ -3492,14 +3494,14 @@ const Dispatch = (props) => {
                     } else {
                         setIsLoading(false);
                         dispatchClearBtnClick();
-                        if (props.isOnPanel){
-                            if (refOrderNumber?.current){
+                        if (props.isOnPanel) {
+                            if (refOrderNumber?.current) {
                                 refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refOrderNumber?.current){
+                        } else {
+                            if (props.refOrderNumber?.current) {
                                 props.refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
@@ -3632,14 +3634,14 @@ const Dispatch = (props) => {
                     } else {
                         setIsLoading(false);
                         dispatchClearBtnClick();
-                        if (props.isOnPanel){
-                            if (refOrderNumber?.current){
+                        if (props.isOnPanel) {
+                            if (refOrderNumber?.current) {
                                 refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refOrderNumber?.current){
+                        } else {
+                            if (props.refOrderNumber?.current) {
                                 props.refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
@@ -4197,6 +4199,24 @@ const Dispatch = (props) => {
         }
     }
 
+    const getLoadBoardOrders = () => {
+        props.setIsLoadingWidget(true)
+        axios.post(props.serverUrl + '/getLoadBoardOrders', {
+            user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+        }).then(async res => {
+            if (res.data.result === 'OK') {
+                props.setAvailableOrders(res.data.available_orders);
+                props.setBookedOrders(res.data.booked_orders);
+                props.setInTransitOrders(res.data.in_transit_orders);
+                props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
+            }
+        }).catch(e => {
+            console.log('error loading orders', e)
+        }).finally(() => {
+            props.setIsLoadingWidget(false)
+        })
+    }
+
     return (
         <div
             className="dispatch-main-container"
@@ -4214,8 +4234,8 @@ const Dispatch = (props) => {
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
 
-                if (key === 27){
-                    if ((selectedOrder?.id || 0) > 0){
+                if (key === 27) {
+                    if ((selectedOrder?.id || 0) > 0) {
                         e.stopPropagation();
                         dispatchClearBtnClick();
                     }
@@ -4224,14 +4244,14 @@ const Dispatch = (props) => {
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        if (props.isOnPanel){
-                            if (refOrderNumber?.current){
+                        if (props.isOnPanel) {
+                            if (refOrderNumber?.current) {
                                 refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refOrderNumber?.current){
+                        } else {
+                            if (props.refOrderNumber?.current) {
                                 props.refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
@@ -5519,12 +5539,12 @@ const Dispatch = (props) => {
                                                                             template_id: templateItems[templateItems.findIndex((item) => item.selected)].id,
                                                                         }
                                                                     });
-                                                                    
+
                                                                     setTimeout(() => { doUseTemplate(templateItems[templateItems.findIndex((item) => item.selected)].id) }, 100);
                                                                     setTemplateItems([]);
                                                                     refTemplate.current.focus();
-                                                                }else{
-                                                                    if ((selectedOrder?.template_id || 0) > 0){
+                                                                } else {
+                                                                    if ((selectedOrder?.template_id || 0) > 0) {
                                                                         setTimeout(() => { doUseTemplate(templateItems[templateItems.findIndex((item) => item.selected)].id) }, 100);
                                                                     }
                                                                 }
@@ -10701,21 +10721,167 @@ const Dispatch = (props) => {
                             flexBasis: "100%",
                         }}
                     >
-                        <div
-                            className="form-bordered-box"
-                            style={{
-                                minWidth: "38%",
-                                maxWidth: "38%",
-                                marginRight: 10,
-                                height: "9rem",
-                                position: "relative",
-                            }}
-                        >
+                        <div className="form-bordered-box" style={{
+                            minWidth: "38%",
+                            maxWidth: "38%",
+                            marginRight: 10,
+                            height: "9rem",
+                            position: "relative",
+                        }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
                                 <div className="form-title">Shipper</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedOrder?.pickups || []).find(x => x.id === 0)){
+                                            const newPickups = (selectedOrder?.pickups || []).filter(x => x.id !== 0);
+
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    pickups: newPickups
+                                                }
+                                            })
+
+                                            if (newPickups.length > 0) {
+                                                setSelectedShipperCustomer({
+                                                    ...newPickups[0].customer,
+                                                    pickup_id: newPickups[0].id
+                                                })
+
+                                                setSelectedShipperCustomerContact((newPickups[0].customer?.contacts || []).find(c => c.is_primary === 1) || {})
+                                            }
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-customer`,
+                                            component: (
+                                                <Customers
+                                                    pageName={"Customer"}
+                                                    title={"Shipper Company"}
+                                                    panelName={`${props.panelName}-customer`}
+                                                    tabTimes={3000 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    origin={props.origin}
+                                                    suborigin='dispatch shipper'
+                                                    onCustomerChangeCallback={(customer) => {
+                                                        // checking if the order is already created
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            // checking if the customer is already selected as shipper
+                                                            if ((selectedShipperCustomer?.id || 0) === customer.id) {
+                                                                setSelectedOrder(prev => {
+                                                                    return {
+                                                                        ...prev,
+                                                                        pickups: (prev?.pickups || []).map((p, i) => {
+                                                                            if (p.id === (selectedShipperCustomer?.pickup_id || 0)) {
+                                                                                p.customer = customer;
+                                                                                p.customer_id = customer.id;
+
+                                                                                setSelectedShipperCustomer(prev => {
+                                                                                    return {
+                                                                                        ...prev,
+                                                                                        ...customer,
+                                                                                        customer: {}
+                                                                                    }
+                                                                                })
+
+                                                                                setSelectedShipperCustomerContact((customer.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                                            }
+                                                                            return p;
+                                                                        })
+                                                                    }
+                                                                })
+
+                                                                setIsShowingShipperSecondPage(true);
+                                                            } else { // if the customer is not selected as shipper, is added as new pickup and selected as shipper
+                                                                setSelectedOrder((prev) => {
+                                                                    return {
+                                                                        ...prev,
+                                                                        pickups: [
+                                                                            ...(prev?.pickups || []),
+                                                                            {
+                                                                                id: 0,
+                                                                                order_id: prev.id,
+                                                                                customer: { ...customer },
+                                                                                customer_id: customer.id
+                                                                            }
+                                                                        ]
+                                                                    };
+                                                                });
+
+                                                                setSelectedShipperCustomer({
+                                                                    ...customer,
+                                                                    customer: {},
+                                                                    pickup_id: 0
+                                                                })
+
+                                                                setSelectedShipperCustomerContact((customer?.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                                setIsShowingShipperSecondPage(true)
+                                                                setIsSavingPickupId(0)
+                                                            }
+                                                        } else {
+                                                            // if the order is not created yet, check if the customer has the Bill To Code filled
+                                                            // and proceed to create the order with the selected customer as bill to customer and shipper
+                                                            if ((customer?.bill_to_code || '') !== '') {
+                                                                setIsLoading(true);
+                                                                const billToCode = (customer?.bill_to_code || '') + ((customer?.bill_to_code_number || 0) === 0 ? '' : customer.bill_to_code_number)
+
+                                                                axios.post(props.serverUrl + "/getCustomerByCode", {
+                                                                    code: billToCode,
+                                                                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+                                                                }).then((res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        setSelectedBillToCustomer(res.data.customer);
+                                                                        setSelectedBillToCustomerContact((res.data.customer.contacts || []).find((c) => c.is_primary === 1) || {});
+
+                                                                        setSelectedShipperCustomer({
+                                                                            ...customer,
+                                                                            customer: {},
+                                                                            pickup_id: 0
+                                                                        })
+
+                                                                        setSelectedShipperCustomerContact((customer?.contacts || []).find((c) => c.is_primary === 1) || {})
+
+                                                                        setSelectedOrder((selectedOrder) => {
+                                                                            return {
+                                                                                ...selectedOrder,
+                                                                                bill_to_customer_id: res.data.customer.id,
+                                                                                pickups: [
+                                                                                    {
+                                                                                        toSave: true,
+                                                                                        id: 0,
+                                                                                        customer: { ...customer },
+                                                                                        customer_id: customer.id
+                                                                                    }
+                                                                                ]
+                                                                            };
+                                                                        });
+
+                                                                        validateOrderForSaving({ keyCode: 9 });
+
+                                                                        setIsShowingShipperSecondPage(true);
+                                                                    }
+                                                                    setIsLoading(false);
+                                                                }).catch((e) => {
+                                                                    console.log("error getting customers", e);
+                                                                    setIsLoading(false);
+                                                                });
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Add New Shipper</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
                                     <div className="mochi-button" onClick={shipperCompanySearch} style={{
                                         pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
                                     }}>
@@ -10727,36 +10893,33 @@ const Dispatch = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
 
-                                    <div
-                                        className="mochi-button"
-                                        onClick={() => {
-                                            if ((selectedShipperCustomer.id || 0) === 0) {
-                                                window.alert("You must select a customer first!");
-                                                return;
-                                            }
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedShipperCustomer.id || 0) === 0) {
+                                            window.alert("You must select a customer first!");
+                                            return;
+                                        }
 
-                                            let panel = {
-                                                panelName: `${props.panelName}-customer`,
-                                                component: (
-                                                    <Customers
-                                                        pageName={"Customer"}
-                                                        title={"Shipper Company"}
-                                                        panelName={`${props.panelName}-customer`}
-                                                        tabTimes={3000 + props.tabTimes}
-                                                        componentId={moment().format("x")}
-                                                        isOnPanel={true}
-                                                        isAdmin={props.isAdmin}
-                                                        origin={props.origin}
+                                        let panel = {
+                                            panelName: `${props.panelName}-customer`,
+                                            component: (
+                                                <Customers
+                                                    pageName={"Customer"}
+                                                    title={"Shipper Company"}
+                                                    panelName={`${props.panelName}-customer`}
+                                                    tabTimes={3000 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    origin={props.origin}
 
 
-                                                        customer_id={selectedShipperCustomer.id}
-                                                    />
-                                                ),
-                                            };
+                                                    customer_id={selectedShipperCustomer.id}
+                                                />
+                                            ),
+                                        };
 
-                                            openPanel(panel, props.origin);
-                                        }}
-                                    >
+                                        openPanel(panel, props.origin);
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Company info</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -11087,6 +11250,7 @@ const Dispatch = (props) => {
                                                             tabIndex={18 + props.tabTimes}
                                                             type="text"
                                                             placeholder="Address 1"
+                                                            style={{ textTransform: "capitalize" }}
                                                             readOnly={(selectedOrder?.is_cancelled || 0) === 1}
                                                             onInput={(e) => {
                                                                 if ((selectedShipperCustomer?.id || 0) === 0) {
@@ -14298,6 +14462,109 @@ const Dispatch = (props) => {
                                 <div className="form-title">Consignee</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
+                                <div className="mochi-button" onClick={() => {
+                                        if ((selectedOrder?.id || 0) === 0){
+                                            window.alert("You must create or load an order first!")
+                                            return
+                                        }
+
+                                        if ((selectedOrder?.deliveries || []).find(x => x.id === 0)){
+                                            const newDeliveries = (selectedOrder?.deliveries || []).filter(x => x.id !== 0);
+
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    deliveries: newDeliveries
+                                                }
+                                            })
+
+                                            if (newDeliveries.length > 0) {
+                                                setSelectedConsigneeCustomer({
+                                                    ...newDeliveries[0].customer,
+                                                    delivery_id: newDeliveries[0].id
+                                                })
+
+                                                setSelectedConsigneeCustomerContact((newDeliveries[0].customer?.contacts || []).find(c => c.is_primary === 1) || {})
+                                            }
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-customer`,
+                                            component: (
+                                                <Customers
+                                                    pageName={"Customer"}
+                                                    title={"Consignee Company"}
+                                                    panelName={`${props.panelName}-customer`}
+                                                    tabTimes={3000 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    origin={props.origin}
+                                                    suborigin='dispatch consignee'
+                                                    onCustomerChangeCallback={(customer) => {
+                                                        // checking if the customer is already selected as consignee
+                                                        if ((selectedConsigneeCustomer?.id || 0) === customer.id) {
+                                                            setSelectedOrder(prev => {
+                                                                return {
+                                                                    ...prev,
+                                                                    deliveries: (prev?.deliveries || []).map((p, i) => {
+                                                                        if (p.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                            p.customer = customer;
+                                                                            p.customer_id = customer.id;
+
+                                                                            setSelectedConsigneeCustomer(prev => {
+                                                                                return {
+                                                                                    ...prev,
+                                                                                    ...customer,
+                                                                                    customer: {}
+                                                                                }
+                                                                            })
+
+                                                                            setSelectedConsigneeCustomerContact((customer.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                                        }
+                                                                        return p;
+                                                                    })
+                                                                }
+                                                            })
+
+                                                            setIsShowingConsigneeSecondPage(true);
+                                                        } else { // if the customer is not selected as consignee, is added as new delivery and selected as consignee
+                                                            setSelectedOrder((prev) => {
+                                                                return {
+                                                                    ...prev,
+                                                                    deliveries: [
+                                                                        ...(prev?.deliveries || []),
+                                                                        {
+                                                                            id: 0,
+                                                                            order_id: prev.id,
+                                                                            customer: { ...customer },
+                                                                            customer_id: customer.id
+                                                                        }
+                                                                    ]
+                                                                };
+                                                            });
+
+                                                            setSelectedConsigneeCustomer({
+                                                                ...customer,
+                                                                customer: {},
+                                                                delivery_id: 0
+                                                            })
+
+                                                            setSelectedConsigneeCustomerContact((customer?.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                            setIsShowingConsigneeSecondPage(true)
+                                                            setIsSavingDeliveryId(0)
+                                                        }
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Add New Consignee</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
                                     <div className="mochi-button" onClick={consigneeCompanySearch} style={{
                                         pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
                                     }}>
@@ -17970,14 +18237,14 @@ const Dispatch = (props) => {
 
                                 if (key === 9) {
                                     e.preventDefault();
-                                    if (props.isOnPanel){
-                                        if (refOrderNumber?.current){
+                                    if (props.isOnPanel) {
+                                        if (refOrderNumber?.current) {
                                             refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
                                         }
-                                    }else{
-                                        if (props.refOrderNumber?.current){
+                                    } else {
+                                        if (props.refOrderNumber?.current) {
                                             props.refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
@@ -19552,14 +19819,14 @@ const Dispatch = (props) => {
                                         await setDispatchEventTime(formatted);
 
                                         if ((dispatchEvent?.name || "") === "") {
-                                            if (props.isOnPanel){
-                                                if (refOrderNumber?.current){
+                                            if (props.isOnPanel) {
+                                                if (refOrderNumber?.current) {
                                                     refOrderNumber.current.focus({
                                                         preventScroll: true,
                                                     });
                                                 }
-                                            }else{
-                                                if (props.refOrderNumber?.current){
+                                            } else {
+                                                if (props.refOrderNumber?.current) {
                                                     props.refOrderNumber.current.focus({
                                                         preventScroll: true,
                                                     });
@@ -19567,14 +19834,14 @@ const Dispatch = (props) => {
                                             }
                                         } else {
                                             if ((selectedOrder?.id || 0) === 0) {
-                                                if (props.isOnPanel){
-                                                    if (refOrderNumber?.current){
+                                                if (props.isOnPanel) {
+                                                    if (refOrderNumber?.current) {
                                                         refOrderNumber.current.focus({
                                                             preventScroll: true,
                                                         });
                                                     }
-                                                }else{
-                                                    if (props.refOrderNumber?.current){
+                                                } else {
+                                                    if (props.refOrderNumber?.current) {
                                                         props.refOrderNumber.current.focus({
                                                             preventScroll: true,
                                                         });
@@ -19692,6 +19959,8 @@ const Dispatch = (props) => {
 
                                                                     return true;
                                                                 });
+
+                                                                getLoadBoardOrders()
                                                             } else if ((selectedOrderEvent?.type || '') === 'delivery') {
                                                                 emailUrl = '/sendCarrierArrivedConsigneeEmail';
                                                                 customer_id = selectedOrderEvent.customer.id;
@@ -19714,6 +19983,8 @@ const Dispatch = (props) => {
 
                                                                     return true;
                                                                 });
+
+                                                                getLoadBoardOrders()
                                                             }
                                                         }
 
@@ -19739,6 +20010,8 @@ const Dispatch = (props) => {
 
                                                                 return true;
                                                             });
+
+                                                            getLoadBoardOrders()
                                                         }
 
                                                         if ((event_parameters?.event_type_id || 0) === 6) { // Delivered at consignee
@@ -19766,6 +20039,8 @@ const Dispatch = (props) => {
                                                                     return true;
                                                                 });
                                                             }
+
+                                                            getLoadBoardOrders()
                                                         }
 
                                                         if ((event_parameters?.event_type_id || 0) === 4) { // Check Calls
@@ -19796,6 +20071,8 @@ const Dispatch = (props) => {
                                                                     return true;
                                                                 });
                                                             }
+
+                                                            getLoadBoardOrders()
                                                         }
 
                                                         if (recipient_to.length > 0) {
@@ -20792,8 +21069,6 @@ const Dispatch = (props) => {
                                     panelName={`${props.panelName}-change-carrier`}
                                     tabTimes={props.tabTimes}
                                     componentId={moment().format("x")}
-
-
                                     origin={props.origin}
                                     closeModal={() => {
                                         setShowingChangeCarrier(false);
@@ -20955,5 +21230,10 @@ export default connect(mapStateToProps, {
     setAdminLoadBoardPanels,
     setCompanyLoadBoardPanels,
     setAdminReportPanels,
-    setCompanyReportPanels
+    setCompanyReportPanels,
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 })(Dispatch);

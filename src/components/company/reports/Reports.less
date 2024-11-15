@@ -18,5 +18,22 @@
     transition                                        : all ease 0.7s;
     overflow                                          : hidden;
     padding                                           : 10px;
+    place-items: center;
+    justify-content: center;
+    
+    .button-container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
 
+        .mochi-button-decorator{
+            font-size: 1.5rem;
+        }
+        
+        .mochi-button-base{
+            font-size: 1rem;
+        }
+    }
 }

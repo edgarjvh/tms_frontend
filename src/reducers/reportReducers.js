@@ -8,14 +8,24 @@ export const reportReducers = (state = {
         case reportsConstants.SET_ADMIN_REPORT_PANELS:
             state = {
                 ...state,
-                adminReportPanels: action.payload
+                adminReportPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
             
         case reportsConstants.SET_COMPANY_REPORT_PANELS:
             state = {
                 ...state,
-                companyReportPanels: action.payload
+                companyReportPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         default:

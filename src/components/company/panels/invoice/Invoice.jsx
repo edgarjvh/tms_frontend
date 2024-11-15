@@ -24,15 +24,31 @@ import {
     setAdminReportPanels,
     setCompanyReportPanels,
 
-    setSelectedOrder
+    setSelectedOrder,
+
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 } from './../../../../actions';
 import { useTransition, animated } from 'react-spring';
+import Loader from "react-loader-spinner";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import classNames from 'classnames';
 
 const Invoice = (props) => {
     const refInvoiceContainer = useRef();
     const toPrintRef = useRef();
     const [selectedOrder, setSelectedOrder] = useState({});
+    const [isLoading, setIsLoading] = useState(false)
+
+    const loadingTransition = useTransition(isLoading, {
+        from: { opacity: 0, display: "block" },
+        enter: { opacity: 1, display: "block" },
+        leave: { opacity: 0, display: "none" },
+        reverse: isLoading,
+    });
 
     const handlePrint = useReactToPrint({
         pageStyle: () => {
@@ -225,10 +241,45 @@ const Invoice = (props) => {
         }
     }
 
+    const getLoadBoardOrders = () => {
+        props.setIsLoadingWidget(true)
+        axios.post(props.serverUrl + '/getLoadBoardOrders', {
+            user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
+        }).then(async res => {
+            if (res.data.result === 'OK') {
+                props.setAvailableOrders(res.data.available_orders);
+                props.setBookedOrders(res.data.booked_orders);
+                props.setInTransitOrders(res.data.in_transit_orders);
+                props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
+            }
+        }).catch(e => {
+            console.log('error loading orders', e)
+        }).finally(() => {
+            props.setIsLoadingWidget(false)
+        })
+    }
+
     return (
-        <div className="panel-content" tabIndex={0} ref={refInvoiceContainer}> 
+        <div className="panel-content" tabIndex={0} ref={refInvoiceContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+
+            {loadingTransition(
+                (style, item) =>
+                    item && (
+                        <animated.div className="loading-container" style={style}>
+                            <div className="loading-container-wrapper">
+                                <Loader
+                                    type="Circles"
+                                    color="#009bdd"
+                                    height={40}
+                                    width={40}
+                                    visible={item}
+                                />
+                            </div>
+                        </animated.div>
+                    )
+            )}
 
             <div className="header-buttons" style={{ marginTop: 10, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
                 <div className={classNames({
@@ -249,6 +300,8 @@ const Invoice = (props) => {
                     pointerEvents: (selectedOrder?.order_invoiced || 0) === 1 ? 'none' : 'all'
                 }} onClick={() => {
                     if (window.confirm('Are you sure you want to proceed?')) {
+                        setIsLoading(true)
+
                         props.setSelectedOrder({
                             ...selectedOrder,
                             order_invoiced: 1,
@@ -267,8 +320,7 @@ const Invoice = (props) => {
                             order_invoiced: 1
                         }).then(res => {
 
-                            if ((res.data.order.order_invoiced || 0) === 1 &&
-                                (res.data.order.events || []).find(e => (e.event_type_id || 0) === 13) === undefined) {
+                            if ((res.data.order.order_invoiced || 0) === 1 && !(res.data.order.events || []).find(e => (e.event_type_id || 0) === 13)) {
                                 let event_parameters = {
                                     order_id: res.data.order.id,
                                     time: moment().format('HHmm'),
@@ -295,6 +347,8 @@ const Invoice = (props) => {
                                             events: res.data.order_events,
                                             component_id: props.componentId
                                         });
+
+                                        getLoadBoardOrders();
                                     } else if (res.data.result === 'ORDER ID NOT VALID') {
                                         window.alert('The order number is not valid!');
                                     }
@@ -304,6 +358,8 @@ const Invoice = (props) => {
                             }
                         }).catch(e => {
                             console.log('error saving order invoiced', e);
+                        }).finally(() => {
+                            setIsLoading(false)
                         });
                     }
                 }}>
@@ -382,5 +438,11 @@ export default connect(mapStateToProps, {
     setAdminReportPanels,
     setCompanyReportPanels,
 
-    setSelectedOrder
+    setSelectedOrder,
+
+    setAvailableOrders,
+    setBookedOrders,
+    setInTransitOrders,
+    setDeliveredNotInvoiced,
+    setIsLoadingWidget
 })(Invoice)

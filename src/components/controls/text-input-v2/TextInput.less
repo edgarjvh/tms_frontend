@@ -1,0 +1,59 @@
+.input-box-container-v2 {
+  background-color: white;
+  border-radius: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  min-height: 24px;
+  max-height: 24px;
+  flex-grow: 1;
+  overflow: hidden;
+  padding: 0;
+
+  &.disabled {
+    pointer-events: none;
+    filter: brightness(80%);
+  }
+
+  .login-type-icon {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.2);
+    height: 1.5rem;
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  input {
+    background-color: transparent;
+    border: 0;
+    outline: none;
+    flex-grow: 1;
+    max-width: 100%;
+    width: 100%;
+    padding: 0 7px;
+    font-family: Mochi Med Oblique;
+
+    &:disabled {
+      pointer-events: none;
+      user-select: none;
+    }
+  }
+
+  .fixed-placeholder {
+    margin-top: -1px;
+    color: rgba(0, 0, 0, 0.5);
+    user-select: none;
+    cursor: default;
+    white-space: nowrap;
+  }
+
+  ::placeholder {
+    text-transform: capitalize;
+    color: rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+  }
+}

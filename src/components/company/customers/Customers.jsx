@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -447,6 +448,10 @@ const Customers = (props) => {
                     if (res.data.result === 'OK') {
                         let customer = JSON.parse(JSON.stringify(res.data.customer));
 
+                        if (props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee') {
+                            props.onCustomerChangeCallback(customer);
+                        }
+
                         if ((selectedCustomer?.id || 0) === 0) {
 
                             setSelectedCustomer(prev => {
@@ -608,6 +613,13 @@ const Customers = (props) => {
 
             axios.post(props.serverUrl + '/saveContact', selectedContact).then(res => {
                 if (res.data.result === 'OK') {
+                    if (props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee') {
+                        props.onContactChangeCallback({
+                            ...selectedCustomer,
+                            contacts: res.data?.contacts || []
+                        });
+                    }
+
                     let mailing_contact = selectedCustomer?.mailing_address?.mailing_contact || {};
 
                     if ((mailing_contact?.id || 0) === res.data.contact.id) {
@@ -826,14 +838,14 @@ const Customers = (props) => {
                     }
                 }
                 setIsLoading(false);
-                if (props.isOnPanel){
-                    if (refCustomerCode?.current){
+                if (props.isOnPanel) {
+                    if (refCustomerCode?.current) {
                         refCustomerCode.current.focus({
                             preventScroll: true,
                         });
                     }
-                }else{
-                    if (props.refCustomerCode?.current){
+                } else {
+                    if (props.refCustomerCode?.current) {
                         props.refCustomerCode.current.focus({
                             preventScroll: true,
                         });
@@ -842,25 +854,36 @@ const Customers = (props) => {
             }).catch(e => {
                 console.log('error getting customer by id')
                 setIsLoading(false);
-                if (props.isOnPanel){
-                    if (refCustomerCode?.current){
+                if (props.isOnPanel) {
+                    if (refCustomerCode?.current) {
                         refCustomerCode.current.focus({
                             preventScroll: true,
                         });
                     }
-                }else{
-                    if (props.refCustomerCode?.current){
-                        props.refCustomerCode.current.focus({
+                } else {
+                    // if (props.refCustomerCode?.current){
+                    //     props.refCustomerCode.current.focus({
+                    //         preventScroll: true,
+                    //     });
+                    // }
+                    if (refCustomerCode?.current) {
+                        refCustomerCode.current.focus({
                             preventScroll: true,
                         });
                     }
                 }
             });
         }
+
+        if (props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee') {
+            refCustomerName.current.focus({
+                preventScroll: true,
+            });
+        }
     }, [])
 
     useEffect(() => {
-        if (props.refCustomerCode?.current){
+        if (props.refCustomerCode?.current) {
             props.refCustomerCode.current.focus({
                 preventScroll: true
             });
@@ -869,14 +892,20 @@ const Customers = (props) => {
 
     useEffect(() => {
         if (props.screenFocused) {
-            if (props.isOnPanel){
-                if (refCustomerCode?.current){
-                    refCustomerCode.current.focus({
-                        preventScroll: true,
-                    });
+            if (props.isOnPanel) {
+                if (refCustomerCode?.current && refCustomerName?.current) {
+                    if (props.suborigin === 'dispatch shipper' || props.suborigin === 'dispatch consignee') {
+                        refCustomerName.current.focus({
+                            preventScroll: true,
+                        });
+                    } else {
+                        refCustomerCode.current.focus({
+                            preventScroll: true,
+                        });
+                    }
                 }
-            }else{
-                if (props.refCustomerCode?.current){
+            } else {
+                if (props.refCustomerCode?.current) {
                     props.refCustomerCode.current.focus({
                         preventScroll: true,
                     });
@@ -1372,17 +1401,17 @@ const Customers = (props) => {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-customer-search`, props.origin);
-                        refCustomerName.current.focus();
+                        refCustomerName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-customer-search`, props.origin);
-                        if (props.isOnPanel){
-                            if (refCustomerCode?.current){
+                        if (props.isOnPanel) {
+                            if (refCustomerCode?.current) {
                                 refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refCustomerCode?.current){
+                        } else {
+                            if (props.refCustomerCode?.current) {
                                 props.refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
@@ -1467,17 +1496,17 @@ const Customers = (props) => {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        refCustomerName.current.focus();
+                        refCustomerName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        if (props.isOnPanel){
-                            if (refCustomerCode?.current){
+                        if (props.isOnPanel) {
+                            if (refCustomerCode?.current) {
                                 refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refCustomerCode?.current){
+                        } else {
+                            if (props.refCustomerCode?.current) {
                                 props.refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
@@ -1544,7 +1573,8 @@ const Customers = (props) => {
                     suborigin={'customer'}
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedCustomer }}
-                    selectedOwnerDocument={{                        id: 0,
+                    selectedOwnerDocument={{
+                        id: 0,
                         user_id: Math.floor(Math.random() * (15 - 1)) + 1,
                         date_entered: moment().format('MM/DD/YYYY')
                     }}
@@ -1778,7 +1808,7 @@ const Customers = (props) => {
         });
 
         validateCustomerForSaving({ keyCode: 9 });
-        refCustomerMailingCode.current.focus();
+        refCustomerMailingCode.current.focus({ preventScroll: true });
     }
 
     const mailingAddressBillToBtn = () => {
@@ -1961,7 +1991,7 @@ const Customers = (props) => {
         mywindow.document.write(data);
         mywindow.document.write('</body></html>');
         mywindow.document.close();
-        mywindow.focus();
+        mywindow.focus({ preventScroll: true });
         setTimeout(function () {
             mywindow.print();
         }, 1000);
@@ -2168,18 +2198,18 @@ const Customers = (props) => {
             onKeyDown={(e) => {
                 let key = e.keyCode || e.which;
 
-                if (key === 27){
-                    if ((selectedCustomer?.id || 0) > 0){
+                if (key === 27) {
+                    if ((selectedCustomer?.id || 0) > 0) {
                         e.stopPropagation();
                         setInitialValues();
-                        if (props.isOnPanel){
-                            if (refCustomerCode?.current){
+                        if (props.isOnPanel) {
+                            if (refCustomerCode?.current) {
                                 refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refCustomerCode?.current){
+                        } else {
+                            if (props.refCustomerCode?.current) {
                                 props.refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
@@ -2191,14 +2221,14 @@ const Customers = (props) => {
                 if (key === 9) {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        if (props.isOnPanel){
-                            if (refCustomerCode?.current){
+                        if (props.isOnPanel) {
+                            if (refCustomerCode?.current) {
                                 refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refCustomerCode?.current){
+                        } else {
+                            if (props.refCustomerCode?.current) {
                                 props.refCustomerCode.current.focus({
                                     preventScroll: true,
                                 });
@@ -2254,14 +2284,14 @@ const Customers = (props) => {
                                     title: 'Clear',
                                     onClick: () => {
                                         setInitialValues();
-                                        if (props.isOnPanel){
-                                            if (refCustomerCode?.current){
+                                        if (props.isOnPanel) {
+                                            if (refCustomerCode?.current) {
                                                 refCustomerCode.current.focus({
                                                     preventScroll: true,
                                                 });
                                             }
-                                        }else{
-                                            if (props.refCustomerCode?.current){
+                                        } else {
+                                            if (props.refCustomerCode?.current) {
                                                 props.refCustomerCode.current.focus({
                                                     preventScroll: true,
                                                 });
@@ -2296,6 +2326,8 @@ const Customers = (props) => {
                                 'email'
                             ]}
                             triggerFields={['email']}
+                            parentInfoPermission='customer info'
+                            suborigin={props.suborigin}
                         />
 
                     </div>
@@ -2545,7 +2577,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
-                                                                refDivision.current.focus();
+                                                                refDivision.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -2562,7 +2594,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setDivisionItems([]);
-                                                                refDivision.current.focus();
+                                                                refDivision.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -2694,7 +2726,7 @@ const Customers = (props) => {
                                                         }
                                                     }
 
-                                                    refDivision.current.focus();
+                                                    refDivision.current.focus({ preventScroll: true });
                                                 }}
                                             />
                                         }
@@ -2743,7 +2775,7 @@ const Customers = (props) => {
                                                                             window.setTimeout(() => {
                                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                                 setDivisionItems([]);
-                                                                                refDivision.current.focus();
+                                                                                refDivision.current.focus({ preventScroll: true });
                                                                             }, 0);
                                                                         }}
                                                                         ref={(ref) => refDivisionPopupItems.current.push(ref)}
@@ -2970,7 +3002,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setSalesmanItems([]);
-                                                                refSalesman.current.focus();
+                                                                refSalesman.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -2987,7 +3019,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setSalesmanItems([]);
-                                                                refSalesman.current.focus();
+                                                                refSalesman.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -3119,7 +3151,7 @@ const Customers = (props) => {
                                                         }
                                                     }
 
-                                                    refSalesman.current.focus();
+                                                    refSalesman.current.focus({ preventScroll: true });
                                                 }}
                                             />
                                         }
@@ -3168,7 +3200,7 @@ const Customers = (props) => {
                                                                             window.setTimeout(() => {
                                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                                 setSalesmanItems([]);
-                                                                                refSalesman.current.focus();
+                                                                                refSalesman.current.focus({ preventScroll: true });
                                                                             }, 0);
                                                                         }}
                                                                         ref={(ref) => refSalesmanPopupItems.current.push(ref)}
@@ -3390,7 +3422,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setTermsItems([]);
-                                                                refTerms.current.focus();
+                                                                refTerms.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -3407,7 +3439,7 @@ const Customers = (props) => {
 
                                                                 // validateCustomerForSaving({keyCode: 9});
                                                                 setTermsItems([]);
-                                                                refTerms.current.focus();
+                                                                refTerms.current.focus({ preventScroll: true });
                                                             }
                                                             break;
 
@@ -3534,7 +3566,7 @@ const Customers = (props) => {
                                                         }
                                                     }
 
-                                                    refTerms.current.focus();
+                                                    refTerms.current.focus({ preventScroll: true });
                                                 }} />
                                         }
                                     </div>
@@ -3581,7 +3613,7 @@ const Customers = (props) => {
                                                                                 window.setTimeout(() => {
                                                                                     // validateCustomerForSaving({keyCode: 9});
                                                                                     setTermsItems([]);
-                                                                                    refTerms.current.focus();
+                                                                                    refTerms.current.focus({ preventScroll: true });
                                                                                 }, 0);
                                                                             }}
                                                                             ref={ref => refTermsPopupItems.current.push(ref)}
@@ -3891,14 +3923,14 @@ const Customers = (props) => {
                                                         resolve('OK');
                                                     }).then((response) => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        if (props.isOnPanel){
-                                                            if (refCustomerCode?.current){
+                                                        if (props.isOnPanel) {
+                                                            if (refCustomerCode?.current) {
                                                                 refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
                                                             }
-                                                        }else{
-                                                            if (props.refCustomerCode?.current){
+                                                        } else {
+                                                            if (props.refCustomerCode?.current) {
                                                                 props.refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
@@ -3906,14 +3938,14 @@ const Customers = (props) => {
                                                         }
                                                     }).catch(e => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        if (props.isOnPanel){
-                                                            if (refCustomerCode?.current){
+                                                        if (props.isOnPanel) {
+                                                            if (refCustomerCode?.current) {
                                                                 refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
                                                             }
-                                                        }else{
-                                                            if (props.refCustomerCode?.current){
+                                                        } else {
+                                                            if (props.refCustomerCode?.current) {
                                                                 props.refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
@@ -3980,7 +4012,7 @@ const Customers = (props) => {
                                     title: 'Clear',
                                     onClick: () => {
                                         setSelectedContact({});
-                                        refCustomerContactFirstName.current.focus();
+                                        refCustomerContactFirstName.current.focus({ preventScroll: true });
                                     },
                                     isEnabled: true
                                 }
@@ -4075,7 +4107,7 @@ const Customers = (props) => {
                                             setTempLoaded(false);
                                             setTempEmpty(false);
 
-                                            refAutomaticEmailsTo.current.focus();
+                                            refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                         }).catch(e => {
                                             console.log('error saving automatic emails', e);
                                         })
@@ -4134,7 +4166,7 @@ const Customers = (props) => {
                                                                     }}
                                                                         onClick={() => {
                                                                             setTempAutomaticEmails(tempAutomaticEmails.filter((x, i) => i !== index));
-                                                                            refAutomaticEmailsTo.current.focus();
+                                                                            refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                         }}></span>
                                                                     <span className="automatic-email-inputted"
                                                                         style={{ whiteSpace: 'nowrap' }}>{
@@ -4258,7 +4290,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsTo('');
 
                                                                         setEmailToDropdownItems([]);
-                                                                        refAutomaticEmailsTo.current.focus();
+                                                                        refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailToDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsTo || ''))) {
@@ -4275,7 +4307,7 @@ const Customers = (props) => {
                                                                         }
                                                                         await setAutomaticEmailsTo('');
                                                                         setEmailToDropdownItems([]);
-                                                                        refAutomaticEmailsTo.current.focus();
+                                                                        refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -4301,7 +4333,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsTo('');
 
                                                                         setEmailToDropdownItems([]);
-                                                                        refAutomaticEmailsTo.current.focus();
+                                                                        refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailToDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsTo || ''))) {
@@ -4320,7 +4352,7 @@ const Customers = (props) => {
                                                                         }
                                                                         await setAutomaticEmailsTo('');
                                                                         setEmailToDropdownItems([]);
-                                                                        refAutomaticEmailsTo.current.focus();
+                                                                        refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -4433,7 +4465,7 @@ const Customers = (props) => {
                                                                                     await setAutomaticEmailsTo('');
 
                                                                                     setEmailToDropdownItems([]);
-                                                                                    refAutomaticEmailsTo.current.focus();
+                                                                                    refAutomaticEmailsTo.current.focus({ preventScroll: true });
                                                                                 }
                                                                             }}
                                                                             ref={ref => refEmailToPopupItems.current.push(ref)}
@@ -4529,7 +4561,7 @@ const Customers = (props) => {
                                                                     }}
                                                                         onClick={() => {
                                                                             setTempAutomaticEmails(tempAutomaticEmails.filter((x, i) => i !== index));
-                                                                            refAutomaticEmailsCc.current.focus();
+                                                                            refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                         }}></span>
                                                                     <span className="automatic-email-inputted"
                                                                         style={{ whiteSpace: 'nowrap' }}>{
@@ -4653,7 +4685,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsCc('');
 
                                                                         setEmailCcDropdownItems([]);
-                                                                        refAutomaticEmailsCc.current.focus();
+                                                                        refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailToDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsCc || ''))) {
@@ -4671,7 +4703,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsCc('');
 
                                                                         setEmailCcDropdownItems([]);
-                                                                        refAutomaticEmailsCc.current.focus();
+                                                                        refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -4699,7 +4731,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsCc('');
 
                                                                         setEmailCcDropdownItems([]);
-                                                                        refAutomaticEmailsCc.current.focus();
+                                                                        refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailToDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsCc || ''))) {
@@ -4719,7 +4751,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsCc('');
 
                                                                         setEmailCcDropdownItems([]);
-                                                                        refAutomaticEmailsCc.current.focus();
+                                                                        refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -4832,7 +4864,7 @@ const Customers = (props) => {
                                                                                     await setAutomaticEmailsCc('');
 
                                                                                     setEmailCcDropdownItems([]);
-                                                                                    refAutomaticEmailsCc.current.focus();
+                                                                                    refAutomaticEmailsCc.current.focus({ preventScroll: true });
                                                                                 }
                                                                             }}
                                                                             ref={ref => refEmailCcPopupItems.current.push(ref)}
@@ -4931,7 +4963,7 @@ const Customers = (props) => {
                                                                     }}
                                                                         onClick={() => {
                                                                             setTempAutomaticEmails(tempAutomaticEmails.filter((x, i) => i !== index));
-                                                                            refAutomaticEmailsBcc.current.focus();
+                                                                            refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                         }}></span>
                                                                     <span className="automatic-email-inputted"
                                                                         style={{ whiteSpace: 'nowrap' }}>{
@@ -5054,7 +5086,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsBcc('');
 
                                                                         setEmailBccDropdownItems([]);
-                                                                        refAutomaticEmailsBcc.current.focus();
+                                                                        refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailBccDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsBcc || ''))) {
@@ -5072,7 +5104,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsBcc('');
 
                                                                         setEmailBccDropdownItems([]);
-                                                                        refAutomaticEmailsBcc.current.focus();
+                                                                        refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -5098,7 +5130,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsBcc('');
 
                                                                         setEmailBccDropdownItems([]);
-                                                                        refAutomaticEmailsBcc.current.focus();
+                                                                        refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                     }
                                                                 } else if (emailBccDropdownItems.length === 0) {
                                                                     if (isEmailValid((automaticEmailsBcc || ''))) {
@@ -5118,7 +5150,7 @@ const Customers = (props) => {
                                                                         await setAutomaticEmailsBcc('');
 
                                                                         setEmailBccDropdownItems([]);
-                                                                        refAutomaticEmailsBcc.current.focus();
+                                                                        refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                     }
                                                                 }
                                                                 break;
@@ -5231,7 +5263,7 @@ const Customers = (props) => {
                                                                                     await setAutomaticEmailsBcc('');
 
                                                                                     setEmailBccDropdownItems([]);
-                                                                                    refAutomaticEmailsBcc.current.focus();
+                                                                                    refAutomaticEmailsBcc.current.focus({ preventScroll: true });
                                                                                 }
                                                                             }}
                                                                             ref={ref => refEmailBccPopupItems.current.push(ref)}
@@ -5376,14 +5408,14 @@ const Customers = (props) => {
                                                         resolve('OK');
                                                     }).then((response) => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        if (props.isOnPanel){
-                                                            if (refCustomerCode?.current){
+                                                        if (props.isOnPanel) {
+                                                            if (refCustomerCode?.current) {
                                                                 refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
                                                             }
-                                                        }else{
-                                                            if (props.refCustomerCode?.current){
+                                                        } else {
+                                                            if (props.refCustomerCode?.current) {
                                                                 props.refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
@@ -5391,14 +5423,14 @@ const Customers = (props) => {
                                                         }
                                                     }).catch(e => {
                                                         closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                        if (props.isOnPanel){
-                                                            if (refCustomerCode?.current){
+                                                        if (props.isOnPanel) {
+                                                            if (refCustomerCode?.current) {
                                                                 refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
                                                             }
-                                                        }else{
-                                                            if (props.refCustomerCode?.current){
+                                                        } else {
+                                                            if (props.refCustomerCode?.current) {
                                                                 props.refCustomerCode.current.focus({
                                                                     preventScroll: true,
                                                                 });
@@ -5465,7 +5497,7 @@ const Customers = (props) => {
                                     title: 'Clear',
                                     onClick: () => {
                                         setSelectedContact({});
-                                        refCustomerContactFirstName.current.focus();
+                                        refCustomerContactFirstName.current.focus({ preventScroll: true });
                                     },
                                     isEnabled: true
                                 }
@@ -5751,19 +5783,19 @@ const Customers = (props) => {
 
                                                     // for (var i = elems.length; i--;) {
                                                     //     if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === (1 + props.tabTimes).toString()) {
-                                                    //         elems[i].focus();
+                                                    //         elems[i].focus({preventScroll:true});
                                                     //         break;
                                                     //     }
                                                     // }
 
-                                                    if (props.isOnPanel){
-                                                        if (refCustomerCode?.current){
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
                                                             refCustomerCode.current.focus({
                                                                 preventScroll: true,
                                                             });
                                                         }
-                                                    }else{
-                                                        if (props.refCustomerCode?.current){
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
                                                             props.refCustomerCode.current.focus({
                                                                 preventScroll: true,
                                                             });
@@ -6043,9 +6075,9 @@ const Customers = (props) => {
                         ? 'mochi-button disabled wrap' : 'mochi-button wrap'
                 } onClick={() => {
                     if (props.user.id === 1 || props.user.email_work === 'bdoss@et3logistics.com') {
-                        window.open('https://suitecrm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                        window.open('https://suitecrm.et3.dev/index.php?module=Users&action=Login', '_blank').focus({ preventScroll: true });
                     } else {
-                        window.open('https://crm.et3.dev/index.php?module=Users&action=Login', '_blank').focus();
+                        window.open('https://crm.et3.dev/index.php?module=Users&action=Login', '_blank').focus({ preventScroll: true });
                     }
                 }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>

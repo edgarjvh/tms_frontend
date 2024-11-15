@@ -1896,14 +1896,24 @@ export const carrierReducers = (state = {
         case carriersConstants.SET_ADMIN_CARRIER_PANELS:
             state = {
                 ...state,
-                adminCarrierPanels: action.payload
+                adminCarrierPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
 
         case carriersConstants.SET_COMPANY_CARRIER_PANELS:
             state = {
                 ...state,
-                companyCarrierPanels: action.payload
+                companyCarrierPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         default:

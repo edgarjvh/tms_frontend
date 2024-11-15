@@ -216,7 +216,7 @@ function Admin(props) {
     const refAdminCompanySetupPanels = useRef([]);
     const refAdminInvoicePanels = useRef([]);
     const refAdminReportsPanels = useRef([]);
-    
+
     const baseWidth = 95;
     const panelGap = 70;
 
@@ -327,26 +327,25 @@ function Admin(props) {
         props.setSetupCompanyScreenFocused(true);
     }
 
-    const switchAppBtnClick = () => {
-        props.setScale(props.scale === 1 ? 0.7 : 1);
-    }
-
     const adminHomePanelTransition = useTransition(props.adminHomePanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -355,27 +354,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const dispatchPanelTransition = useTransition(props.adminDispatchPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -383,27 +386,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const customerPanelTransition = useTransition(props.adminCustomerPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -411,27 +418,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const carrierPanelTransition = useTransition(props.adminCarrierPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -440,27 +451,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const reportsPanelTransition = useTransition(props.adminReportPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -469,27 +484,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const invoicePanelTransition = useTransition(props.adminInvoicePanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -498,27 +517,31 @@ function Admin(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.adminInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const companySetupPanelTransition = useTransition(props.adminCompanySetupPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * ((props.adminCompanySetupPanels || []).findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -534,8 +557,65 @@ function Admin(props) {
 
     const eventControl = (event, info, panelName, origin) => {
         if (event.type === 'mouseup') {
-            if (info.x > 150) {
-                closePanel(panelName, origin);
+            switch (origin) {
+                case 'admin-home':
+                    props.setAdminHomePanels(props.adminHomePanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-carrier':
+                    props.setAdminCarrierPanels(props.adminCarrierPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-company-setup':
+                    props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-customer':
+                    props.setAdminCustomerPanels(props.adminCustomerPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-dispatch':
+                    props.setAdminDispatchPanels(props.adminDispatchPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-invoice':
+                    props.setAdminInvoicePanels(props.adminInvoicePanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'admin-repost':
+                    props.setAdminReportPanels(props.adminReportPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -591,14 +671,14 @@ function Admin(props) {
 
             let adminHomePanelsLength = currentAdminHomePanels.length;
 
-            if (adminHomePanelsLength > 0){
+            if (adminHomePanelsLength > 0) {
                 let lastPanelName = currentAdminHomePanels[adminHomePanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminHomePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -609,34 +689,34 @@ function Admin(props) {
 
             let adminCarrierPanelsLength = currentAdminCarrierPanels.length;
 
-            if (adminCarrierPanelsLength > 0){
+            if (adminCarrierPanelsLength > 0) {
                 let lastPanelName = currentAdminCarrierPanels[adminCarrierPanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminCarrierPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refAdminCarrierCode?.current){
+            } else {
+                if (refAdminCarrierCode?.current) {
                     refAdminCarrierCode.current.focus();
                 }
             }
         }
 
         if (origin === 'admin-company-setup') {
-            let currentAdminCompanySetupPanels = [...props.adminAdminSetupPanels.filter(panel => panel.panelName !== panelName)];
+            let currentAdminCompanySetupPanels = [...props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName)];
             props.setAdminCompanySetupPanels(currentAdminCompanySetupPanels);
 
             let adminCompanySetupPanelsLength = currentAdminCompanySetupPanels.length;
 
-            if (adminCompanySetupPanelsLength > 0){
+            if (adminCompanySetupPanelsLength > 0) {
                 let lastPanelName = currentAdminCompanySetupPanels[adminCompanySetupPanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminCompanySetupPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -647,15 +727,15 @@ function Admin(props) {
 
             let adminCustomerPanelsLength = currentAdminCustomerPanels.length;
 
-            if (adminCustomerPanelsLength > 0){
+            if (adminCustomerPanelsLength > 0) {
                 let lastPanelName = currentAdminCustomerPanels[adminCustomerPanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminCustomerPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refAdminCustomerCode?.current){
+            } else {
+                if (refAdminCustomerCode?.current) {
                     refAdminCustomerCode.current.focus();
                 }
             }
@@ -667,15 +747,15 @@ function Admin(props) {
 
             let adminDispatchPanelsLength = currentAdminDispatchPanels.length;
 
-            if (adminDispatchPanelsLength > 0){
+            if (adminDispatchPanelsLength > 0) {
                 let lastPanelName = currentAdminDispatchPanels[adminDispatchPanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminDispatchPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refAdminDispatchOrderNumber?.current){
+            } else {
+                if (refAdminDispatchOrderNumber?.current) {
                     refAdminDispatchOrderNumber.current.focus();
                 }
             }
@@ -687,15 +767,15 @@ function Admin(props) {
 
             let adminInvoicePanelsLength = currentAdminInvoicePanels.length;
 
-            if (adminInvoicePanelsLength > 0){
+            if (adminInvoicePanelsLength > 0) {
                 let lastPanelName = currentAdminInvoicePanels[adminInvoicePanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminInvoicePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refAdminInvoiceOrderNumber?.current){
+            } else {
+                if (refAdminInvoiceOrderNumber?.current) {
                     refAdminInvoiceOrderNumber.current.focus();
                 }
             }
@@ -707,14 +787,14 @@ function Admin(props) {
 
             let adminReportPanelsLength = currentAdminReportPanels.length;
 
-            if (adminReportPanelsLength > 0){
+            if (adminReportPanelsLength > 0) {
                 let lastPanelName = currentAdminReportPanels[adminReportPanelsLength - 1]?.panelName || '';
                 let refEl = (refAdminReportsPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -913,21 +993,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refAdminHomePanels.current[index] = el)}
+                                                tabIndex={-1}
+                                                ref={(el) => (refAdminHomePanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -945,7 +1020,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -969,7 +1045,8 @@ function Admin(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
                             tabIndex={-1}
                             onKeyDown={(e) => {
@@ -990,21 +1067,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminCarrierPanels.current[index] = el)}
+                                                ref={(el) => (refAdminCarrierPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1021,7 +1093,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1058,7 +1131,8 @@ function Admin(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
                             tabIndex={-1}
                             onKeyDown={(e) => {
@@ -1079,21 +1153,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminCompanySetupPanels.current[index] = el)}
+                                                ref={(el) => (refAdminCompanySetupPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1110,7 +1179,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1148,7 +1218,8 @@ function Admin(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
                             tabIndex={-1}
                             onKeyDown={(e) => {
@@ -1169,21 +1240,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminCustomerPanels.current[index] = el)}
+                                                ref={(el) => (refAdminCustomerPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1200,7 +1266,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1259,22 +1326,17 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminDispatchPanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
+                                                ref={(el) => (refAdminDispatchPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
                                                     if (key === 27) {
@@ -1291,7 +1353,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1327,7 +1390,8 @@ function Admin(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
                             tabIndex={-1}
                             onKeyDown={(e) => {
@@ -1348,21 +1412,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminInvoicePanels.current[index] = el)}
+                                                ref={(el) => (refAdminInvoicePanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1380,7 +1439,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1417,7 +1477,8 @@ function Admin(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
                             tabIndex={-1}
                             onKeyDown={(e) => {
@@ -1438,21 +1499,16 @@ function Admin(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             position={{ x: 0, y: 0 }}
-                                            key={index}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
                                                 tabIndex={-1}
-                                                          ref={(el) => (refAdminReportsPanels.current[index] = el)}
+                                                ref={(el) => (refAdminReportsPanels.current[index] = el)}
                                                 onKeyDown={(e) => {
                                                     let key = e.keyCode || e.which;
 
@@ -1462,13 +1518,6 @@ function Admin(props) {
                                                         closePanel(panel?.panelName, origin);
                                                     }
                                                 }}
-                                            // onClick={() => {
-                                            //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                            //     // let _panels = [...props.customerOpenedPanels];
-                                            //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
-
-                                            //     // props.setCustomerOpenedPanels(_panels);
-                                            // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => { e.stopPropagation(); closePanel(panel?.panelName, origin) }}><span className="fas fa-times"></span></div>
 
@@ -1477,7 +1526,8 @@ function Admin(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div><div className="side-title"><div>{panel?.component?.props?.title}</div></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :

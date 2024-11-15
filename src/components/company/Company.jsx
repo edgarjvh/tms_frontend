@@ -1,12 +1,12 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Company.css';
 import classnames from 'classnames';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 // import { Transition, Spring, animated, config } from 'react-spring';
-import {useTransition, animated} from 'react-spring';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck} from '@fortawesome/free-solid-svg-icons';
-import {useDetectClickOutside} from "react-detect-click-outside";
+import { useTransition, animated, config } from 'react-spring';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { useDetectClickOutside } from "react-detect-click-outside";
 import Draggable from 'react-draggable';
 import axios from 'axios';
 
@@ -240,7 +240,7 @@ import {
     setCompanyReportPanels
 } from '../../actions/reportsActions';
 
-import {CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT} from './../company';
+import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT } from './../company';
 import moment from 'moment';
 
 function Company(props) {
@@ -259,7 +259,7 @@ function Company(props) {
     const refCompanyCarrierCode = useRef(null);
     const refCompanyDispatchOrderNumber = useRef(null);
     const refCompanyInvoiceOrderNumber = useRef(null);
-    
+
     const refCompanyHomePanels = useRef([]);
     const refCompanyCustomerPanels = useRef([]);
     const refCompanyCarrierPanels = useRef([]);
@@ -400,21 +400,24 @@ function Company(props) {
     }
 
     const homePanelTransition = useTransition(props.companyHomePanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -423,56 +426,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyHomePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
-            }
-        },
-    })
-
-    const customersTPanelTransition = useTransition(props.customersTPanels, {
-        from: panel => {
-            return {
-                width: `calc(${baseWidth}% - ${panelGap * (props.customersTPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
-            }
-        },
-        enter: panel => {
-            return {
-                display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
-            }
-        },
-        leave: panel => {
-            return {
-                right: `calc(-100%)`,
-            }
-        },
-        update: panel => {
-            if (panel === undefined) {
-                // setHomePanels([]);
-            }
-            return {
-                width: `calc(${baseWidth}% - ${panelGap * (props.customersTPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const dispatchPanelTransition = useTransition(props.companyDispatchPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -481,27 +459,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyDispatchPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const customerPanelTransition = useTransition(props.companyCustomerPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -510,27 +492,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyCustomerPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const carrierPanelTransition = useTransition(props.companyCarrierPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -539,27 +525,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyCarrierPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const loadBoardPanelTransition = useTransition(props.companyLoadBoardPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyLoadBoardPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -568,27 +558,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyLoadBoardPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const invoicePanelTransition = useTransition(props.companyInvoicePanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -597,27 +591,31 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyInvoicePanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const reportsPanelTransition = useTransition(props.companyReportPanels, {
+        keys: panel => panel.panelName,
         from: panel => {
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         enter: panel => {
             return {
                 display: panel === undefined ? 'none' : 'block',
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
             }
         },
         leave: panel => {
             return {
-                right: `calc(-100%)`,
+                right: `calc(-100% + 0px)`,
+                config: { duration: 300 }
             }
         },
         update: panel => {
@@ -626,15 +624,73 @@ function Company(props) {
             }
             return {
                 width: `calc(${baseWidth}% - ${panelGap * (props.companyReportPanels.findIndex(p => p?.panelName === (panel?.panelName || '')))}px)`,
-                right: `calc(0%)`,
+                right: `calc(0% + ${panel?.right ?? 0}px)`,
+                config: { duration: 0 }
             }
         },
     })
 
     const eventControl = (event, info, panelName, origin) => {
         if (event.type === 'mouseup') {
-            if (info.x > 150) {
-                closePanel(panelName, origin);
+            switch (origin) {
+                case 'company-home':
+                    props.setCompanyHomePanels(props.companyHomePanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-carrier':
+                    props.setCompanyCarrierPanels(props.companyCarrierPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-customer':
+                    props.setCompanyCustomerPanels(props.companyCustomerPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-dispatch':
+                    props.setCompanyDispatchPanels(props.companyDispatchPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-invoice':
+                    props.setCompanyInvoicePanels(props.companyInvoicePanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-load-board':
+                    props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                case 'company-repost':
+                    props.setCompanyReportPanels(props.companyReportPanels.map(item => {
+                        if (item.panelName === panelName) {
+                            item.right = (item.right) + (info.x * -1);
+                        }
+                        return item;
+                    }))
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -643,12 +699,6 @@ function Company(props) {
         if (origin === 'company-home') {
             if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
                 props.setCompanyHomePanels([...props.companyHomePanels, panel]);
-            }
-        }
-
-        if (origin === 'customers-t') {
-            if (props.customersTPanels.find(p => p.panelName === panel.panelName) === undefined) {
-                props.setCustomersTPanels([...props.customersTPanels, panel]);
             }
         }
 
@@ -696,14 +746,14 @@ function Company(props) {
 
             let companyHomePanelsLength = currentCompanyHomePanels.length;
 
-            if (companyHomePanelsLength > 0){
+            if (companyHomePanelsLength > 0) {
                 let lastPanelName = currentCompanyHomePanels[companyHomePanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyHomePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -714,15 +764,15 @@ function Company(props) {
 
             let companyCarrierPanelsLength = currentCompanyCarrierPanels.length;
 
-            if (companyCarrierPanelsLength > 0){
+            if (companyCarrierPanelsLength > 0) {
                 let lastPanelName = currentCompanyCarrierPanels[companyCarrierPanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyCarrierPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refCompanyCarrierCode?.current){
+            } else {
+                if (refCompanyCarrierCode?.current) {
                     refCompanyCarrierCode.current.focus();
                 }
             }
@@ -734,15 +784,15 @@ function Company(props) {
 
             let companyCustomerPanelsLength = currentCompanyCustomerPanels.length;
 
-            if (companyCustomerPanelsLength > 0){
+            if (companyCustomerPanelsLength > 0) {
                 let lastPanelName = currentCompanyCustomerPanels[companyCustomerPanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyCustomerPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refCompanyCustomerCode?.current){
+            } else {
+                if (refCompanyCustomerCode?.current) {
                     refCompanyCustomerCode.current.focus();
                 }
             }
@@ -754,15 +804,15 @@ function Company(props) {
 
             let companyDispatchPanelsLength = currentCompanyDispatchPanels.length;
 
-            if (companyDispatchPanelsLength > 0){
+            if (companyDispatchPanelsLength > 0) {
                 let lastPanelName = currentCompanyDispatchPanels[companyDispatchPanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyDispatchPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refCompanyDispatchOrderNumber?.current){
+            } else {
+                if (refCompanyDispatchOrderNumber?.current) {
                     refCompanyDispatchOrderNumber.current.focus();
                 }
             }
@@ -774,15 +824,15 @@ function Company(props) {
 
             let companyInvoicePanelsLength = currentCompanyInvoicePanels.length;
 
-            if (companyInvoicePanelsLength > 0){
+            if (companyInvoicePanelsLength > 0) {
                 let lastPanelName = currentCompanyInvoicePanels[companyInvoicePanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyInvoicePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
-                if (refCompanyInvoiceOrderNumber?.current){
+            } else {
+                if (refCompanyInvoiceOrderNumber?.current) {
                     refCompanyInvoiceOrderNumber.current.focus();
                 }
             }
@@ -794,14 +844,14 @@ function Company(props) {
 
             let companyLoadBoardPanelsLength = currentCompanyLoadBoardPanels.length;
 
-            if (companyLoadBoardPanelsLength > 0){
+            if (companyLoadBoardPanelsLength > 0) {
                 let lastPanelName = currentCompanyLoadBoardPanels[companyLoadBoardPanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyLoadBoardPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -812,14 +862,14 @@ function Company(props) {
 
             let companyReportPanelsLength = currentCompanyReportPanels.length;
 
-            if (companyReportPanelsLength > 0){
+            if (companyReportPanelsLength > 0) {
                 let lastPanelName = currentCompanyReportPanels[companyReportPanelsLength - 1]?.panelName || '';
                 let refEl = (refCompanyReportsPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
 
-                if (refEl){
+                if (refEl) {
                     refEl.focus();
                 }
-            }else{
+            } else {
                 // Focus the main input when is available
             }
         }
@@ -859,9 +909,9 @@ function Company(props) {
                                 alignItems: 'center',
                                 lineHeight: '1rem'
                             }}>
-                                <div className="user-name" style={{display: 'flex', alignItems: 'center'}}>
+                                <div className="user-name" style={{ display: 'flex', alignItems: 'center' }}>
                                     <span>{props.user.user_code.code}</span>
-                                    <span style={{marginRight: 5, marginLeft: 5}}>-</span>
+                                    <span style={{ marginRight: 5, marginLeft: 5 }}>-</span>
                                     <span>{props.user?.first_name || ''} {props.user?.last_name || ''}</span>
                                 </div>
                             </div>
@@ -888,9 +938,9 @@ function Company(props) {
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base"
-                                     style={{
-                                         color: 'red'
-                                     }}
+                                    style={{
+                                        color: 'red'
+                                    }}
                                 >Logout
                                 </div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -915,7 +965,7 @@ function Company(props) {
                         </div>
                         <div className="section">
                             <div className="mochi-input-decorator">
-                                <input type="search" placeholder="just type" id="txt-main-search"/>
+                                <input type="search" placeholder="just type" id="txt-main-search" />
                             </div>
                         </div>
                         {/* <div className='section' style={{ marginLeft: 5 }}>
@@ -982,7 +1032,7 @@ function Company(props) {
                             </div>
                             <div className={classnames({
                                 'mochi-button': true,
-                                'screen-focused': props.scale !== 1,
+                                'screen-focused': props.reportsScreenFocused,
                                 'testing': false
                             })} onClick={reportsBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -1012,16 +1062,16 @@ function Company(props) {
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 homePanelTransition((style, panel, item, index) => {
@@ -1031,31 +1081,26 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyHomePanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyHomePanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}
-                                                
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
+
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1066,13 +1111,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div
-                                                                className="title">{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1106,18 +1147,19 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 carrierPanelTransition((style, panel, item, index) => {
@@ -1127,30 +1169,25 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyCarrierPanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyCarrierPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}                                                
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1161,13 +1198,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title" tabIndex={0}
-                                                                 autoFocus={true}>{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1203,18 +1236,19 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 customerPanelTransition((style, panel, item, index) => {
@@ -1224,30 +1258,25 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyCustomerPanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyCustomerPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1258,13 +1287,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div
-                                                                className="title">{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1304,16 +1329,16 @@ function Company(props) {
                             borderRadius: props.scale === 1 ? 0 : '20px',
                             overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 dispatchPanelTransition((style, panel, item, index) => {
@@ -1323,32 +1348,27 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
                                             <animated.div className={panelClasses}
-                                                          id={`${origin}-panel-${panel?.panelName || ''}`}
-                                                          key={index} style={{
-                                                ...style,
-                                                maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
-                                            }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyDispatchPanels.current[index] = el)}                                                          
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                id={`${origin}-panel-${panel?.panelName || ''}`}
+                                                key={panel.panelName} style={{
+                                                    ...style,
+                                                    maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
+                                                }}
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyDispatchPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1359,13 +1379,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title" tabIndex={0}
-                                                                 autoFocus={true}>{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1401,18 +1417,19 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 invoicePanelTransition((style, panel, item, index) => {
@@ -1422,30 +1439,25 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyInvoicePanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyInvoicePanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1456,13 +1468,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div
-                                                                className="title">{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1498,18 +1506,19 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 loadBoardPanelTransition((style, panel, item, index) => {
@@ -1519,30 +1528,25 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyLoadBoardPanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyLoadBoardPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}                                                
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1553,13 +1557,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div
-                                                                className="title">{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :
@@ -1595,18 +1595,19 @@ function Company(props) {
                             transform: `scale(${props.scale})`,
                             transition: 'all ease 0.7s',
                             boxShadow: props.scale === 1 ? '0 0 3px 5px transparent' : '0 0 10px 5px rgba(0,0,0,0.5)',
-                            borderRadius: props.scale === 1 ? 0 : '20px'
+                            borderRadius: props.scale === 1 ? 0 : '20px',
+                            overflow: 'hidden'
                         }}
-                             tabIndex={-1}
-                             onKeyDown={(e) => {
-                                 let key = e.keyCode || e.which;
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                                let key = e.keyCode || e.which;
 
-                                 if (key === 9) {
-                                     if (e.target.type === undefined) {
-                                         e.preventDefault();
-                                     }
-                                 }
-                             }}
+                                if (key === 9) {
+                                    if (e.target.type === undefined) {
+                                        e.preventDefault();
+                                    }
+                                }
+                            }}
                         >
                             {
                                 reportsPanelTransition((style, panel, item, index) => {
@@ -1616,37 +1617,26 @@ function Company(props) {
                                         <Draggable
                                             axis="x"
                                             handle={'.drag-handler'}
-                                            onStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
                                             onStop={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseDown={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onMouseUp={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchStart={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            onTouchEnd={(e, i) => eventControl(e, i, panel.panelName, origin)}
-                                            position={{x: 0, y: 0}}
-                                            key={index}
+                                            position={{ x: 0, y: 0 }}
+                                            key={panel.panelName}
                                         >
-                                            <animated.div className={panelClasses} key={index} style={{
+                                            <animated.div className={panelClasses} key={panel.panelName} style={{
                                                 ...style,
                                                 maxWidth: panel.fixedWidthPercentage ? `${panel.fixedWidthPercentage}%` : `100%`,
                                             }}
-                                                          tabIndex={-1}
-                                                          ref={(el) => (refCompanyReportsPanels.current[index] = el)}
-                                                          onKeyDown={(e) => {
-                                                              let key = e.keyCode || e.which;
+                                                tabIndex={-1}
+                                                ref={(el) => (refCompanyReportsPanels.current[index] = el)}
+                                                onKeyDown={(e) => {
+                                                    let key = e.keyCode || e.which;
 
-                                                              if (key === 27) {
-                                                                  e.stopPropagation();
-                                                                  e.preventDefault();
-                                                                  closePanel(panel?.panelName, origin);
-                                                              }
-                                                          }}
-                                                // onClick={() => {
-                                                //     // let oldIndex = props.customerOpenedPanels.findIndex(p => p.panelName === panel?.panelName);
-                                                //     // let _panels = [...props.customerOpenedPanels];
-                                                //     // _panels.splice(_panels.length - 1, 0, _panels.splice(oldIndex, 1)[0]);
+                                                    if (key === 27) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        closePanel(panel?.panelName, origin);
+                                                    }
+                                                }}
 
-                                                //     // props.setCustomerOpenedPanels(_panels);
-                                                // }}
                                             >
                                                 <div className="close-btn" title="Close" onClick={e => {
                                                     e.stopPropagation();
@@ -1657,13 +1647,9 @@ function Company(props) {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
-                                                            <div className="drag-handler"
-                                                                 onClick={e => e.stopPropagation()}></div>
-                                                            <div
-                                                                className="title">{panel?.component?.props?.title}</div>
-                                                            <div className="side-title">
-                                                                <div>{panel?.component?.props?.title}</div>
-                                                            </div>
+                                                            <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="side-title"> <div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
                                                         :

@@ -323,7 +323,7 @@ const LoadBoard = (props) => {
 
                             } else {
                                 setIsLoading(true);
-                                setIsLoadingWidget(true);
+                                props.setIsLoadingWidget(true);
 
                                 axios.post(props.serverUrl + '/getLoadBoardOrders', {
                                     user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : '',
@@ -389,14 +389,14 @@ const LoadBoard = (props) => {
                                         }
 
                                         setIsLoading(false);
-                                        setIsLoadingWidget(false);
+                                        props.setIsLoadingWidget(false);
 
                                         setLoadBoardTimer();
                                     }
                                 }).catch(e => {
                                     console.log('error loading orders', e)
                                     setIsLoading(false);
-                                    setIsLoadingWidget(false);
+                                    props.setIsLoadingWidget(false);
                                 })
                             }
                         }
@@ -427,7 +427,7 @@ const LoadBoard = (props) => {
     useEffect(() => {
         if ((props.user?.id || 0) > 0) {
             setIsLoading(true);
-            setIsLoadingWidget(true);
+            props.setIsLoadingWidget(true);
 
             axios.post(props.serverUrl + '/getLoadBoardOrders', {
                 user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : ''
@@ -444,12 +444,12 @@ const LoadBoard = (props) => {
                     props.setDeliveredNotInvoiced(res.data.not_invoiced_orders);
 
                     setIsLoading(false);
-                    setIsLoadingWidget(false);
+                    props.setIsLoadingWidget(false);
                 }
             }).catch(e => {
                 console.log('error loading orders', e)
                 setIsLoading(false);
-                setIsLoadingWidget(false);
+                props.setIsLoadingWidget(false);
             })
 
             updateSystemDateTime();
@@ -508,7 +508,7 @@ const LoadBoard = (props) => {
 
     const onOrderClick = (order) => {
         setIsLoading(true);
-        setIsLoadingWidget(true);
+        props.setIsLoadingWidget(true);
         axios.post(props.serverUrl + '/getLoadBoardOrderById', { id: order.id }).then(res => {
             if (res.data.result === 'OK') {
                 let order = { ...res.data.order };
@@ -563,7 +563,7 @@ const LoadBoard = (props) => {
             console.log('error getting order by id', e);
         }).finally(() => {
             setIsLoading(false);
-            setIsLoadingWidget(false);
+            props.setIsLoadingWidget(false);
         });
     }
 
@@ -597,7 +597,7 @@ const LoadBoard = (props) => {
         if ((props.user?.id || 0) > 0) {
             if (!isLoading) {
                 setIsLoading(true);
-                setIsLoadingWidget(true);
+                props.setIsLoadingWidget(true);
 
                 axios.post(props.serverUrl + '/getLoadBoardOrders', {
                     user_code: props.user.user_code.type === 'agent' ? props.user.user_code.code : '',
@@ -663,12 +663,12 @@ const LoadBoard = (props) => {
                         }
 
                         setIsLoading(false);
-                        setIsLoadingWidget(false);
+                        props.setIsLoadingWidget(false);
                     }
                 }).catch(e => {
                     console.log('error loading orders', e)
                     setIsLoading(false);
-                    setIsLoadingWidget(false);
+                    props.setIsLoadingWidget(false);
                 })
             }
         }
@@ -841,8 +841,8 @@ const LoadBoard = (props) => {
             }}
         >
 
-            <div className="fields-container-col grow" style={{ marginRight: 10 }}>
-                <div className="form-bordered-box" style={{ marginBottom: 10 }}>
+            <div className="fields-container-col grow" style={{ flexGrow: 1 }}>
+                <div className="form-bordered-box">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Available</div>
@@ -944,7 +944,7 @@ const LoadBoard = (props) => {
                     </div>
                 </div>
 
-                <div className="form-bordered-box" style={{ marginBottom: 10 }}>
+                <div className="form-bordered-box">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Booked</div>
@@ -1159,8 +1159,8 @@ const LoadBoard = (props) => {
                 </div>
             </div>
 
-            <div className="fields-container-col grow" style={{ minWidth: '800px' }}>
-                <div className="form-borderless-box" style={{ marginBottom: 15 }}>
+            <div className="fields-container-col grow" style={{ minWidth: '65%' }}>
+                <div className="form-borderless-box">
                     <div className="form-row" style={{ position: 'relative' }}>
                         <div className="mochi-button" onClick={onRefreshBtnClick}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -1330,7 +1330,9 @@ const LoadBoard = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="form-bordered-box" style={{ marginBottom: 10, paddingTop: 20 }}>
+
+                {/* LOAD INFORMATION */}
+                <div className="form-bordered-box">
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Load Information</div>
@@ -1538,14 +1540,14 @@ const LoadBoard = (props) => {
                                             popupId="lb-bill-to-contact-phone"
                                             tabIndex={9 + props.tabTimes}
                                             boxStyle={{
-                                                minHeight: '1.2rem',
-                                                maxHeight: '1.2rem',
-                                                minWidth: '6.5rem',
-                                                maxWidth: '6.5rem'
+                                                minHeight: '1.5rem',
+                                                maxHeight: '1.5rem',
+                                                minWidth: '8.5rem',
+                                                maxWidth: '8.5rem'
                                             }}
-                                            wrapperStyle={{ minHeight: '1.2rem', maxHeight: '1.2rem' }}
-                                            inputStyle={{ fontSize: '0.5rem' }}
-                                            phoneTypeStyles={{ fontSize: '0.5rem', fontWeight: 'bold' }}
+                                            wrapperStyle={{ minHeight: '1.5rem', maxHeight: '1.5rem' }}
+                                            inputStyle={{ fontSize: '0.75rem' }}
+                                            phoneTypeStyles={{ fontSize: '0.6rem', fontWeight: 'bold' }}
                                             refs={{
                                                 refInput: null,
                                                 refPopupItems: null,
@@ -1697,7 +1699,7 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
 
-                                        <div className="input-box-container grow" style={{ position: 'relative' }}>
+                                        <div className="input-box-container input-phone" style={{ position: 'relative' }}>
                                             <MaskedInput tabIndex={54 + props.tabTimes}
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
@@ -1726,7 +1728,7 @@ const LoadBoard = (props) => {
                                                     className={classnames({
                                                         'selected-carrier-contact-primary-phone': true,
                                                         'pushed': false
-                                                    })} style={{ fontSize: '0.5rem' }}>
+                                                    })} style={{ fontSize: '0.6rem' }}>
                                                     {selectedCarrier?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                 </div>
                                             }
@@ -1744,7 +1746,7 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
 
-                                        <div className="input-box-container grow" style={{ position: 'relative' }}>
+                                        <div className="input-box-container grow" style={{ maxWidth: '8.7rem', minWidth: '8.7rem' }}>
                                             <input tabIndex={56 + props.tabTimes} type="text" placeholder="Equipments"
                                                 onChange={e => {
                                                 }}
@@ -1764,7 +1766,7 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
 
-                                        <div className="input-box-container grow">
+                                        <div className="input-box-container input-phone">
                                             <MaskedInput tabIndex={58 + props.tabTimes}
                                                 mask={[/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                                 guide={true}
@@ -1775,7 +1777,7 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
 
-                                        <div className="input-box-container grow">
+                                        <div className="input-box-container" style={{ maxWidth: '5.7rem' }}>
                                             <input tabIndex={59 + props.tabTimes} type="text" placeholder="Unit Number"
                                                 onChange={e => {
                                                 }}
@@ -1783,7 +1785,7 @@ const LoadBoard = (props) => {
                                             />
                                         </div>
 
-                                        <div className="input-box-container grow">
+                                        <div className="input-box-container" style={{ maxWidth: '5.7rem' }}>
                                             <input tabIndex={60 + props.tabTimes} type="text"
                                                 placeholder="Trailer Number"
                                                 onChange={e => {
@@ -1796,8 +1798,8 @@ const LoadBoard = (props) => {
                             </div>
 
                             <div className="lb-form-row" style={{
-                                minHeight: '2.5rem',
-                                display: 'flex'
+                                display: 'flex',
+                                minHeight: '2.5rem'
                             }}>
 
                                 <div className="pickups-container" style={{ display: 'flex', flexDirection: 'row' }}>
@@ -2207,7 +2209,7 @@ const LoadBoard = (props) => {
                                                             <div className={classnames({
                                                                 'selected-customer-contact-primary-phone': true,
                                                                 'pushed': false
-                                                            })} style={{ fontSize: '0.5rem' }}>
+                                                            })} style={{ fontSize: '0.6rem' }}>
                                                                 {selectedShipperCustomer?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                             </div>
                                                         }
@@ -2290,7 +2292,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2321,7 +2323,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2350,7 +2352,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2587,7 +2589,7 @@ const LoadBoard = (props) => {
                                                             <div className={classnames({
                                                                 'selected-customer-contact-primary-phone': true,
                                                                 'pushed': false
-                                                            })} style={{ fontSize: '0.5rem' }}>
+                                                            })} style={{ fontSize: '0.6rem' }}>
                                                                 {selectedConsigneeCustomer?.contacts.find(c => c.is_primary === 1).primary_phone}
                                                             </div>
                                                         }
@@ -2668,7 +2670,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2699,7 +2701,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2728,7 +2730,7 @@ const LoadBoard = (props) => {
                                                                         <div key={index} style={{
                                                                             display: 'flex',
                                                                             alignItems: 'center',
-                                                                            fontSize: '0.5rem',
+                                                                            fontSize: '0.6rem',
                                                                             backgroundColor: 'rgba(0,0,0,0.2)',
                                                                             padding: '1px 5px',
                                                                             borderRadius: '10px',
@@ -2784,7 +2786,8 @@ const LoadBoard = (props) => {
                     }
                 </div>
 
-                <div className="form-bordered-box">
+                {/* LOAD DELIVERED */}
+                <div className="form-bordered-box" >
                     <div className="form-header">
                         <div className="top-border top-border-left"></div>
                         <div className="form-title">Loads Delivered but not Invoiced</div>

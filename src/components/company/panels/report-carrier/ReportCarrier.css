@@ -1,0 +1,173 @@
+.reports-main-container-carrier {
+  gap: 10px;
+}
+.reports-main-container-carrier .title {
+  display: flex;
+  align-items: center;
+}
+.reports-main-container-carrier .title .list-count {
+  background-color: #009bdd;
+  padding: 0 7px;
+  border-radius: 10px;
+  margin-left: 20px;
+  color: white;
+  font-size: 1.45rem;
+  margin-top: 2px;
+}
+.reports-main-container-carrier .reports-container-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .code {
+  min-width: 80px;
+  max-width: 80px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .name {
+  min-width: 200px;
+  max-width: 200px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .equipment {
+  min-width: 120px;
+  max-width: 120px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .address1 {
+  min-width: 200px;
+  max-width: 200px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .address2 {
+  min-width: 200px;
+  max-width: 200px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .city {
+  min-width: 120px;
+  max-width: 120px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .state {
+  min-width: 40px;
+  max-width: 40px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .zip {
+  min-width: 70px;
+  max-width: 70px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .contact-name {
+  min-width: 150px;
+  max-width: 150px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .contact-phone {
+  min-width: 100px;
+  max-width: 100px;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .contact-email {
+  flex-grow: 1;
+  white-space: nowrap;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-header {
+  position: fixed;
+  height: 35px;
+  width: calc(100% - 50px);
+  z-index: 1;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-header::before {
+  content: '';
+  position: absolute;
+  height: 10px;
+  width: calc(100% - 50px);
+  box-shadow: 0 0 7px 1px #000000;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  border-radius: 100%;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-header .report-table-header-wrapper {
+  position: absolute;
+  width: calc(100% - 25px);
+  height: 100%;
+  top: 1px;
+  left: 0;
+  display: flex;
+  z-index: 2;
+  align-items: center;
+  background: #ffffff;
+  /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, #ffffff 18%, #ffffff 18%, #d3d3d3 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
+  font-size: 12px;
+  font-weight: bold;
+  gap: 5px;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-header .header-label {
+  padding: 0 2px;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body {
+  position: relative;
+  flex-grow: 1;
+  width: 100%;
+  height: calc(100% - 45px);
+  overflow-x: auto;
+  margin-top: 45px;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  font-size: 12px;
+  padding: 3px 0;
+  border-radius: 5px;
+  gap: 5px;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row > div {
+  user-select: none;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .report-table-cell {
+  padding: 0 1px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .contact-name,
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .city,
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .address1,
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .address2,
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .name,
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row .equipment {
+  text-transform: capitalize;
+}
+.reports-main-container-carrier .reports-container-wrapper .reports-container .report-table-body .report-table-body-wrapper .report-table-row:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}

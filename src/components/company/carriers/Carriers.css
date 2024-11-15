@@ -6,6 +6,7 @@
   flex-direction: column;
   font-size: 24px;
   background: white;
+  gap: 10px;
   transition: all ease 0.7s;
   overflow: hidden;
   padding: 10px;
@@ -109,8 +110,6 @@
 }
 .carriers-main-container .fields-container-row {
   display: flex;
-  flex-grow: 1;
-  flex-basis: 100%;
 }
 .carriers-main-container .fields-container-row .fields-container-col {
   margin-right: 10px;
@@ -455,4 +454,3 @@
 .carriers-main-container .orders-list-container .orders-list-wrapper .orders-list-item:hover {
   background-color: rgba(0, 0, 0, 0.1);
 }
-/*# sourceMappingURL=Carriers.css.map */

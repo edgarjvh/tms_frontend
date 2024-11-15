@@ -1,0 +1,75 @@
+.select-box-container-current{
+  background-color: white;
+  border-radius: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;  
+  border: 1px solid rgba(0,0,0,0.5);
+  gap: 10px;
+  min-height: 1.5rem;
+  max-height: 1.5rem;
+  flex-grow: 1;
+  padding: 0px 7px;
+
+  &.disabled{
+    pointer-events: none;
+    filter: brightness(80%);    
+  }
+
+  input{
+    background-color: transparent;
+    border: 0;
+    outline: none;
+    flex-grow: 1;
+    max-width: 100%;
+    width: 100%;
+
+    &:disabled{
+      pointer-events: none;
+      user-select: none;
+    }
+  }
+
+  .fixed-placeholder{
+    margin-top: -1px;
+    color: rgba(0,0,0,0.5);
+    user-select: none;
+    cursor: default;
+  }
+
+  .input-mode{
+    user-select: none;
+    font-weight: bold;
+    color: #00628b;
+    text-transform: capitalize;
+    margin-top: -1px;
+    font-size: 11px;
+  }
+
+  .dropdown-button{
+    font-size: 16px;
+    color: #00b3ff;
+    margin-top: -1px;
+    cursor: pointer;
+
+    &:hover{
+      filter: brightness(90%);
+    }
+  }
+
+  .copy-button{
+    font-size: 14px;
+    color: #00b3ff;
+    // margin-top: -1px;
+    cursor: pointer;
+
+    &:hover{
+      filter: brightness(90%);
+    }
+  }
+
+  ::placeholder{
+    text-transform: capitalize;
+    color: rgba(0,0,0,0.5);
+  }
+}

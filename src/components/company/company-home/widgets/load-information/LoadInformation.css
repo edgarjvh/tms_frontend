@@ -3,6 +3,7 @@
   flex-direction: column;
   padding: 10px;
   gap: 10px;
+  width: 400px !important;
 }
 .widget-load-information:hover .widget-header .title .drag-widget {
   opacity: 1;

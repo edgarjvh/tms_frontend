@@ -1191,7 +1191,6 @@ const Employees = (props) => {
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div className="footer">

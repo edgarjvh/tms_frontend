@@ -18,10 +18,12 @@ import {
     Login
 } from './../panels';
 import LoadInformation from './widgets/load-information/LoadInformation';
+import FuelPrices from './widgets/fuel-prices/FuelPrices';
 
 const CompanyHome = (props) => {
     const [widgets, setWidgets] = useState([])
     const refLoadInformationGrabber = useRef(null);
+    const refDieselPricesGrabber = useRef(null);
 
     useEffect(() => {
         if (props.user && props.user?.user_code?.id) {
@@ -32,9 +34,8 @@ const CompanyHome = (props) => {
             axios.post(props.serverUrl + '/getWidgets').then(res => {
                 if (res.data.result === 'OK') {
                     (res.data.widgets || []).map(widget => {
-                        const widgetName = widget.name;                        
+                        const widgetName = widget.name;
                         const uWidget = userWidgets.find(x => x?.pivot?.user_code_id === userCodeId && x?.pivot?.widget_id === widget.id);
-                        console.log(userWidgets)
 
                         if (uWidget) {
                             const top = uWidget.pivot?.top || 0;
@@ -53,6 +54,18 @@ const CompanyHome = (props) => {
                                     ]
 
                                     break;
+                                case 'diesel prices':
+                                    _widgets = [
+                                        ..._widgets,
+                                        {
+                                            widget_id: widget.id,
+                                            top,
+                                            left,
+                                            component: <FuelPrices refGrab={refDieselPricesGrabber} origin={props.origin} />
+                                        }
+                                    ]
+
+                                    break;
                                 default:
                                     break;
                             }
@@ -66,6 +79,25 @@ const CompanyHome = (props) => {
                                             top: 100,
                                             left: 100,
                                             component: <LoadInformation refGrab={refLoadInformationGrabber} origin={props.origin} />
+                                        }
+                                    ]
+
+                                    axios.post(props.serverUrl + '/saveWidget', {
+                                        user_code_id: userCodeId,
+                                        widget_id: widget.id,
+                                        top: 100,
+                                        left: 100
+                                    })
+
+                                    break;
+                                case 'diesel prices':
+                                    _widgets = [
+                                        ..._widgets,
+                                        {
+                                            widget_id: widget.id,
+                                            top: 100,
+                                            left: 100,
+                                            component: <FuelPrices refGrab={refDieselPricesGrabber} origin={props.origin} />
                                         }
                                     ]
 

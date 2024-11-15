@@ -20,13 +20,23 @@ export const loadBoardReducers = (state = {
         case loadBoardConstants.SET_ADMIN_LOAD_BOARD_PANELS:
             state = {
                 ...state,
-                adminLoadBoardPanels: action.payload
+                adminLoadBoardPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         case loadBoardConstants.SET_COMPANY_LOAD_BOARD_PANELS:
             state = {
                 ...state,
-                companyLoadBoardPanels: action.payload
+                companyLoadBoardPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         case loadBoardConstants.SET_AVAILABLE_ORDERS:

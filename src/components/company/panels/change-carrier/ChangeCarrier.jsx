@@ -75,7 +75,13 @@ const ChangeCarrier = (props) => {
                     division_type: props.selectedOrder?.division?.type
                 }).then(res => {
                     if (res.data.result === 'OK') {
-                        setNewCarrier({ ...res.data.carrier, driver_code: res.data?.driver_code });
+                        const carrier = { ...res.data.carrier };
+                        if ((carrier?.insurance_status || '') === 'active') {
+                            window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                            return;
+                        }
+
+                        setNewCarrier({ ...carrier, driver_code: res.data?.driver_code });
                         refNewCarrierName.current.focus();
                     } else {
                         setNewCarrier({});
@@ -135,29 +141,30 @@ const ChangeCarrier = (props) => {
                 tabTimes={69000 + props.tabTimes}
                 panelName={`${props.panelName}-carrier-search`}
                 origin={props.origin}
-                
-                
                 suborigin={'carrier'}
-
                 customerSearch={carrierSearch}
-
                 callback={(id) => {
                     if (id) {
                         new Promise((resolve, reject) => {
                             axios.post(props.serverUrl + '/getCarrierById', { id: id }).then(res => {
                                 if (res.data.result === 'OK') {
-                                    let carrier = res.data.carrier;
-    
-                                    if (carrier) {                                    
-                                        setNewCarrier({ ...carrier });                                    
+                                    const carrier = res.data.carrier;
+
+                                    if (carrier) {
+                                        if ((carrier?.insurance_status || '') === 'active') {
+                                            window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                                            reject("no carrier");
+                                            return;
+                                        }
+                                        setNewCarrier({ ...carrier });
                                         resolve("OK");
                                     } else {
                                         reject("no carrier");
                                     }
-                                }                                    
+                                }
                             }).catch(e => {
                                 console.log('error on getting carrier', e);
-                            })                            
+                            })
                         }).then(response => {
                             if (response === 'OK') {
                                 closePanel(`${props.panelName}-carrier-search`, props.origin);
@@ -438,7 +445,7 @@ const ChangeCarrier = (props) => {
         <div className="change-carrier-content" onKeyDown={(e) => {
             let key = e.keyCode || e.which;
 
-            if (key === 27){
+            if (key === 27) {
                 e.stopPropagation();
                 props.closeModal();
             }

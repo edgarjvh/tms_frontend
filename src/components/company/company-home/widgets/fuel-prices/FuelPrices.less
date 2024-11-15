@@ -1,0 +1,155 @@
+.widget-fuel-prices {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+  min-height: 200px;
+
+  .loading-container-wrapper{
+    place-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+  }
+
+  &:hover{
+    .widget-header{
+      .title{
+        .drag-widget{
+          opacity: 1;
+        }
+      }
+    }    
+  }
+
+  .widget-header {
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+
+    .date-info {
+      padding: 0 5px;
+      user-select: none;
+    }
+
+    .title {
+      text-align: center;
+      flex-grow: 1;
+      font-weight: bold;
+      position: relative;
+
+      span {
+        text-transform: uppercase;
+        cursor: pointer;
+        border-bottom: 1px solid transparent;
+        transition: border linear 0.2s;
+        user-select: none;
+
+        &:hover {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      .drag-widget{
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: rotate(45deg);
+        cursor: grab;
+        opacity: 0;
+        transition: opacity 0.1s linear;
+      }
+    }
+  }
+
+  .fuel-data {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    gap: 5px;
+    flex-grow: 1;
+    // justify-content: space-between;
+
+    .fuel-data-header {
+      display: grid;
+      grid-template-columns: 1fr 60px 60px 60px 60px 60px;
+      gap: 5px;
+      text-align: center;
+      font-weight: bold;
+      padding: 0 5px;
+      user-select: none;
+    }
+
+    .category-info {
+      display: grid;
+      grid-template-columns: 1fr 60px 60px 60px 60px 60px;
+      gap: 5px;
+      align-items: center;
+      padding: 2px 5px;
+      transition: background-color linear 0.2s;
+      cursor: default;
+      user-select: none;
+      border-radius: 5px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .third-week,
+      .last-week,
+      .current-week,
+      .week-ago,
+      .year-ago {
+        text-align: center;
+      }
+
+      .week-ago,
+      .year-ago{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        &.indented{
+          padding-left: 10px;
+        }
+
+        span.category-count {
+          font-size: 10px;
+          padding: 2px 7px;
+          color: white;
+          background-color: #4b4b4b;
+          border-radius: 5px;
+        }
+      }
+    }
+
+    .totals-info {
+      flex-grow: 1;
+      align-content: end;
+      font-weight: bold;
+      padding: 0 5px;
+      user-select: none;
+      display: grid;
+      grid-template-columns: 1fr 100px 100px;
+      gap: 5px;
+      align-items: center;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+      .third-week,
+      .last-week,
+      .current-week,
+      .week-ago,
+      .year-ago {
+        text-align: center;
+      }
+    }
+  }
+}

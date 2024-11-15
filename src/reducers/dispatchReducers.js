@@ -671,13 +671,23 @@ export const dispatchReducers = (state = {
         case dispatchConstants.SET_ADMIN_DISPATCH_PANELS:
             state = {
                 ...state,
-                adminDispatchPanels: action.payload
+                adminDispatchPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         case dispatchConstants.SET_COMPANY_DISPATCH_PANELS:
             state = {
                 ...state,
-                companyDispatchPanels: action.payload
+                companyDispatchPanels: (action.payload || []).map(item => {
+                    if (!item?.right){
+                        item.right = 0
+                    }
+                    return item;
+                })
             }
             break;
         default:

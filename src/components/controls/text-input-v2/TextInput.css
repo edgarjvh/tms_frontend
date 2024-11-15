@@ -1,0 +1,52 @@
+.input-box-container-v2 {
+  background-color: white;
+  border-radius: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  min-height: 24px;
+  max-height: 24px;
+  flex-grow: 1;
+  overflow: hidden;
+  padding: 0;
+}
+.input-box-container-v2.disabled {
+  pointer-events: none;
+  filter: brightness(80%);
+}
+.input-box-container-v2 .login-type-icon {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.2);
+  height: 1.5rem;
+  width: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.input-box-container-v2 input {
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  flex-grow: 1;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 7px;
+  font-family: Mochi Med Oblique;
+}
+.input-box-container-v2 input:disabled {
+  pointer-events: none;
+  user-select: none;
+}
+.input-box-container-v2 .fixed-placeholder {
+  margin-top: -1px;
+  color: rgba(0, 0, 0, 0.5);
+  user-select: none;
+  cursor: default;
+  white-space: nowrap;
+}
+.input-box-container-v2 ::placeholder {
+  text-transform: capitalize;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
