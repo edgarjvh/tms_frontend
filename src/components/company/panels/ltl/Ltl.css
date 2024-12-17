@@ -1,0 +1,230 @@
+.ltl-main-container {
+  flex-grow: 1;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ltl-main-container .ltl-fields {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  max-width: 100%;
+}
+.ltl-main-container .ltl-fields .form-bordered-box {
+  flex-grow: 1;
+  flex-basis: 100%;
+  max-width: 100%;
+}
+.ltl-main-container .ltl-fields .form-bordered-box .form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 100%;
+}
+.ltl-main-container .ltl-fields .form-bordered-box .form-wrapper .form-row {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  max-width: 100%;
+}
+.ltl-main-container .ltl-fields .form-bordered-box .form-wrapper .form-row .input-box-container.disabled {
+  background-color: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  user-select: none;
+}
+.ltl-main-container .ltl-fields .form-bordered-box .form-wrapper .form-row .select-box-container.disabled .select-box-wrapper {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.ltl-main-container .ltl-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ltl-main-container .ltl-list .form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0;
+}
+.ltl-main-container .ltl-list .ltl-unit-item {
+  display: flex;
+  flex-direction: column;
+  padding: 7px 10px;
+  background-color: #d4d3d3;
+  overflow: hidden;
+  gap: 2px;
+  box-shadow: 0 2px 5px #000000;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.ltl-main-container .ltl-list .ltl-unit-item.selected {
+  background-color: #32c2ff !important;
+}
+.ltl-main-container .ltl-list .ltl-unit-item:hover {
+  background-color: #68d0fd;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .ltl-unit-info,
+.ltl-main-container .ltl-list .ltl-unit-item .ltl-unit-hazmat-info {
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  background-color: inherit;
+  gap: 5px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .ltl-unit-hazmat-title {
+  background-color: rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  font-weight: bold;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  z-index: 1;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .ltl-unit-hazmat-title .hazmat-caret-down {
+  font-size: 15px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column {
+  position: relative;
+  display: flex;
+  background-color: #f1f1f1;
+  justify-content: center;
+  align-items: flex-end;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  padding: 1px 7px;
+  border-radius: 5px;
+  height: 29px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column .item-label {
+  position: absolute;
+  left: 5px;
+  font-weight: bold;
+  top: -2px;
+  background-color: transparent;
+  font-size: 10px;
+  padding: 0 2px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.units {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.pieces {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.handling-units {
+  min-width: 120px;
+  max-width: 120px;
+  text-transform: capitalize;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.weight {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.weight .item-data {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.length {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.length .item-data {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.width {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.width .item-data {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.height {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.height .item-data {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.unit-class {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.nmfc {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.description {
+  flex-grow: 1;
+  justify-content: flex-start !important;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-name {
+  flex-grow: 1;
+  justify-content: flex-start !important;
+  text-transform: capitalize;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-packaging {
+  min-width: 120px;
+  max-width: 120px;
+  text-transform: capitalize;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-un-na {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-group {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-class {
+  min-width: 100px;
+  max-width: 100px;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.emergency-contact {
+  min-width: 277px;
+  max-width: 277px;
+  justify-content: flex-start !important;
+  text-transform: capitalize;
+}
+.ltl-main-container .ltl-list .ltl-unit-item .item-column.hazmat-phone {
+  min-width: 120px;
+  max-width: 120px;
+}
+.ltl-main-container .accessorial-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.ltl-main-container .accessorial-container .accessorial-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  padding: 3px 10px;
+  border-radius: 5px;
+}
+.ltl-main-container .accessorial-container .accessorial-item .accessorial-item-name {
+  font-size: 14px;
+}
+.ltl-main-container .accessorial-container .accessorial-item .accessorial-delete-icon {
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.ltl-main-container .accessorial-container .accessorial-item .accessorial-delete-icon:hover {
+  opacity: 0.7;
+}

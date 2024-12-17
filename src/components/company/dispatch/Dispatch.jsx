@@ -11,12 +11,12 @@ import "loaders.css";
 import NumberFormat from "react-number-format";
 import { useTransition, animated } from "react-spring";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretRight, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretRight, faCalendarAlt, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useDetectClickOutside } from "react-detect-click-outside";
 import SwiperCore, { Navigation } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css";
-import { Calendar, RatingScreen } from "./../panels";
+import { Calendar, Ltl, RatingScreen } from "./../panels";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import {
@@ -1910,10 +1910,12 @@ const Dispatch = (props) => {
                         if (res.data.carrier) {
                             const carrier = { ...res.data.carrier };
 
-                            if ((carrier?.insurance_status || '') !== 'active') {
+                            if ((carrier?.insurance_status || '') === 'expired') {
                                 window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
                                 return;
-                            }else if ((carrier?.insurance_flag || 0) === 1) {
+                            } else if ((carrier?.insurance_status || '') === 'warning') {
+                                window.alert(`The carrier's insurance is expiring in ${carrier?.insurance_remaining_days || 0} days. Please update as soon as possible.`);
+                            } else if ((carrier?.insurance_flag || 0) === 1) {
                                 window.alert("This carrier isn't allowed to be assigned to an order because the insurance document must be uploaded first.");
                                 return;
                             }
@@ -2383,8 +2385,13 @@ const Dispatch = (props) => {
                                     const carrier = res.data.carrier;
 
                                     if (carrier) {
-                                        if ((carrier?.insurance_status || '') !== 'active') {
+                                        if ((carrier?.insurance_status || '') === 'expired') {
                                             window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                                            return;
+                                        } else if ((carrier?.insurance_status || '') === 'warning') {
+                                            window.alert(`The carrier's insurance is expiring in ${carrier?.insurance_remaining_days || 0} days. Please update as soon as possible.`);
+                                        } else if ((carrier?.insurance_flag || 0) === 1) {
+                                            window.alert("This carrier isn't allowed to be assigned to an order because the insurance document must be uploaded first.");
                                             return;
                                         }
 
@@ -2642,7 +2649,7 @@ const Dispatch = (props) => {
                             if (!isAddingNewShipper && !isAddingNewConsignee) {
                                 refShipperCompanyCode.current.focus();
                             }
-                            
+
                             getLoadBoardOrders()
                         }
                     } else {
@@ -4901,41 +4908,39 @@ const Dispatch = (props) => {
                                                                         return true;
                                                                     });
                                                                 } else {
-                                                                    axios
-                                                                        .post(props.serverUrl + "/getLoadTypes")
-                                                                        .then(async (res) => {
-                                                                            if (res.data.result === "OK") {
-                                                                                await setLoadTypeItems(
-                                                                                    res.data.load_types.map(
-                                                                                        (item, index) => {
-                                                                                            item.selected =
-                                                                                                (selectedOrder?.load_type?.id ||
-                                                                                                    0) === 0
-                                                                                                    ? index === 0
-                                                                                                    : item.id ===
-                                                                                                    selectedOrder.load_type.id;
-                                                                                            return item;
-                                                                                        }
-                                                                                    )
-                                                                                );
-
-                                                                                refLoadTypePopupItems.current.map(
-                                                                                    (r, i) => {
-                                                                                        if (
-                                                                                            r &&
-                                                                                            r.classList.contains("selected")
-                                                                                        ) {
-                                                                                            r.scrollIntoView({
-                                                                                                behavior: "auto",
-                                                                                                block: "center",
-                                                                                                inline: "nearest",
-                                                                                            });
-                                                                                        }
-                                                                                        return true;
+                                                                    axios.post(props.serverUrl + "/getLoadTypes").then((res) => {
+                                                                        if (res.data.result === "OK") {
+                                                                            setLoadTypeItems(
+                                                                                res.data.load_types.map(
+                                                                                    (item, index) => {
+                                                                                        item.selected =
+                                                                                            (selectedOrder?.load_type?.id ||
+                                                                                                0) === 0
+                                                                                                ? index === 0
+                                                                                                : item.id ===
+                                                                                                selectedOrder.load_type.id;
+                                                                                        return item;
                                                                                     }
-                                                                                );
-                                                                            }
-                                                                        })
+                                                                                )
+                                                                            );
+
+                                                                            refLoadTypePopupItems.current.map(
+                                                                                (r, i) => {
+                                                                                    if (
+                                                                                        r &&
+                                                                                        r.classList.contains("selected")
+                                                                                    ) {
+                                                                                        r.scrollIntoView({
+                                                                                            behavior: "auto",
+                                                                                            block: "center",
+                                                                                            inline: "nearest",
+                                                                                        });
+                                                                                    }
+                                                                                    return true;
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                    })
                                                                         .catch(async (e) => {
                                                                             console.log("error getting load types", e);
                                                                         });
@@ -5031,26 +5036,11 @@ const Dispatch = (props) => {
                                                                 break;
 
                                                             case 13: // enter
-                                                                if (
-                                                                    loadTypeItems.length > 0 &&
-                                                                    loadTypeItems.findIndex(
-                                                                        (item) => item.selected
-                                                                    ) > -1
-                                                                ) {
+                                                                if (loadTypeItems.length > 0 && loadTypeItems.findIndex((item) => item.selected) > -1) {
                                                                     await setSelectedOrder({
                                                                         ...selectedOrder,
-                                                                        load_type:
-                                                                            loadTypeItems[
-                                                                            loadTypeItems.findIndex(
-                                                                                (item) => item.selected
-                                                                            )
-                                                                            ],
-                                                                        load_type_id:
-                                                                            loadTypeItems[
-                                                                                loadTypeItems.findIndex(
-                                                                                    (item) => item.selected
-                                                                                )
-                                                                            ].id,
+                                                                        load_type: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)],
+                                                                        load_type_id: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].id,
                                                                     });
                                                                     validateOrderForSaving({ keyCode: 9 });
                                                                     setLoadTypeItems([]);
@@ -6228,25 +6218,19 @@ const Dispatch = (props) => {
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
                                 }
-
                             </div>
                         </div>
                     </div>
 
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            marginBottom: 10,
-                            flexGrow: 1,
-                            flexBasis: "100%",
-                        }}
-                    >
-                        <div
-                            className="form-bordered-box"
-                            style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}
-
-                        >
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        marginBottom: 10,
+                        flexGrow: 1,
+                        flexBasis: "100%",
+                    }}>
+                        <div className={`form-bordered-box${((selectedOrder?.division_id || 0) === 0 || (selectedOrder?.load_type_id || 0) === 0) ? ' form-disabled' : ''}`}
+                            style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10 }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
                                 <div className="form-title">Bill To</div>
@@ -6260,70 +6244,64 @@ const Dispatch = (props) => {
                                             <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                         </div>
                                     }
-                                    <div
-                                        className="mochi-button"
-                                        onClick={() => {
-                                            if ((selectedBillToCustomer.id || 0) === 0) {
-                                                window.alert("You must select a customer first!");
-                                                return;
-                                            }
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedBillToCustomer.id || 0) === 0) {
+                                            window.alert("You must select a customer first!");
+                                            return;
+                                        }
 
-                                            let panel = {
-                                                panelName: `${props.panelName}-customer`,
-                                                component: (
-                                                    <Customers
-                                                        pageName={"Customer"}
-                                                        title={"Bill-To Company"}
-                                                        panelName={`${props.panelName}-customer`}
-                                                        tabTimes={2000 + props.tabTimes}
-                                                        componentId={moment().format("x")}
-                                                        isOnPanel={true}
-                                                        isAdmin={props.isAdmin}
-                                                        origin={props.origin}
+                                        let panel = {
+                                            panelName: `${props.panelName}-customer`,
+                                            component: (
+                                                <Customers
+                                                    pageName={"Customer"}
+                                                    title={"Bill-To Company"}
+                                                    panelName={`${props.panelName}-customer`}
+                                                    tabTimes={2000 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    origin={props.origin}
 
 
-                                                        customer_id={selectedBillToCustomer.id}
-                                                    />
-                                                ),
-                                            };
+                                                    customer_id={selectedBillToCustomer.id}
+                                                />
+                                            ),
+                                        };
 
-                                            openPanel(panel, props.origin);
-                                        }}
-                                    >
+                                        openPanel(panel, props.origin);
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Company info</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                     </div>
-                                    <div
-                                        className="mochi-button"
-                                        onClick={() => {
-                                            if ((selectedOrder?.id || 0) === 0) {
-                                                window.alert("You must create or load an order first!");
-                                                return;
-                                            }
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedOrder?.id || 0) === 0) {
+                                            window.alert("You must create or load an order first!");
+                                            return;
+                                        }
 
-                                            if ((selectedOrder?.load_type_id || 0) === 0) {
-                                                window.alert("You must select a load type first!");
-                                                return;
-                                            }
+                                        if ((selectedOrder?.load_type_id || 0) === 0) {
+                                            window.alert("You must select a load type first!");
+                                            return;
+                                        }
 
-                                            let panel = {
-                                                panelName: `${props.panelName}-rating`,
-                                                component: (
-                                                    <RatingScreen
-                                                        panelName={`${props.panelName}-rating`}
-                                                        title="Rating Screen"
-                                                        tabTimes={34000 + props.tabTimes}
-                                                        componentId={moment().format("x")}
-                                                        origin={props.origin}
-                                                        selectedOrder={selectedOrder}
-                                                    />
-                                                ),
-                                            };
+                                        let panel = {
+                                            panelName: `${props.panelName}-rating`,
+                                            component: (
+                                                <RatingScreen
+                                                    panelName={`${props.panelName}-rating`}
+                                                    title="Rating Screen"
+                                                    tabTimes={34000 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    origin={props.origin}
+                                                    selectedOrder={selectedOrder}
+                                                />
+                                            ),
+                                        };
 
-                                            openPanel(panel, props.origin);
-                                        }}
-                                    >
+                                        openPanel(panel, props.origin);
+                                    }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                         <div className="mochi-button-base">Rate load</div>
                                         <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -6667,7 +6645,7 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div className="form-bordered-box"
+                        <div className={`form-bordered-box${((selectedOrder?.division_id || 0) === 0 || (selectedOrder?.load_type_id || 0) === 0) ? ' form-disabled' : ''}`}
                             style={{ minWidth: "38%", maxWidth: "38%", marginRight: 10, gap: 2 }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
@@ -8906,77 +8884,66 @@ const Dispatch = (props) => {
                                 </div>
                             </div>
 
-                            <div
-                                className="form-row"
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    flexGrow: 1,
-                                    alignItems: "flex-end",
-                                }}
-                            >
-                                <div
-                                    className="mochi-button"
-                                    style={{ fontSize: "1rem" }}
-                                    onClick={() => {
-                                        if ((selectedOrder?.id || 0) === 0) {
-                                            window.alert("You must create or load an order first!");
-                                            return;
-                                        }
+                            <div className="form-row" style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                flexGrow: 1,
+                                alignItems: "flex-end",
+                            }}>
+                                <div className="mochi-button" style={{ fontSize: "1rem" }} onClick={() => {
+                                    if ((selectedOrder?.id || 0) === 0) {
+                                        window.alert("You must create or load an order first!");
+                                        return;
+                                    }
 
-                                        let panel = {
-                                            panelName: `${props.panelName}-rate-conf`,
-                                            component: (
-                                                <RateConf
-                                                    title="Rate Conf"
-                                                    tabTimes={41000 + props.tabTimes}
-                                                    panelName={`${props.panelName}-rate-conf`}
-                                                    origin={props.origin}
-                                                    componentId={moment().format("x")}
-                                                    selectedOrderId={selectedOrder?.id || 0}
-                                                />
-                                            ),
-                                        };
+                                    let panel = {
+                                        panelName: `${props.panelName}-rate-conf`,
+                                        component: (
+                                            <RateConf
+                                                title="Rate Conf"
+                                                tabTimes={41000 + props.tabTimes}
+                                                panelName={`${props.panelName}-rate-conf`}
+                                                origin={props.origin}
+                                                componentId={moment().format("x")}
+                                                selectedOrderId={selectedOrder?.id || 0}
+                                            />
+                                        ),
+                                    };
 
-                                        openPanel(panel, props.origin);
-                                    }}
-                                >
+                                    openPanel(panel, props.origin);
+                                }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left"> (</div>
                                     <div className="mochi-button-base">Rate Confirmation</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right"> )</div>
                                 </div>
-                                <div
-                                    className="mochi-button"
-                                    style={{ fontSize: "1rem" }}
-                                    onClick={() => {
-                                        if ((selectedOrder?.id || 0) === 0) {
-                                            window.alert("You must create or load an order first!");
-                                            return;
-                                        }
+                                <div className="mochi-button" style={{ fontSize: "1rem" }} onClick={() => {
+                                    if ((selectedOrder?.id || 0) === 0) {
+                                        window.alert("You must create or load an order first!");
+                                        return;
+                                    }
 
-                                        if ((selectedOrder?.load_type_id || 0) === 0) {
-                                            window.alert("You must select a load type first!");
-                                            return;
-                                        }
+                                    if ((selectedOrder?.load_type_id || 0) === 0) {
+                                        window.alert("You must select a load type first!");
+                                        return;
+                                    }
 
-                                        let panel = {
-                                            panelName: `${props.panelName}-rating`,
-                                            component: (
-                                                <RatingScreen
-                                                    panelName={`${props.panelName}-rating`}
-                                                    title="Rating Screen"
-                                                    tabTimes={34000 + props.tabTimes}
-                                                    componentId={moment().format("x")}
-                                                    origin={props.origin}
-                                                    selectedOrder={selectedOrder}
-                                                />
-                                            ),
-                                        };
+                                    let panel = {
+                                        panelName: `${props.panelName}-rating`,
+                                        component: (
+                                            <RatingScreen
+                                                panelName={`${props.panelName}-rating`}
+                                                title="Rating Screen"
+                                                tabTimes={34000 + props.tabTimes}
+                                                componentId={moment().format("x")}
+                                                origin={props.origin}
+                                                selectedOrder={selectedOrder}
+                                            />
+                                        ),
+                                    };
 
-                                        openPanel(panel, props.origin);
-                                    }}
-                                >
+                                    openPanel(panel, props.origin);
+                                }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">
                                         (
                                     </div>
@@ -8986,8 +8953,7 @@ const Dispatch = (props) => {
                                     </div>
                                 </div>
                                 <div className="mochi-button" style={{
-                                    fontSize: "1rem",
-                                    pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
+                                    fontSize: "1rem"
                                 }} onClick={(e) => {
                                     if ((selectedOrder?.id || 0) === 0) {
                                         window.alert("You must create or load an order first!");
@@ -9008,21 +8974,14 @@ const Dispatch = (props) => {
                                     </div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
-                                <div
-                                    className="mochi-button"
-                                    style={{
-                                        fontSize: "1rem",
-                                        pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
-                                    }}
-                                    onClick={() => {
-                                        if ((selectedOrder?.order_number || 0) === 0) {
-                                            window.alert("You must select or create an order first!");
-                                            return;
-                                        }
+                                <div className="mochi-button" style={{ fontSize: "1rem" }} onClick={() => {
+                                    if ((selectedOrder?.order_number || 0) === 0) {
+                                        window.alert("You must select or create an order first!");
+                                        return;
+                                    }
 
-                                        setSelectedNoteForDriver({ id: 0 });
-                                    }}
-                                >
+                                    setSelectedNoteForDriver({ id: 0 });
+                                }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base" style={{
                                         color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
@@ -9033,10 +8992,8 @@ const Dispatch = (props) => {
                             </div>
                         </div>
 
-                        <div
-                            className="form-borderless-box"
-                            style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
-                        >
+                        <div className={`form-borderless-box${((selectedOrder?.division_id || 0) === 0 || (selectedOrder?.load_type_id || 0) === 0) ? ' form-disabled' : ''}`}
+                            style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
                             <div
                                 className="form-row"
                                 style={{
@@ -9045,9 +9002,7 @@ const Dispatch = (props) => {
                                     marginBottom: 10,
                                 }}
                             >
-                                <div className="input-toggle-container" style={{
-                                    pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
-                                }}>
+                                <div className="input-toggle-container">
                                     <input
                                         type="checkbox"
                                         id="cbox-dispatch-hazmat-btn"
@@ -9067,9 +9022,7 @@ const Dispatch = (props) => {
                                         <div className="input-toggle-btn"></div>
                                     </label>
                                 </div>
-                                <div className="input-toggle-container" style={{
-                                    pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
-                                }}>
+                                <div className="input-toggle-container">
                                     <input
                                         type="checkbox"
                                         id="cbox-dispatch-expedited-btn"
@@ -9089,44 +9042,24 @@ const Dispatch = (props) => {
                                     </label>
                                 </div>
                             </div>
-                            <div
-                                className="form-row"
-                                style={{ flexGrow: 1, display: "flex" }}
-                            >
-                                <div className="form-bordered-box">
+                            <div className="form-row" style={{ flexGrow: 1, display: "flex" }}>
+                                <div className={`form-bordered-box${((selectedOrder?.division_id || 0) === 0 || (selectedOrder?.load_type_id || 0) === 0) ? ' form-disabled' : ''}`}>
                                     <div className="form-header">
                                         <div className="top-border top-border-left"></div>
-                                        <div className="form-title">
-                                            Notes for Carrier on Rate Conf
-                                        </div>
+                                        <div className="form-title">Notes for Carrier on Rate Conf</div>
                                         <div className="top-border top-border-middle"></div>
                                         <div className="form-buttons">
-                                            <div
-                                                className="mochi-button"
-                                                style={{
-                                                    pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
-                                                }}
-                                                onClick={() => {
-                                                    if ((selectedOrder?.order_number || 0) === 0) {
-                                                        window.alert(
-                                                            "You must select or create an order first!"
-                                                        );
-                                                        return;
-                                                    }
+                                            <div className="mochi-button" onClick={() => {
+                                                if ((selectedOrder?.order_number || 0) === 0) {
+                                                    window.alert("You must select or create an order first!");
+                                                    return;
+                                                }
 
-                                                    setSelectedNoteForCarrier({ id: 0 });
-                                                }}
-                                            >
-                                                <div className="mochi-button-decorator mochi-button-decorator-left">
-                                                    (
-                                                </div>
-                                                <div className="mochi-button-base" style={{
-                                                    color: (selectedOrder?.is_cancelled || 0) === 0 ? 'black' : 'rgba(0,0,0,0.4)'
-                                                }}>Add note
-                                                </div>
-                                                <div className="mochi-button-decorator mochi-button-decorator-right">
-                                                    )
-                                                </div>
+                                                setSelectedNoteForCarrier({ id: 0 });
+                                            }}>
+                                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                                <div className="mochi-button-base">Add note</div>
+                                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                             </div>
                                         </div>
                                         <div className="top-border top-border-right"></div>
@@ -9155,8 +9088,7 @@ const Dispatch = (props) => {
                     </div>
                 </div>
 
-                <div
-                    className="fields-container-col"
+                <div className={`fields-container-col${((selectedOrder?.division_id || 0) === 0 || (selectedOrder?.load_type_id || 0) === 0) ? ' form-disabled' : ''}`}
                     style={{
                         display: "flex",
                         flexDirection: "column",
@@ -10730,11 +10662,15 @@ const Dispatch = (props) => {
                         }}>
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
-                                <div className="form-title">Shipper</div>
-                                <div className="top-border top-border-middle"></div>
-                                <div className="form-buttons">
-                                    <div className="mochi-button" onClick={() => {
-                                        if ((selectedOrder?.pickups || []).find(x => x.id === 0)){
+                                <div className="form-title" style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    gap: 10,
+                                    alignItems: 'center'
+                                }}>
+                                    <span>Shipper</span>
+                                    <FontAwesomeIcon icon={faPlus} style={{ cursor: 'pointer' }} onClick={() => {
+                                        if ((selectedOrder?.pickups || []).find(x => x.id === 0)) {
                                             const newPickups = (selectedOrder?.pickups || []).filter(x => x.id !== 0);
 
                                             setSelectedOrder(prev => {
@@ -10877,11 +10813,40 @@ const Dispatch = (props) => {
                                         };
 
                                         openPanel(panel, props.origin);
-                                    }}>
-                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                        <div className="mochi-button-base">Add New Shipper</div>
-                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
-                                    </div>
+                                    }} />
+                                </div>
+                                <div className="top-border top-border-middle"></div>
+                                <div className="form-buttons">
+                                    {
+                                        ((selectedOrder?.id || 0) > 0 && (selectedOrder?.load_type_id || 0) === 2) &&
+                                        <div className="mochi-button" onClick={() => {
+                                            let panel = {
+                                                panelName: `${props.panelName}-ltl-units`,
+                                                component: (
+                                                    <Ltl
+                                                        title="LTL Units & Accessorials"
+                                                        tabTimes={1546484 + props.tabTimes}
+                                                        panelName={`${props.panelName}-ltl`}
+                                                        origin={props.origin}
+                                                        componentId={moment().format("x")}
+                                                        selectedOrderId={selectedOrder.id}
+                                                        setSelectedOrder={setSelectedOrder}
+                                                        onEscCallback={() => {
+                                                            closePanel(`${props.panelName}-ltl-units`, props.origin);
+                                                            refConsigneeCompanyCode.current.focus();
+                                                            setIsShowingShipperSecondPage(false);
+                                                        }}
+                                                    />
+                                                ),
+                                            };
+
+                                            openPanel(panel, props.origin);
+                                        }}>
+                                            <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                            <div className="mochi-button-base">LTL Units</div>
+                                            <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                        </div>
+                                    }
                                     <div className="mochi-button" onClick={shipperCompanySearch} style={{
                                         pointerEvents: (selectedOrder?.is_cancelled || 0) === 0 ? 'all' : 'none'
                                     }}>
@@ -14382,8 +14347,40 @@ const Dispatch = (props) => {
                                                                     if (key === 9) {
                                                                         e.preventDefault();
                                                                         setIsSavingPickupId(selectedShipperCustomer?.pickup_id || 0);
-                                                                        refConsigneeCompanyCode.current.focus();
-                                                                        setIsShowingShipperSecondPage(false);
+
+                                                                        if ((selectedOrder?.id || 0) === 0) {
+                                                                            window.alert("You must create or load an order first!");
+                                                                            return;
+                                                                        }
+
+                                                                        if ((selectedOrder?.load_type_id || 0) === 2) {
+                                                                            let panel = {
+                                                                                panelName: `${props.panelName}-ltl-units`,
+                                                                                component: (
+                                                                                    <Ltl
+                                                                                        title="LTL Units & Accessorials"
+                                                                                        tabTimes={1546484 + props.tabTimes}
+                                                                                        panelName={`${props.panelName}-ltl`}
+                                                                                        origin={props.origin}
+                                                                                        componentId={moment().format("x")}
+                                                                                        selectedOrderId={selectedOrder.id}
+                                                                                        setSelectedOrder={setSelectedOrder}
+                                                                                        onEscCallback={() => {
+                                                                                            closePanel(`${props.panelName}-ltl-units`, props.origin);
+                                                                                            refConsigneeCompanyCode.current.focus();
+                                                                                            setIsShowingShipperSecondPage(false);
+                                                                                        }}
+                                                                                    />
+                                                                                ),
+                                                                            };
+
+                                                                            openPanel(panel, props.origin);
+                                                                        } else {
+                                                                            refConsigneeCompanyCode.current.focus();
+                                                                            setIsShowingShipperSecondPage(false);
+                                                                        }
+
+
                                                                     }
                                                                 }
                                                             }}
@@ -14462,13 +14459,13 @@ const Dispatch = (props) => {
                                 <div className="form-title">Consignee</div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
-                                <div className="mochi-button" onClick={() => {
-                                        if ((selectedOrder?.id || 0) === 0){
+                                    <div className="mochi-button" onClick={() => {
+                                        if ((selectedOrder?.id || 0) === 0) {
                                             window.alert("You must create or load an order first!")
                                             return
                                         }
 
-                                        if ((selectedOrder?.deliveries || []).find(x => x.id === 0)){
+                                        if ((selectedOrder?.deliveries || []).find(x => x.id === 0)) {
                                             const newDeliveries = (selectedOrder?.deliveries || []).filter(x => x.id !== 0);
 
                                             setSelectedOrder(prev => {
@@ -14495,7 +14492,7 @@ const Dispatch = (props) => {
                                                     pageName={"Customer"}
                                                     title={"Consignee Company"}
                                                     panelName={`${props.panelName}-customer`}
-                                                    tabTimes={3000 + props.tabTimes}
+                                                    tabTimes={30056440 + props.tabTimes}
                                                     componentId={moment().format("x")}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}

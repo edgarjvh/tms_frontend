@@ -1,0 +1,278 @@
+.ltl-main-container{
+  flex-grow: 1;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .ltl-fields{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    max-width: 100%;
+
+    .form-bordered-box{
+      flex-grow: 1;
+      flex-basis: 100%;
+      max-width: 100%;
+      
+      .form-wrapper{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        // overflow: hidden;
+        max-width: 100%;
+
+        .form-row{
+          display: flex;
+          flex-direction: row;
+          gap: 2px;
+          max-width: 100%;
+
+          .input-box-container{
+            &.disabled{
+              background-color: rgba(0, 0, 0, 0.1);
+              pointer-events: none;
+              user-select: none;
+            }
+          }
+
+          .select-box-container{
+            &.disabled{
+              .select-box-wrapper{
+                background-color: rgba(0, 0, 0, 0.1);
+              }
+            }
+          }
+        }
+      };
+    }
+  }
+
+  .ltl-list{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .form-wrapper{
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 0;
+    }
+
+    .ltl-unit-item{
+      display: flex;
+      flex-direction: column;
+      padding: 7px 10px;
+      background-color: rgb(212, 211, 211);
+      overflow: hidden;
+      gap: 2px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 1);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+
+      &.selected{
+        background-color: #32c2ff !important;
+      }
+
+      &:hover{
+        background-color: #68d0fd;
+      }
+
+      .ltl-unit-info, .ltl-unit-hazmat-info{
+        display: flex;
+        flex-direction: row;
+        font-size: 14px;
+        background-color: inherit;
+        gap: 5px;
+      }
+
+      .ltl-unit-hazmat-title{
+        background-color: rgba(0, 0, 0, 0.1);
+        font-size: 12px;
+        font-weight: bold;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 5px;
+        z-index: 1;
+        // margin-bottom: 4px;
+
+        .hazmat-caret-down{
+          font-size: 15px;
+        }
+      }
+
+      .item-column{
+        position: relative;
+        display: flex;
+        background-color: rgb(241, 241, 241);          
+        justify-content: center;
+        align-items: flex-end;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        padding: 1px 7px;
+        border-radius: 5px;
+        height: 29px;
+
+        .item-label{
+          position: absolute;
+          left: 5px;
+          font-weight: bold;
+          top: -2px;
+          background-color: transparent;
+          font-size: 10px;
+          padding: 0 2px;
+        }
+
+        &.units{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.pieces{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.handling-units{
+          min-width: 120px;
+          max-width: 120px;
+          text-transform: capitalize;
+        }
+
+        &.weight{
+          min-width: 100px;
+          max-width: 100px;
+          .item-data{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+        }
+
+        &.length{
+          min-width: 100px;
+          max-width: 100px;
+          
+          .item-data{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+        }
+
+        &.width{
+          min-width: 100px;
+          max-width: 100px;
+          
+          .item-data{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+        }
+
+        &.height{
+          min-width: 100px;
+          max-width: 100px;
+          
+          .item-data{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+        }
+
+        &.unit-class{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.nmfc{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.description{
+          flex-grow: 1;
+          justify-content: flex-start !important;
+        }
+
+        &.hazmat-name{
+          flex-grow: 1;
+          justify-content: flex-start !important;
+          text-transform: capitalize;
+        }
+
+        &.hazmat-packaging{
+          min-width: 120px;
+          max-width: 120px;
+          text-transform: capitalize;
+        }
+
+        &.hazmat-un-na{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.hazmat-group{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.hazmat-class{
+          min-width: 100px;
+          max-width: 100px;
+        }
+
+        &.emergency-contact{
+          min-width: 277px;
+          max-width: 277px;
+          justify-content: flex-start !important;
+          text-transform: capitalize;
+        }
+
+        &.hazmat-phone{
+          min-width: 120px;
+          max-width: 120px;
+        }
+      }
+    }
+  }
+
+  .accessorial-container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+
+    .accessorial-item{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      padding: 3px 10px;
+      border-radius: 5px;
+
+      .accessorial-item-name{
+        font-size: 14px;
+      }
+
+      .accessorial-delete-icon{
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover{
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}

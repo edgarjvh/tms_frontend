@@ -18,6 +18,8 @@ import {
     faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
+import { parse } from 'vcf';
+
 import {
     setAdminHomePanels,
     setCompanyHomePanels,
@@ -65,6 +67,7 @@ const Contacts = (props) => {
     const [progressUploaded, setProgressUploaded] = useState(0);
     const [progressTotal, setProgressTotal] = useState(0);
     const [newPassword, setNewPassword] = useState('');
+    const refImportContact = useRef();  // Import contact button
 
     var lastLetter = '';
 
@@ -377,6 +380,126 @@ const Contacts = (props) => {
         }
     }
 
+    const importContact = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const vcfData = e.target.result;
+            const parsedContacts = parse(vcfData);
+            const contactsArray = parsedContacts.map(contact => {
+                const emails = Array.isArray(contact.get('email')) ? contact.get('email').map(email => ({
+                    type: Array.isArray(email.type) ? email.type.filter(t => ['work', 'personal', 'other'].includes(t)).join(', ') : (email.type || 'other'),
+                    value: email.valueOf()
+                })) : [{ type: 'work', value: contact.get('email')?.valueOf() || '' }];
+
+                const phones = Array.isArray(contact.get('tel')) ? contact.get('tel').map(phone => ({
+                    type: Array.isArray(phone.type) ? phone.type.filter(t => ['work', 'fax', 'mobile', 'direct', 'other'].includes(t)).join(', ') : (phone.type || 'other'),
+                    value: phone.valueOf()
+                })) : [{ type: 'work', value: contact.get('tel')?.valueOf() || '' }];
+
+                const addressParts = contact.get('adr')?.valueOf().split(';') || [];
+                const address = {
+                    street: addressParts[2] || '',
+                    city: addressParts[3] || '',
+                    state: addressParts[4] || '',
+                    zip: addressParts[5] || ''
+                };
+
+                const nameParts = contact.get('n')?.valueOf().split(';') || [];
+                const name = {
+                    last: nameParts[0] || '',
+                    first: nameParts[1] || '',
+                    middle: nameParts[2] || '',
+                    prefix: nameParts[3] || '',
+                    suffix: nameParts[4] || ''
+                }
+
+                const organizationParts = contact.get('org')?.valueOf().split(';') || [];
+                const organization = {
+                    company: organizationParts[0] || '',
+                    department: organizationParts[1] || ''
+                }
+
+                return {
+                    fullName: contact.get('fn')?.valueOf() || '',
+                    name,
+                    organization,
+                    title: contact.get('title')?.valueOf() || '',
+                    emails,
+                    phones,
+                    address,
+                    url: contact.get('url')?.valueOf() || '',
+                    note: contact.get('note')?.valueOf() || '',
+                    birthday: contact.get('bday')?.valueOf() || ''
+                };
+            });
+            if ((contactsArray || []).length > 0) {
+                setTempSelectedContact({
+                    prefix: contactsArray[0].name.prefix,
+                    first_name: contactsArray[0].name.first,
+                    middle_name: contactsArray[0].name.middle,
+                    last_name: contactsArray[0].name.last,
+                    suffix: contactsArray[0].name.suffix,
+                    company: contactsArray[0].organization.company,
+                    department: contactsArray[0].organization.department,
+                    title: contactsArray[0].title,
+                    email_work: contactsArray[0].emails.find(email => email.type === 'work')?.value || '',
+                    email_personal: contactsArray[0].emails.find(email => email.type === 'personal')?.value || '',
+                    email_other: contactsArray[0].emails.find(email => email.type === 'other')?.value || '',
+                    phone_work: contactsArray[0].phones.find(phone => phone.type === 'work')?.value || '',
+                    phone_work_fax: contactsArray[0].phones.find(phone => phone.type === 'fax')?.value || '',
+                    phone_mobile: contactsArray[0].phones.find(phone => phone.type === 'mobile')?.value || '',
+                    phone_direct: contactsArray[0].phones.find(phone => phone.type === 'direct')?.value || '',
+                    phone_other: contactsArray[0].phones.find(phone => phone.type === 'other')?.value || '',
+                    address1: contactsArray[0].address.street,
+                    city: contactsArray[0].address.city,
+                    state: contactsArray[0].address.state,
+                    zip_code: contactsArray[0].address.zip,
+                    website: contactsArray[0].url,
+                    notes: contactsArray[0].note,
+                    birthday: contactsArray[0].birthday
+                });
+
+                setIsEditingContact(true);
+                setContactSearchCustomer(prev => {
+                    return {
+                        ...prev,
+                        selectedContact: {
+                            prefix: contactsArray[0].name.prefix,
+                            first_name: contactsArray[0].name.first,
+                            middle_name: contactsArray[0].name.middle,
+                            last_name: contactsArray[0].name.last,
+                            suffix: contactsArray[0].name.suffix,
+                            company: contactsArray[0].organization.company,
+                            department: contactsArray[0].organization.department,
+                            title: contactsArray[0].title,
+                            email_work: contactsArray[0].emails.find(email => email.type === 'work')?.value || '',
+                            email_personal: contactsArray[0].emails.find(email => email.type === 'personal')?.value || '',
+                            email_other: contactsArray[0].emails.find(email => email.type === 'other')?.value || '',
+                            phone_work: contactsArray[0].phones.find(phone => phone.type === 'work')?.value || '',
+                            phone_work_fax: contactsArray[0].phones.find(phone => phone.type === 'fax')?.value || '',
+                            phone_mobile: contactsArray[0].phones.find(phone => phone.type === 'mobile')?.value || '',
+                            phone_direct: contactsArray[0].phones.find(phone => phone.type === 'direct')?.value || '',
+                            phone_other: contactsArray[0].phones.find(phone => phone.type === 'other')?.value || '',
+                            address1: contactsArray[0].address.street,
+                            city: contactsArray[0].address.city,
+                            state: contactsArray[0].address.state,
+                            zip_code: contactsArray[0].address.zip,
+                            website: contactsArray[0].url,
+                            notes: contactsArray[0].note,
+                            birthday: contactsArray[0].birthday
+                        }
+                    }
+                });
+                refPrefix.current.focus({ preventScroll: true });
+            }
+        };
+
+        reader.readAsText(file);
+        event.target.value = null;
+    }
+
     const exportContact = () => {
         let selectedPerson = {};
 
@@ -394,18 +517,20 @@ const Contacts = (props) => {
         myVCard
             .addName((selectedPerson?.last_name || ''), (selectedPerson?.first_name || ''), (selectedPerson?.middle_name || ''), (selectedPerson?.prefix || ''), (selectedPerson?.suffix || ''))
             .addCompany((selectedPerson?.company || ''), (selectedPerson?.department || ''))
-            .addJobtitle((selectedPerson?.tittle || ''))
-            .addEmail((selectedPerson?.email_work || ''), 'PREF;WORK')
-            .addEmail((selectedPerson?.email_personal || ''))
-            .addEmail((selectedPerson?.email_other || ''))
-            .addPhoneNumber((selectedPerson?.phone_work || ''), 'PREF;WORK')
+            .addJobtitle((selectedPerson?.title || ''))
+            .addEmail((selectedPerson?.email_work || ''), 'WORK')
+            .addEmail((selectedPerson?.email_personal || ''), 'PERSONAL')
+            .addEmail((selectedPerson?.email_other || ''), 'OTHER')
+            .addPhoneNumber((selectedPerson?.phone_work || ''), 'WORK')
             .addPhoneNumber((selectedPerson?.phone_work_fax || ''), 'FAX')
             .addPhoneNumber((selectedPerson?.phone_mobile || ''), 'CELL')
             .addPhoneNumber((selectedPerson?.phone_direct || ''), 'HOME')
+            .addPhoneNumber((selectedPerson?.phone_other || ''), 'OTHER')
             .addAddress(null, null, (selectedPerson?.address1 || ''), (selectedPerson?.city || ''), (selectedPerson?.state || ''), (selectedPerson?.zip_code || ''), (selectedPerson?.country || ''))
             .addURL((selectedPerson?.website || ''))
             .addNote((selectedPerson?.notes || ''))
-            .addPhotoURL(baseUrl + 'avatars/' + photo)
+            .addPhotoURL(photo !== '' ? baseUrl + '/avatars/' + photo : '')
+            .addBirthday((selectedPerson?.birthday || ''));
 
         let file = new Blob([
             myVCard.toString()
@@ -985,13 +1110,18 @@ const Contacts = (props) => {
                                 <div className="contact-company">
                                     <span>
                                         {
-                                            (contactSearchCustomer?.selectedContact?.id || 0) > 0
-                                                ? (contactSearchCustomer?.selectedContact?.company || '') === ''
-                                                    ? (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal'
-                                                        ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
-                                                        : ''
-                                                    : contactSearchCustomer?.selectedContact?.company
-                                                : ''
+                                            // (contactSearchCustomer?.selectedContact?.id || 0) > 0
+                                            //     ? (contactSearchCustomer?.selectedContact?.company || '') === ''
+                                            //         ? (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal'
+                                            //             ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
+                                            //             : ''
+                                            //         : contactSearchCustomer?.selectedContact?.company
+                                            //     : ''
+                                            (contactSearchCustomer?.selectedContact?.company || '') === ''
+                                                ? (contactSearchCustomer?.selectedContact?.type || 'internal') === 'internal'
+                                                    ? (contactSearchCustomer?.selectedContact?.customer?.name || '')
+                                                    : ''
+                                                : contactSearchCustomer?.selectedContact?.company
                                         }
                                     </span>
 
@@ -1221,19 +1351,43 @@ const Contacts = (props) => {
                                         </div>
                                     }
 
+                                    <input type="file" ref={refImportContact} accept='.vcf' onChange={importContact} style={{ display: 'none' }} />
+
                                     <div className={
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
-                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 0)
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0)
+                                            ? 'mochi-button disabled' : 'mochi-button'
+                                    } onClick={() => {
+                                        refImportContact.current.click();
+                                    }} style={{
+                                        marginLeft: '0.2rem',
+                                        pointerEvents: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
+                                            ? 'all' : 'none',
+                                        cursor: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
+                                            ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
+                                            ? 'pointer' : 'not-allowed'
+                                    }}>
+                                        <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                        <div className="mochi-button-base">Import</div>
+                                        <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                    </div>
+
+                                    <div className={
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 0)
                                             ? 'mochi-button disabled' : 'mochi-button'
                                     } onClick={exportContact} style={{
                                         marginLeft: '0.2rem',
                                         pointerEvents: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
                                             ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 1))
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
                                             ? 'all' : 'none',
                                         cursor: ((contactSearchCustomer?.selectedContact?.id !== undefined && contactSearchCustomer?.selectedContact?.id > 0) &&
                                             ((props.user?.user_code?.is_admin || 0) === 1 ||
-                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.export || 0) === 1))
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.edit || 0) === 1))
                                             ? 'pointer' : 'not-allowed'
                                     }}>
                                         <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
@@ -1292,7 +1446,7 @@ const Contacts = (props) => {
 
                             </div>
                         </div>
-                        
+
                         <div className="contact-form-fields">
                             <div className="col-contact-form">
                                 <div className="contact-form-wrapper">

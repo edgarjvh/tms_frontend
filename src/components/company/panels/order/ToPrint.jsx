@@ -141,7 +141,7 @@ export default class ToPrint extends Component {
                                 marginBottom: '2px',
                                 marginTop: '2px'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>CODE:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'uppercase' }}>CODE:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{((this.props.selectedOrder?.bill_to_company?.code_number || 0) === 0 ? (this.props.selectedOrder?.bill_to_company?.code || '') : this.props.selectedOrder?.bill_to_company?.code + this.props.selectedOrder?.bill_to_company?.code_number).toUpperCase()}</span>
                             </div>
 
@@ -149,7 +149,7 @@ export default class ToPrint extends Component {
                                 ...this.styleFlexRow,
                                 marginBottom: '2px'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>NAME:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'capitalize' }}>NAME:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.name || '')}</span>
                             </div>
 
@@ -158,7 +158,7 @@ export default class ToPrint extends Component {
                                 marginBottom: '2px',
                                 alignItems: 'flex-start'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>ADDRESS 1:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'capitalize' }}>ADDRESS 1:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.address1 || '')}</span>
                             </div>
 
@@ -167,7 +167,7 @@ export default class ToPrint extends Component {
                                 marginBottom: '2px',
                                 alignItems: 'flex-start'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>ADDRESS 2:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'capitalize' }}>ADDRESS 2:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.address2 || '')}</span>
                             </div>
 
@@ -180,21 +180,21 @@ export default class ToPrint extends Component {
                                 <div style={{
                                     ...this.styleFlexRow
                                 }}>
-                                    <span style={{ ...this.styleFieldName, marginRight: 10 }}>CITY:</span> <span
+                                    <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'capitalize' }}>CITY:</span> <span
                                         style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.city || '')}</span>
                                 </div>
 
                                 <div style={{
                                     ...this.styleFlexRow
                                 }}>
-                                    <span style={{ ...this.styleFieldName, marginRight: 10 }}>STATE:</span> <span
+                                    <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'uppercase' }}>STATE:</span> <span
                                         style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.state || '')}</span>
                                 </div>
 
                                 <div style={{
                                     ...this.styleFlexRow
                                 }}>
-                                    <span style={{ ...this.styleFieldName, marginRight: 10 }}>ZIP:</span> <span
+                                    <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'uppercase' }}>ZIP:</span> <span
                                         style={{ ...this.styleFieldDataBold }}>{(this.props.selectedOrder?.bill_to_company?.zip || '')}</span>
                                 </div>
                             </div>
@@ -203,7 +203,7 @@ export default class ToPrint extends Component {
                                 ...this.styleFlexRow,
                                 marginBottom: '2px'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>CONTACT NAME:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'capitalize' }}>CONTACT NAME:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{
                                         (this.props.selectedOrder?.bill_to_company?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? (this.props.selectedOrder?.bill_to_company?.contact_name || '')
@@ -254,7 +254,7 @@ export default class ToPrint extends Component {
                                 ...this.styleFlexRow,
                                 marginBottom: '2px'
                             }}>
-                                <span style={{ ...this.styleFieldName, marginRight: 10 }}>E-MAIL:</span> <span
+                                <span style={{ ...this.styleFieldName, marginRight: 10, textTransform: 'lowercase' }}>E-MAIL:</span> <span
                                     style={{ ...this.styleFieldDataBold }}>{
                                         (this.props.selectedOrder?.bill_to_company?.contacts || []).find(c => c.is_primary === 1) === undefined
                                             ? (this.props.selectedOrder?.bill_to_company?.email || '')
@@ -655,7 +655,7 @@ export default class ToPrint extends Component {
                                                         <div
                                                             style={{ ...this.styleFieldName }}>{route.type === 'pickup' ? 'Pick-Up' : 'Delivery'} Information
                                                         </div>
-                                                        <div style={{ ...this.styleFieldData }}>
+                                                        <div style={{ ...this.styleFieldData, textTransform: 'capitalize' }}>
                                                             {customer.name} <br />
                                                             {customer.address1} <br />
                                                             {customer.city}, {customer.state} {customer.zip}

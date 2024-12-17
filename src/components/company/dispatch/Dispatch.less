@@ -21,11 +21,42 @@
   transition                                        : all ease 0.7s;
   padding                                           : 10px;
 
-  // .form-bordered-box{
-  //   .form-header{
-  //     float: left;
-  //   }
-  // }
+  .form-bordered-box{
+    &.form-disabled{
+      .input-box-container, .select-box-container, .select-box-wrapper{
+        background-color: #f0f0f0 !important;
+        color: #a0a0a0;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .mochi-button{        
+        pointer-events: none;
+        user-select: none;
+
+        .mochi-button-decorator, .mochi-button-base{
+          color: #a0a0a0 !important;
+          pointer-events: none !important;
+        }
+      }
+    }
+  }
+
+  .form-borderless-box{
+    &.form-disabled{
+      .input-box-container{
+        background-color: #f0f0f0;
+        color: #a0a0a0;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .input-toggle-container{
+        pointer-events: none;
+        user-select: none;
+      }
+    }
+  }
 
   .form-page{
     display: grid;

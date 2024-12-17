@@ -1,0 +1,20 @@
+BEGIN:VCARD
+VERSION:3.0
+REV:2024-12-16T18:02:17.012Z
+N;CHARSET=utf-8:Aycock;Carrol (CW);;;
+FN;CHARSET=utf-8:Carrol (CW) Aycock
+ORG;CHARSET=utf-8:Texas Refinery Corp;Protective Coatings Division
+TITLE;CHARSET=utf-8:
+EMAIL;INTERNET;PREF;WORK:caycock@texasrefinery.com
+EMAIL;INTERNET:
+EMAIL;INTERNET:
+TEL;PREF;WORK:800-827-0711
+TEL;FAX:
+TEL;CELL:
+TEL;HOME:
+ADR;WORK;POSTAL;CHARSET=utf-8:null;null;840 N Main St;Fort Worth;TX;76164
+ ;
+URL:
+NOTE;CHARSET=utf-8:
+PHOTO;VALUE=uri:http://localhost:8000/avatars/
+END:VCARD

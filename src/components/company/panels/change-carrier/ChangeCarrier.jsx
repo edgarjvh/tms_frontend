@@ -76,8 +76,13 @@ const ChangeCarrier = (props) => {
                 }).then(res => {
                     if (res.data.result === 'OK') {
                         const carrier = { ...res.data.carrier };
-                        if ((carrier?.insurance_status || '') === 'active') {
+                        if ((carrier?.insurance_status || '') === 'expired') {
                             window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
+                            return;
+                        } else if ((carrier?.insurance_status || '') === 'warning') {
+                            window.alert(`The carrier's insurance is expiring in ${carrier?.insurance_remaining_days || 0} days. Please update as soon as possible.`);
+                        } else if ((carrier?.insurance_flag || 0) === 1) {
+                            window.alert("This carrier isn't allowed to be assigned to an order because the insurance document must be uploaded first.");
                             return;
                         }
 
@@ -151,11 +156,18 @@ const ChangeCarrier = (props) => {
                                     const carrier = res.data.carrier;
 
                                     if (carrier) {
-                                        if ((carrier?.insurance_status || '') === 'active') {
+                                        if ((carrier?.insurance_status || '') === 'expired') {
                                             window.alert("This carrier isn't allowed to be assigned to an order because it doesn't have an active insurance status.");
                                             reject("no carrier");
                                             return;
+                                        } else if ((carrier?.insurance_status || '') === 'warning') {
+                                            window.alert(`The carrier's insurance is expiring in ${carrier?.insurance_remaining_days || 0} days. Please update as soon as possible.`);
+                                        } else if ((carrier?.insurance_flag || 0) === 1) {
+                                            window.alert("This carrier isn't allowed to be assigned to an order because the insurance document must be uploaded first.");
+                                            reject("no carrier");
+                                            return;
                                         }
+                                        
                                         setNewCarrier({ ...carrier });
                                         resolve("OK");
                                     } else {

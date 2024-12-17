@@ -21,6 +21,33 @@
   transition: all ease 0.7s;
   padding: 10px;
 }
+.dispatch-main-container .form-bordered-box.form-disabled .input-box-container,
+.dispatch-main-container .form-bordered-box.form-disabled .select-box-container,
+.dispatch-main-container .form-bordered-box.form-disabled .select-box-wrapper {
+  background-color: #f0f0f0 !important;
+  color: #a0a0a0;
+  pointer-events: none;
+  user-select: none;
+}
+.dispatch-main-container .form-bordered-box.form-disabled .mochi-button {
+  pointer-events: none;
+  user-select: none;
+}
+.dispatch-main-container .form-bordered-box.form-disabled .mochi-button .mochi-button-decorator,
+.dispatch-main-container .form-bordered-box.form-disabled .mochi-button .mochi-button-base {
+  color: #a0a0a0 !important;
+  pointer-events: none !important;
+}
+.dispatch-main-container .form-borderless-box.form-disabled .input-box-container {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+  pointer-events: none;
+  user-select: none;
+}
+.dispatch-main-container .form-borderless-box.form-disabled .input-toggle-container {
+  pointer-events: none;
+  user-select: none;
+}
 .dispatch-main-container .form-page {
   display: grid;
   grid-template-columns: 1fr;

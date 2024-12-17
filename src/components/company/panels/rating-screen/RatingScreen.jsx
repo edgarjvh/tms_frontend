@@ -79,14 +79,140 @@ const RatingScreen = (props) => {
     const [billToPiecesItems, setBillToPiecesItems] = useState([
         {
             id: 1,
+            name: 'Bag ',
+            value: 'bag',
+            selected: false
+        },
+        {
+            id: 2,
+            name: 'Bale',
+            value: 'bale',
+            selected: false
+        },
+        {
+            id: 3,
+            name: 'Box',
+            value: 'box',
+            selected: false
+        },
+        {
+            id: 4,
+            name: 'Bucket',
+            value: 'buck',
+            selected: false
+        },
+        {
+            id: 5,
+            name: 'Bundle',
+            value: 'bdle',
+            selected: false
+        },
+        {
+            id: 6,
+            name: 'Can',
+            value: 'can',
+            selected: false
+        },
+        {
+            id: 7,
+            name: 'Carton',
+            value: 'cton',
+            selected: false
+        },
+        {
+            id: 8,
+            name: 'Case',
+            value: 'case',
+            selected: false
+        },
+        {
+            id: 9,
+            name: 'Coil',
+            value: 'coil',
+            selected: false
+        },
+        {
+            id: 10,
+            name: 'Crate',
+            value: 'crat',
+            selected: false
+        },
+        {
+            id: 11,
+            name: 'Cylinder',
+            value: 'cyl',
+            selected: false
+        },
+        {
+            id: 12,
+            name: 'Drums',
+            value: 'drms',
+            selected: false
+        },
+        {
+            id: 13,
+            name: 'Each',
+            value: 'each',
+            selected: false
+        },
+        {
+            id: 14,
+            name: 'Flat',
+            value: 'flat',
+            selected: false
+        },
+        {
+            id: 15,
+            name: 'Loose',
+            value: 'loose',
+            selected: false
+        },
+        {
+            id: 16,
+            name: 'Pail',
+            value: 'pail',
+            selected: false
+        },
+        {
+            id: 17,
+            name: 'Pallet',
+            value: 'plet',
+            selected: false
+        },
+        {
+            id: 18,
             name: 'Pieces',
             value: 'pc',
             selected: false
         },
         {
-            id: 2,
-            name: 'Skids',
+            id: 19,
+            name: 'Reel',
+            value: 'reel',
+            selected: false
+        },
+        {
+            id: 20,
+            name: 'Roll',
+            value: 'roll',
+            selected: false
+        },
+        {
+            id: 21,
+            name: 'Skid',
             value: 'sk',
+            selected: false
+        },
+        {
+            id: 22,
+            name: 'Tote',
+            value: 'tote',
+            selected: false
+        },
+        {
+            id: 23,
+            name: 'Tube',
+            value: 'tube',
             selected: false
         }
     ]);
@@ -177,14 +303,140 @@ const RatingScreen = (props) => {
     const [carrierPiecesItems, setCarrierPiecesItems] = useState([
         {
             id: 1,
+            name: 'Bag ',
+            value: 'bag',
+            selected: false
+        },
+        {
+            id: 2,
+            name: 'Bale',
+            value: 'bale',
+            selected: false
+        },
+        {
+            id: 3,
+            name: 'Box',
+            value: 'box',
+            selected: false
+        },
+        {
+            id: 4,
+            name: 'Bucket',
+            value: 'buck',
+            selected: false
+        },
+        {
+            id: 5,
+            name: 'Bundle',
+            value: 'bdle',
+            selected: false
+        },
+        {
+            id: 6,
+            name: 'Can',
+            value: 'can',
+            selected: false
+        },
+        {
+            id: 7,
+            name: 'Carton',
+            value: 'cton',
+            selected: false
+        },
+        {
+            id: 8,
+            name: 'Case',
+            value: 'case',
+            selected: false
+        },
+        {
+            id: 9,
+            name: 'Coil',
+            value: 'coil',
+            selected: false
+        },
+        {
+            id: 10,
+            name: 'Crate',
+            value: 'crat',
+            selected: false
+        },
+        {
+            id: 11,
+            name: 'Cylinder',
+            value: 'cyl',
+            selected: false
+        },
+        {
+            id: 12,
+            name: 'Drums',
+            value: 'drms',
+            selected: false
+        },
+        {
+            id: 13,
+            name: 'Each',
+            value: 'each',
+            selected: false
+        },
+        {
+            id: 14,
+            name: 'Flat',
+            value: 'flat',
+            selected: false
+        },
+        {
+            id: 15,
+            name: 'Loose',
+            value: 'loose',
+            selected: false
+        },
+        {
+            id: 16,
+            name: 'Pail',
+            value: 'pail',
+            selected: false
+        },
+        {
+            id: 17,
+            name: 'Pallet',
+            value: 'plet',
+            selected: false
+        },
+        {
+            id: 18,
             name: 'Pieces',
             value: 'pc',
             selected: false
         },
         {
-            id: 2,
-            name: 'Skids',
+            id: 19,
+            name: 'Reel',
+            value: 'reel',
+            selected: false
+        },
+        {
+            id: 20,
+            name: 'Roll',
+            value: 'roll',
+            selected: false
+        },
+        {
+            id: 21,
+            name: 'Skid',
             value: 'sk',
+            selected: false
+        },
+        {
+            id: 22,
+            name: 'Tote',
+            value: 'tote',
+            selected: false
+        },
+        {
+            id: 23,
+            name: 'Tube',
+            value: 'tube',
             selected: false
         }
     ]);
@@ -1374,7 +1626,7 @@ const RatingScreen = (props) => {
                             onTab={(e) => {
                                 if (billToRateTypeItems.length > 0) {
                                     e.preventDefault();
-                                    
+
                                     setRateType('');
 
                                     setSelectedBillToRating(prev => {
@@ -1634,9 +1886,9 @@ const RatingScreen = (props) => {
                         <div className="select-box-container" style={{ // PIECES/SKIDS
                             display: ((selectedBillToRating.rate_type?.name || '').toLowerCase() === 'flat' ||
                                 (selectedBillToRating.rate_type?.name || '').toLowerCase() === 'linehaul') ? 'flex' : 'none',
-                            width: '8rem',
-                            maxWidth: '8rem',
-                            minWidth: '8rem',
+                            width: '10rem',
+                            maxWidth: '10rem',
+                            minWidth: '10rem',
                             marginRight: 2
                         }}>
                             <div className="select-box-wrapper">
@@ -1655,7 +1907,7 @@ const RatingScreen = (props) => {
                                     style={{
                                         textAlign: 'right',
                                         fontWeight: 'bold',
-                                        paddingRight: (selectedBillToRating.pieces || '') !== '' ? 25 : 0
+                                        // paddingRight: (selectedBillToRating.pieces || '') !== '' ? 40 : 0
                                     }}
                                     mask={numberMask}
                                     type="text"
@@ -1665,19 +1917,21 @@ const RatingScreen = (props) => {
                                         let key = e.keyCode || e.which;
 
                                         if ((selectedOrder?.invoice_customer_reviewed || 0) === 0) {
-                                            if (key === 80) {
-                                                e.preventDefault();
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    pieces_unit: 'pc'
-                                                })
-                                            } else if (key === 83) {
-                                                e.preventDefault();
-                                                setSelectedBillToRating({
-                                                    ...selectedBillToRating,
-                                                    pieces_unit: 'sk'
-                                                })
-                                            } else if (key === 38) {
+                                            // if (key === 80) {
+                                            //     e.preventDefault();
+                                            //     setSelectedBillToRating({
+                                            //         ...selectedBillToRating,
+                                            //         pieces_unit: 'pc'
+                                            //     })
+                                            // } else if (key === 83) {
+                                            //     e.preventDefault();
+                                            //     setSelectedBillToRating({
+                                            //         ...selectedBillToRating,
+                                            //         pieces_unit: 'sk'
+                                            //     })
+                                            // } else 
+
+                                            if (key === 38) {
                                                 e.preventDefault();
                                                 if (showBillToPiecesItems) {
                                                     let selectedIndex = billToPiecesItems.findIndex(item => item.selected);
@@ -1827,18 +2081,16 @@ const RatingScreen = (props) => {
                                         })
                                     }}
                                 />
-                                {
-                                    (selectedBillToRating.pieces || '') !== '' &&
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        right: '18px',
-                                        transform: 'translateY(-50%)',
-                                        fontSize: '0.75rem',
-                                        fontFamily: 'Mochi Med Oblique',
-                                        fontWeight: 'bold'
-                                    }}>{selectedBillToRating.pieces_unit || ''}</div>
-                                }
+                                <div style={{
+                                    // position: 'absolute',
+                                    // top: '50%',
+                                    // right: '18px',
+                                    // transform: 'translateY(-50%)',
+                                    fontSize: '0.75rem',
+                                    fontFamily: 'Mochi Med Oblique',
+                                    fontWeight: 'bold',
+                                    marginRight: (selectedBillToRating?.pieces || '') !== '' ? 16 : 0
+                                }}>{(selectedBillToRating?.pieces || '') !== '' ? selectedBillToRating.pieces_unit || '' : ''}</div>
                                 {
                                     (selectedBillToRating.pieces || '') !== '' &&
                                     <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
@@ -5488,9 +5740,9 @@ const RatingScreen = (props) => {
                         <div className="select-box-container" style={{ // PIECES/SKIDS
                             display: ((selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'flat' ||
                                 (selectedCarrierRating.rate_type?.name || '').toLowerCase() === 'linehaul') ? 'flex' : 'none',
-                            width: '8rem',
-                            maxWidth: '8rem',
-                            minWidth: '8rem',
+                            width: '10rem',
+                            maxWidth: '10rem',
+                            minWidth: '10rem',
                             marginRight: 2
                         }}>
                             <div className="select-box-wrapper">
@@ -5509,7 +5761,7 @@ const RatingScreen = (props) => {
                                     style={{
                                         textAlign: 'right',
                                         fontWeight: 'bold',
-                                        paddingRight: (selectedCarrierRating.pieces || '') !== '' ? 25 : 0
+                                        // paddingRight: (selectedCarrierRating.pieces || '') !== '' ? 25 : 0
                                     }}
                                     mask={numberMask}
                                     type="text"
@@ -5519,19 +5771,20 @@ const RatingScreen = (props) => {
                                         let key = e.keyCode || e.which;
 
                                         if ((selectedOrder?.invoice_carrier_previewed || 0) === 0) {
-                                            if (key === 80) {
-                                                e.preventDefault();
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    pieces_unit: 'pc'
-                                                })
-                                            } else if (key === 83) {
-                                                e.preventDefault();
-                                                setSelectedCarrierRating({
-                                                    ...selectedCarrierRating,
-                                                    pieces_unit: 'sk'
-                                                })
-                                            } else if (key === 38) {
+                                            // if (key === 80) {
+                                            //     e.preventDefault();
+                                            //     setSelectedCarrierRating({
+                                            //         ...selectedCarrierRating,
+                                            //         pieces_unit: 'pc'
+                                            //     })
+                                            // } else if (key === 83) {
+                                            //     e.preventDefault();
+                                            //     setSelectedCarrierRating({
+                                            //         ...selectedCarrierRating,
+                                            //         pieces_unit: 'sk'
+                                            //     })
+                                            // } else 
+                                            if (key === 38) {
                                                 e.preventDefault();
                                                 if (showCarrierPiecesItems) {
                                                     let selectedIndex = carrierPiecesItems.findIndex(item => item.selected);
@@ -5668,18 +5921,16 @@ const RatingScreen = (props) => {
                                         })
                                     }}
                                 />
-                                {
-                                    (selectedCarrierRating.pieces || '') !== '' &&
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        right: '18px',
-                                        transform: 'translateY(-50%)',
-                                        fontSize: '0.75rem',
-                                        fontFamily: 'Mochi Med Oblique',
-                                        fontWeight: 'bold'
-                                    }}>{selectedCarrierRating.pieces_unit || ''}</div>
-                                }
+                                <div style={{
+                                    // position: 'absolute',
+                                    // top: '50%',
+                                    // right: '18px',
+                                    // transform: 'translateY(-50%)',
+                                    fontSize: '0.75rem',
+                                    fontFamily: 'Mochi Med Oblique',
+                                    fontWeight: 'bold',
+                                    marginRight: (selectedCarrierRating?.pieces || '') !== '' ? 16 : 0
+                                }}>{(selectedCarrierRating?.pieces || '') !== '' ? selectedCarrierRating.pieces_unit || '' : ''}</div>
                                 {
                                     (selectedCarrierRating.pieces || '') !== '' &&
                                     <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {

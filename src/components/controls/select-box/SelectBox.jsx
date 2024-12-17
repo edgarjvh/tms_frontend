@@ -1,8 +1,8 @@
 import React from "react";
-import {connect} from "react-redux";
-import {useTransition, animated} from "react-spring";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCaretDown, faCaretRight} from "@fortawesome/free-solid-svg-icons";
+import { connect } from "react-redux";
+import { useTransition, animated } from "react-spring";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import classnames from "classnames";
 import './SelectBox.css';
 import PropTypes from 'prop-types';
@@ -64,26 +64,17 @@ function SelectBox(
         readOnly = false,
         isDropdownEnabled = true,
         popupPosition = 'vertical below',
-        onEnter = () => {
-        },
-        onTab = () => {
-        },
-        onBlur = () => {
-        },
-        onInput = () => {
-        },
-        onChange = () => {
-        },
+        onEnter = () => { },
+        onTab = () => { },
+        onBlur = () => { },
+        onInput = () => { },
+        onChange = () => { },
         value = '',
         items = [],
-        getItems = () => {
-        },
-        setItems = () => {
-        },
-        onDropdownClick = () => {
-        },
-        onPopupClick = () => {
-        },
+        getItems = () => { },
+        setItems = () => { },
+        onDropdownClick = () => { },
+        onPopupClick = () => { },
         transitionFromTop = 'calc(100% + 7px)',
         transitionEnterTop = 'calc(100% + 12px)',
         transitionLeaveTop = 'calc(100% + 7px)',
@@ -93,20 +84,19 @@ function SelectBox(
         noStopPropagationOnEsc = false,
         avoidCheckItemsOnTab = false,
         triggerField = 0,
-        validateToSave = () => {
-        },
+        validateToSave = () => { },
         labelType = 'default',
         showHandler = 'array',
         showValue = false,
         title = ''
     }) {
-    const {refInput, refPopupItems, refDropdown} = refs;
+    const { refInput, refPopupItems, refDropdown } = refs;
 
     const popupTransition = useTransition(isDropdownEnabled && (showHandler === 'array' ? items.length > 0 : showValue), {
-        from: {opacity: 0, top: transitionFromTop},
-        enter: {opacity: 1, top: transitionEnterTop},
-        leave: {opacity: 0, top: transitionLeaveTop},
-        config: {duration: 100},
+        from: { opacity: 0, top: transitionFromTop },
+        enter: { opacity: 1, top: transitionEnterTop },
+        leave: { opacity: 0, top: transitionLeaveTop },
+        config: { duration: 100 },
         reverse: isDropdownEnabled && (showHandler === 'array' ? items.length > 0 : showValue)
     });
 
@@ -132,7 +122,7 @@ function SelectBox(
             <input
                 type="text"
                 tabIndex={tabIndex}
-                style={{...inputStyle}}
+                style={{ ...inputStyle }}
                 title={title}
                 placeholder={placeholderFixed ? '' : placeholder}
                 ref={refInput}
@@ -329,7 +319,7 @@ function SelectBox(
                                                         : (item?.name || '')
                                             }
                                             {item.selected && <FontAwesomeIcon className="dropdown-selected"
-                                                                               icon={faCaretRight}/>}
+                                                icon={faCaretRight} />}
                                         </div>
                                     );
                                 })}
@@ -391,4 +381,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps, null, null, {forwardRef: true})(SelectBox);
+export default connect(mapStateToProps, null, null, { forwardRef: true })(SelectBox);

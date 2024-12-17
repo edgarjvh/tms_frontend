@@ -197,7 +197,7 @@ export default class CustomerConfirmation extends Component {
                                             <div
                                                 style={{ ...this.styleFieldName }}>{route.type === 'pickup' ? 'Pick-Up' : 'Delivery'} Information
                                             </div>
-                                            <div style={{ ...this.styleFieldData }}>
+                                            <div style={{ ...this.styleFieldData, textTransform: 'capitalize' }}>
                                                 {customer.name} <br />
                                                 {customer.address1} <br />
                                                 {customer.city}, {customer.state} {customer.zip}
