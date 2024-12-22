@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './CustomerImport.css';
@@ -423,38 +425,21 @@ const CarrierImport = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refCustomerImportContainer}>
+        <div className="panel-content" tabIndex={0} ref={refCustomerImportContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper" style={{ flexDirection: 'column' }}>
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            {/* <div style={{
-                                position: 'relative',
-                                width: '90%',
-                                maxWidth: '600px',
-                                height: 15,
-                                borderRadius: 10,
-                                overflow: 'hidden',
-                                marginTop: 15,
-                                display: 'flex',
-                                backgroundColor: 'lightgray',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <div style={{fontSize: '12px', zIndex: 1}}>{customerCurrentListLength} of {customerTotalListLength} | {Math.floor((customerCurrentListLength / customerTotalListLength) * 100)}%</div>
-                                <div style={{
-                                    background: 'linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 50%,rgba(64,150,238,1) 100%)',
-                                    position: 'absolute',
-                                    height: '100%',
-                                    top: 0,
-                                    left: 0,
-                                    width: (Math.floor((customerCurrentListLength / customerTotalListLength) * 100)) + '%'
-                                }}></div>
-                            </div> */}
                         </div>
                     </animated.div>
                 )
@@ -564,25 +549,8 @@ const CarrierImport = (props) => {
                                     {
                                         customerList.map((customer, index) => {
 
-                                            // let parseCity = customer.city.toLowerCase().trim().replace(/\s/g, "").substring(0, 3);
-
-                                            // if (parseCity.toLowerCase() === "ft.") {
-                                            //     parseCity = "FO";
-                                            // }
-                                            // if (parseCity.toLowerCase() === "mt.") {
-                                            //     parseCity = "MO";
-                                            // }
-                                            // if (parseCity.toLowerCase() === "st.") {
-                                            //     parseCity = "SA";
-                                            // }
-
-                                            // const code = ((customer.name || '').trim().replace(/\s/g, "").replace("&", "A").substring(0, 3) + parseCity.substring(0, 2) + (customer.state || '').trim().replace(/\s/g, "").substring(0, 2)).toUpperCase();
-
-                                            // customer.matches = currentCustomers.filter(cus => cus.code.toUpperCase() === code);
-
                                             const rowContainerClasses = classNames({
                                                 'row-container': true,
-                                                'hidden': false,
                                                 'hidden': false
                                             });
 

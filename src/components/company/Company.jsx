@@ -1102,11 +1102,6 @@ function Company(props) {
                                                 }}
 
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
@@ -1189,10 +1184,7 @@ function Company(props) {
                                                     }
                                                 }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
+
 
                                                 {
                                                     panel?.component?.props?.isOnPanel
@@ -1278,11 +1270,6 @@ function Company(props) {
                                                     }
                                                 }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
@@ -1370,17 +1357,12 @@ function Company(props) {
                                                     }
                                                 }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div>
+                                                            <div className="title">{panel?.component?.props?.title}</div>                                                            
                                                             <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
@@ -1459,11 +1441,6 @@ function Company(props) {
                                                     }
                                                 }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
@@ -1548,11 +1525,6 @@ function Company(props) {
                                                     }
                                                 }}
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?
@@ -1638,11 +1610,6 @@ function Company(props) {
                                                 }}
 
                                             >
-                                                <div className="close-btn" title="Close" onClick={e => {
-                                                    e.stopPropagation();
-                                                    closePanel(panel?.panelName, origin)
-                                                }}><span className="fas fa-times"></span></div>
-
                                                 {
                                                     panel?.component?.props?.isOnPanel
                                                         ?

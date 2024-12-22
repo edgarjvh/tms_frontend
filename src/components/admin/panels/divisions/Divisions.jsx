@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -271,7 +273,7 @@ const Divisions = (props) => {
         }
     }, [selectedDivision?.contacts])
 
-    useEffect(async () => {
+    useEffect(() => {
         let phones = [];
         (selectedContact?.phone_work || '') !== '' && phones.push({
             id: 1,
@@ -299,7 +301,7 @@ const Divisions = (props) => {
             phone: selectedContact.phone_other
         });
 
-        await setDivisionContactPhoneItems(phones);
+        setDivisionContactPhoneItems(phones);
     }, [
         selectedContact?.phone_work,
         selectedContact?.phone_work_fax,
@@ -309,7 +311,7 @@ const Divisions = (props) => {
         selectedContact?.primary_phone
     ]);
 
-    useEffect(async () => {
+    useEffect(() => {
         let emails = [];
         (selectedContact?.email_work || '') !== '' && emails.push({
             id: 1,
@@ -327,7 +329,7 @@ const Divisions = (props) => {
             email: selectedContact.email_other
         });
 
-        await setDivisionContactEmailItems(emails);
+        setDivisionContactEmailItems(emails);
     }, [
         selectedContact?.email_work,
         selectedContact?.email_personal,
@@ -686,8 +688,11 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-division-search`}
                 origin={props.origin}
                 suborigin='division'
-                
-                
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-division-search`, props.origin);
+                    refDivisionCode.current.focus({ preventScroll: true });
+                }}
+
                 componentId={moment().format('x')}
                 customerSearch={divisionSearch}
 
@@ -772,8 +777,11 @@ const Divisions = (props) => {
                 owner='division'
                 origin={props.origin}
                 suborigin='division'
-                
-                
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contact-search`, props.origin);
+                    refDivisionCode.current.focus({ preventScroll: true });
+                }}
+
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
 
@@ -1067,8 +1075,11 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'division'}
-                
-                
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-revenue-information`, props.origin);
+                    refDivisionCode.current.focus({ preventScroll: true });
+                }}
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedDivision}
@@ -1087,8 +1098,11 @@ const Divisions = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'division'}
-                
-                
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-order-history`, props.origin);
+                    refDivisionCode.current.focus({ preventScroll: true });
+                }}
+
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
                 selectedCustomer={selectedDivision}
@@ -1108,8 +1122,11 @@ const Divisions = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'division'}
-                    
-                    
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents`, props.origin);
+                        refDivisionCode.current.focus({ preventScroll: true });
+                    }}
+
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedDivision }}
                     isAdmin={props.isAdmin}
@@ -1279,18 +1296,18 @@ const Divisions = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refDivisionsContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27){
-                if ((selectedDivision?.id || 0) > 0){
-                    e.stopPropagation();
-
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                if ((selectedDivision?.id || 0) > 0) {
                     setInitialValues();
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -1589,7 +1606,7 @@ const Divisions = (props) => {
                                     />
 
                                     {
-                                        (selectedPrimaryContact?.id || 0 > 0) &&
+                                        ((selectedPrimaryContact?.id || 0) > 0) &&
                                         <div
                                             className={classnames({
                                                 'selected-division-contact-primary-phone': true,
@@ -1701,7 +1718,7 @@ const Divisions = (props) => {
                                         }
                                     />
                                     {
-                                        (selectedPrimaryContact?.id || 0 > 0) &&
+                                        ((selectedPrimaryContact?.id || 0) > 0) &&
                                         <div
                                             className={classnames({
                                                 'selected-division-contact-primary-email': true,
@@ -1764,8 +1781,11 @@ const Divisions = (props) => {
                                                 removeAvatarUrl='/removeDivisioContactAvatar'
                                                 origin={props.origin}
                                                 owner='division'
-                                                
-                                                
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contacts`, props.origin);
+                                                    refDivisionCode.current.focus({ preventScroll: true });
+                                                }}
+
                                                 componentId={moment().format('x')}
 
                                                 contactSearchCustomer={{
@@ -1809,8 +1829,11 @@ const Divisions = (props) => {
                                                 removeAvatarUrl='/removeDivisioContactAvatar'
                                                 origin={props.origin}
                                                 owner='division'
-                                                
-                                                
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contacts`, props.origin);
+                                                    refDivisionCode.current.focus({ preventScroll: true });
+                                                }}
+
                                                 componentId={moment().format('x')}
                                                 isEditingContact={true}
 
@@ -2070,6 +2093,8 @@ const Divisions = (props) => {
                                                                     phone_other: e.target.value
                                                                 });
                                                                 break;
+                                                            default:
+                                                                break;
                                                         }
                                                     }
                                                 }
@@ -2119,6 +2144,8 @@ const Divisions = (props) => {
                                                                     ...selectedContact,
                                                                     phone_other: e.target.value
                                                                 });
+                                                                break;
+                                                            default:
                                                                 break;
                                                         }
                                                     }
@@ -2513,6 +2540,8 @@ const Divisions = (props) => {
                                                                     email_other: e.target.value
                                                                 });
                                                                 break;
+                                                            default:
+                                                                break;
                                                         }
                                                     }
                                                 }
@@ -2550,6 +2579,8 @@ const Divisions = (props) => {
                                                                     ...selectedContact,
                                                                     email_other: e.target.value
                                                                 });
+                                                                break;
+                                                            default:
                                                                 break;
                                                         }
                                                     }
@@ -2791,8 +2822,11 @@ const Divisions = (props) => {
                                                                         removeAvatarUrl='/removeAvatar'
                                                                         origin={props.origin}
                                                                         owner='division'
-                                                                        
-                                                                        
+                                                                        closingCallback={() => {
+                                                                            closePanel(`${props.panelName}-contacts`, props.origin);
+                                                                            refDivisionCode.current.focus({ preventScroll: true });
+                                                                        }}
+
                                                                         componentId={moment().format('x')}
 
                                                                         contactSearchCustomer={{
@@ -4376,8 +4410,11 @@ const Divisions = (props) => {
                                                             origin={props.origin}
                                                             isOnPanel={true}
                                                             isAdmin={props.isAdmin}
-                                                            
-                                                            
+                                                            closingCallback={() => {
+                                                                closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                                refDivisionCode.current.focus({ preventScroll: true });
+                                                            }}
+
                                                             componentId={moment().format('x')}
 
                                                             order_id={order.id}

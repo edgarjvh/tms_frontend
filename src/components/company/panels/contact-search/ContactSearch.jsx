@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from 'react';
 import './ContactSearch.css';
 import axios from 'axios';
@@ -86,6 +87,10 @@ const ContactSearch = (props) => {
                         suborigin={props.suborigin}
                         origin={props.origin}
                         owner={props.owner}
+                        closingCallback={() => { 
+                            closePanel(`${props.panelName}-contacts`, props.origin);
+                            refContactSearchContainer.current.focus({ preventScroll: true });
+                        }}
 
                         contactSearchCustomer={{
                             ...(props.suborigin === 'customer'
@@ -330,9 +335,15 @@ const ContactSearch = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refContactSearchContainer}>
+        <div className="panel-content" tabIndex={0} ref={refContactSearchContainer} onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>

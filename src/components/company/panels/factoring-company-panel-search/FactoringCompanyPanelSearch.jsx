@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useRef, useEffect} from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -211,9 +212,14 @@ const FactoringCompanyPanelSearch = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refFactoringCompanyPanelSearchContainer}>
+        <div className="panel-content" tabIndex={0} ref={refFactoringCompanyPanelSearchContainer} onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-            <div className="close-btn" title="Close" onClick={e => closePanelBtnClick(e, props.panelName)}><span className="fas fa-times"></span></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
             <div className="input-box-container" style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from "react-redux";
@@ -15,21 +17,21 @@ import { useTransition, animated } from 'react-spring';
 import { DragDropContext, Droppable, Draggable as DraggableDnd } from 'react-beautiful-dnd'
 import {
     setAdminHomePanels,
-setCompanyHomePanels,
-setAdminCarrierPanels,
-setCompanyCarrierPanels,
-setAdminCompanySetupPanels,
-setCompanyCompanySetupPanels,
-setAdminCustomerPanels,
-setCompanyCustomerPanels,
-setAdminDispatchPanels,
-setCompanyDispatchPanels,
-setAdminInvoicePanels,
-setCompanyInvoicePanels,
-setAdminLoadBoardPanels,
-setCompanyLoadBoardPanels,
-setAdminReportPanels,
-setCompanyReportPanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
 
     setSelectedOrder
 } from './../../../../actions';
@@ -71,7 +73,7 @@ const RoutingMap = (props) => {
             pixelRatio: window.devicePixelRatio || 1,
             padding: { top: 50, left: 50, bottom: 50, right: 50 }
         });
-        
+
         // add a resize listener to make sure that the map occupies the whole container
         window.addEventListener('resize', () => hMap.getViewPort().resize());
 
@@ -181,7 +183,7 @@ const RoutingMap = (props) => {
                     let routeLine = new H.map.Polyline(linestring, {
                         style: { strokeColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`, lineWidth: 3 }
                     });
-                    
+
                     let startMarker = new H.map.Marker(section.departure.place.location);
 
                     // Create a marker for the end point:
@@ -237,9 +239,15 @@ const RoutingMap = (props) => {
     }
 
     return (
-        <div className="panel-content routing-map" tabIndex={0} ref={refRoutingMapContainer}>
+        <div className="panel-content routing-map" tabIndex={0} ref={refRoutingMapContainer} onKeyDown={e => {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="map" ref={mapRef} style={{ height: "100%" }} />
         </div>

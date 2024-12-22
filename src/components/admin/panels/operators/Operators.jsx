@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -39,6 +41,7 @@ import {
 import { Documents, Calendar } from './../../../company/panels';
 
 const Operators = (props) => {
+    const refOperatorsContainer = useRef();
     const refPrefix = useRef();
     const refInputAvatar = useRef();
     const refOperatorInfoWrapper = useRef();
@@ -133,7 +136,7 @@ const Operators = (props) => {
         config: { duration: 100 }
     });
 
-    useEffect(async () => {
+    useEffect(() => {
         setOperatorSearchCompany(props.operatorSearchCompany || {});
 
         if (props.isEditingOperator) {
@@ -141,8 +144,9 @@ const Operators = (props) => {
             refPrefix.current.focus({
                 preventScroll: true
             });
+        }else{
+            refOperatorsContainer.current.focus({ preventScroll: true });
         }
-
     }, [])
 
     const saveOperator = () => {
@@ -908,8 +912,14 @@ const Operators = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" ref={refOperatorsContainer} tabIndex={0} onKeyDown={e => {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="operator-container" style={{ overflow: 'initial' }}>
                 <div className="operator-list-container">
@@ -1195,7 +1205,14 @@ const Operators = (props) => {
                                                 panelName={`${props.panelName}-operator-documents`}
                                                 origin={props.origin}
                                                 suborigin={'company-operator'}
-                                                
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-operator-documents`, props.origin);
+                                                    if (isEditingOperator){
+                                                        refPrefix.current.focus({ preventScroll: true });
+                                                    }else{
+                                                        refOperatorsContainer.current.focus({ preventScroll: true });
+                                                    }
+                                                }}
                                                 
                                                 componentId={moment().format('x')}
                                                 selectedOwner={{ ...operatorSearchCompany.selectedOperator }}

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -172,6 +174,29 @@ const OrderHistory = (props) => {
         }
 
         return formattedDate;
+    }
+
+    const clearFields = () => {
+        setDateStart('');
+        setDateEnd('');
+        setCityOrigin('');
+        setCityDestination('');
+        setStateOrigin('');
+        setStateDestination('');
+        setZipOrigin('');
+        setZipDestination('');
+        setBillToCode('');
+        if ((props.selectedCustomer?.id || 0) === 0) {
+            setCustomerCode('');
+        }
+        setPreSelectedDateStart(moment());
+        setPreSelectedDateEnd(moment());
+        setIsDateStartCalendarShown(false);
+        setIsDateEndCalendarShown(false);
+
+        setOrders([]);
+
+        refDateStart.current.inputElement.focus();
     }
 
     useEffect(() => {
@@ -986,18 +1011,36 @@ const OrderHistory = (props) => {
                 });
             });
 
-            sheet['!cols'] = properties;            
- 
-            XLSX.utils.book_append_sheet(book, sheet, 'Order History');            
+            sheet['!cols'] = properties;
+
+            XLSX.utils.book_append_sheet(book, sheet, 'Order History');
 
             XLSX.writeFile(book, 'Order History.xlsx');
         }
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refOrderHistoryContainer}>
+        <div className="panel-content" tabIndex={0} ref={refOrderHistoryContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                if ((dateStart || '') !== '' ||
+                    (dateEnd || '') !== '' ||
+                    (cityOrigin || '') !== '' ||
+                    (cityDestination || '') !== '' ||
+                    (stateOrigin || '') !== '' ||
+                    (stateDestination || '') !== '' ||
+                    (zipOrigin || '') !== '' ||
+                    (zipDestination || '') !== '' ||
+                    (billToCode || '') !== '') {
+                    clearFields();
+                }else{
+                    props.closingCallback();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -1256,22 +1299,7 @@ const OrderHistory = (props) => {
                     </div>
                     <div className="button-container">
                         <div className="mochi-button" onClick={() => {
-                            setDateStart('');
-                            setDateEnd('');
-                            setCityOrigin('');
-                            setCityDestination('');
-                            setStateOrigin('');
-                            setStateDestination('');
-                            setZipOrigin('');
-                            setZipDestination('');
-                            setBillToCode('');
-                            if ((props.selectedCustomer?.id || 0) === 0) {
-                                setCustomerCode('');
-                            }
-
-                            setOrders([]);
-
-                            refDateStart.current.inputElement.focus();
+                            clearFields();
                         }}>
                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                             <div className="mochi-button-base">Clear</div>
@@ -1716,7 +1744,10 @@ const OrderHistory = (props) => {
                                                                                                         isOnPanel={true}
                                                                                                         isAdmin={props.isAdmin}
                                                                                                         origin={props.origin}
-
+                                                                                                        closingCallback={() => {
+                                                                                                            closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                                                                            refDateStart.current.inputElement.focus({ preventScroll: true });
+                                                                                                        }}
                                                                                                         order_id={order.id}
                                                                                                     />
                                                                                             }

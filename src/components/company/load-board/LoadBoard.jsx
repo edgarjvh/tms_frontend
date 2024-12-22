@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-dupe-keys */
 import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import './LoadBoard.css';
@@ -501,6 +504,8 @@ const LoadBoard = (props) => {
                     statusClass = 'active';
                 }
             }
+
+            return true;
         })
 
         return classes + ' ' + statusClass;
@@ -831,16 +836,25 @@ const LoadBoard = (props) => {
             ref={refMainContainer}
             tabIndex={-1}
             onKeyDown={(e) => {
-                let key = e.keyCode || e.which;
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    if (props.isOnPanel){
+                        props.closingCallback();
+                    }
+                }
 
-                if (key === 9) {
+                if (e.key === 'Tab') {
                     if (e.target.type === undefined) {
                         e.preventDefault();
                     }
                 }
-            }}
-        >
-
+            }}>
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             <div className="fields-container-col grow" style={{ flexGrow: 1 }}>
                 <div className="form-bordered-box">
                     <div className="form-header">
@@ -877,6 +891,8 @@ const LoadBoard = (props) => {
                                             </div>                                            
                                         </div>
                                         `;
+
+                                    return true;
                                 })
 
                                 printWindow(html);
@@ -919,7 +935,10 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                        refMainContainer.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 
@@ -981,6 +1000,8 @@ const LoadBoard = (props) => {
                                             </div>                                            
                                         </div>
                                         `;
+
+                                    return true;
                                 })
 
                                 printWindow(html);
@@ -1024,7 +1045,10 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                        refMainContainer.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 
@@ -1088,6 +1112,8 @@ const LoadBoard = (props) => {
                                             </div>                                            
                                         </div>
                                         `;
+
+                                    return true
                                 })
 
                                 printWindow(html);
@@ -1131,7 +1157,10 @@ const LoadBoard = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                        refMainContainer.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 
@@ -1353,6 +1382,10 @@ const LoadBoard = (props) => {
                                         origin={props.origin}
                                         componentId={moment().format('x')}
                                         selectedOrder={selectedOrder}
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-order`, props.origin);
+                                            refMainContainer.current.focus({ preventScroll: true });
+                                        }}
                                     />
                                 }
 
@@ -1395,7 +1428,10 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-customer`, props.origin);
+                                                            refMainContainer.current.focus({ preventScroll: true });
+                                                        }}
 
                                                         customer_id={selectedBillToCustomer.id}
                                                     />
@@ -1621,7 +1657,10 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-carrier`, props.origin);
+                                                            refMainContainer.current.focus({ preventScroll: true });
+                                                        }}
 
                                                         carrier_id={selectedCarrier.id}
                                                     />
@@ -1913,7 +1952,10 @@ const LoadBoard = (props) => {
                                             title='Routing'
                                             tabTimes={39000 + props.tabTimes}
                                             origin={props.origin}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-routing`, props.origin);
+                                                refMainContainer.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
                                             isAdmin={props.isAdmin}
@@ -2049,6 +2091,10 @@ const LoadBoard = (props) => {
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
                                                         customer_id={selectedShipperCustomer.id}
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-customer`, props.origin);
+                                                            refMainContainer.current.focus({ preventScroll: true });
+                                                        }}
                                                     />
                                                 }
 
@@ -2425,7 +2471,10 @@ const LoadBoard = (props) => {
                                                         isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         origin={props.origin}
-
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-customer`, props.origin);
+                                                            refMainContainer.current.focus({ preventScroll: true });
+                                                        }}
 
                                                         customer_id={selectedConsigneeCustomer.id}
                                                     />
@@ -2824,6 +2873,8 @@ const LoadBoard = (props) => {
                                             </div>                                            
                                         </div>
                                         `;
+
+                                    return true
                                 })
 
                                 printWindow(html);
@@ -2869,7 +2920,10 @@ const LoadBoard = (props) => {
                                                     componentId={moment().format('x')}
                                                     isOnPanel={true}
                                                     origin={props.origin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-invoice`, props.origin);
+                                                        refMainContainer.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     order_id={item.id}
                                                 />

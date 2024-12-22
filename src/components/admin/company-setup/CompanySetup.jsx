@@ -1,3 +1,6 @@
+/* eslint-disable no-dupe-keys */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import './CompanySetup.css';
 import classnames from 'classnames';
@@ -52,6 +55,7 @@ import {
 import { MainForm } from './../../company/forms';
 
 function CompanySetup(props) {
+    const refCompanySetupContainer = useRef();
     const refCompanyInputLogo = useRef();
     const refCompanyCode = useRef();
     const refMailingAddressCode = useRef();
@@ -901,7 +905,10 @@ function CompanySetup(props) {
                 owner='company'
                 origin={props.origin}
                 suborigin='company'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-employee-search`, props.origin);
+                    refCompanyCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 employeeSearch={{ search: filters }}
@@ -919,10 +926,10 @@ function CompanySetup(props) {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-employee-search`, props.origin);
-                        refCompanyName.current.focus({preventScroll: true});
+                        refCompanyName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-employee-search`, props.origin);
-                        refCompanyCode.current.focus({preventScroll: true});
+                        refCompanyCode.current.focus({ preventScroll: true });
                     })
 
                 }}
@@ -986,7 +993,10 @@ function CompanySetup(props) {
                 owner='company'
                 origin={props.origin}
                 suborigin='company'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-agent-search`, props.origin);
+                    refCompanyCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 agentSearch={{ search: filters }}
@@ -1004,10 +1014,10 @@ function CompanySetup(props) {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-agent-search`, props.origin);
-                        refCompanyName.current.focus({preventScroll: true});
+                        refCompanyName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-agent-search`, props.origin);
-                        refCompanyCode.current.focus({preventScroll: true});
+                        refCompanyCode.current.focus({ preventScroll: true });
                     })
 
                 }}
@@ -1067,7 +1077,10 @@ function CompanySetup(props) {
                 owner='company'
                 origin={props.origin}
                 suborigin='company'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-driver-search`, props.origin);
+                    refCompanyCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 driverSearch={{ search: filters }}
@@ -1085,10 +1098,10 @@ function CompanySetup(props) {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-driver-search`, props.origin);
-                        refCompanyName.current.focus({preventScroll: true});
+                        refCompanyName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-driver-search`, props.origin);
-                        refCompanyCode.current.focus({preventScroll: true});
+                        refCompanyCode.current.focus({ preventScroll: true });
                     })
 
                 }}
@@ -1148,7 +1161,10 @@ function CompanySetup(props) {
                 owner='company'
                 origin={props.origin}
                 suborigin='company'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-operator-search`, props.origin);
+                    refCompanyCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 operatorSearch={{ search: filters }}
@@ -1166,10 +1182,10 @@ function CompanySetup(props) {
                         }
                     }).then(response => {
                         closePanel(`${props.panelName}-operator-search`, props.origin);
-                        refCompanyName.current.focus({preventScroll: true});
+                        refCompanyName.current.focus({ preventScroll: true });
                     }).catch(e => {
                         closePanel(`${props.panelName}-operator-search`, props.origin);
-                        refCompanyCode.current.focus({preventScroll: true});
+                        refCompanyCode.current.focus({ preventScroll: true });
                     })
 
                 }}
@@ -1267,7 +1283,7 @@ function CompanySetup(props) {
 
                     setSelectedDriver({ ...res.data.driver });
 
-                    refDriverName.current.focus({preventScroll: true});
+                    refDriverName.current.focus({ preventScroll: true });
                 }
             }).catch(e => {
                 console.log('error getting driver by code', e);
@@ -1428,7 +1444,7 @@ function CompanySetup(props) {
             background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
-        }}>
+        }} ref={refCompanySetupContainer} tabIndex={0}>
 
             <div className="company-left-container">
                 <div className="company-logo-container">
@@ -1508,7 +1524,7 @@ function CompanySetup(props) {
                                 if (key === 9) {
                                     e.preventDefault();
                                     validateCompanyForSaving(e);
-                                    refCompanyCode.current.focus({preventScroll: true});
+                                    refCompanyCode.current.focus({ preventScroll: true });
                                 }
 
                             }}
@@ -1555,6 +1571,10 @@ function CompanySetup(props) {
                                             componentId={moment().format('x')}
                                             selectedCompany={selectedCompany}
                                             isAdmin={props.isAdmin}
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-divisions`, props.origin);
+                                                refCompanyCode.current.focus({ preventScroll: true });
+                                            }}
                                         />
                                     }
 
@@ -1578,7 +1598,7 @@ function CompanySetup(props) {
                                         :
                                         <div className="mochi-button" onClick={() => {
                                             setIsEditingCompany(true);
-                                            refCompanyName.current.focus({preventScroll: true});
+                                            refCompanyName.current.focus({ preventScroll: true });
                                         }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Edit</div>
@@ -1840,7 +1860,7 @@ function CompanySetup(props) {
                                         :
                                         <div className="mochi-button" onClick={() => {
                                             setIsEditingMailingAddress(true);
-                                            refMailingAddressName.current.focus({preventScroll: true});
+                                            refMailingAddressName.current.focus({ preventScroll: true });
                                         }}>
                                             <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                             <div className="mochi-button-base">Edit</div>
@@ -2186,7 +2206,10 @@ function CompanySetup(props) {
                                             removeAvatarUrl='/removeEmployeeAvatar'
                                             origin={props.origin}
                                             owner='company'
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-employees`, props.origin);
+                                                refCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
 
@@ -2222,7 +2245,10 @@ function CompanySetup(props) {
                                             origin={props.origin}
                                             owner='company'
                                             isEditingEmployee={true}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-employees`, props.origin);
+                                                refCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
 
@@ -2241,7 +2267,7 @@ function CompanySetup(props) {
                                 </div>
                                 <div className="mochi-button" onClick={() => {
                                     setSelectedEmployee({});
-                                    refEmployeeFirstName.current.focus({preventScroll: true});
+                                    refEmployeeFirstName.current.focus({ preventScroll: true });
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
@@ -2440,7 +2466,7 @@ function CompanySetup(props) {
 
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                         setShowEmployeePhones(false);
-                                                        refEmployeePhone.current.inputElement.focus({preventScroll: true});
+                                                        refEmployeePhone.current.inputElement.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -2456,7 +2482,7 @@ function CompanySetup(props) {
 
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                         setShowEmployeePhones(false);
-                                                        refEmployeePhone.current.inputElement.focus({preventScroll: true});
+                                                        refEmployeePhone.current.inputElement.focus({ preventScroll: true });
                                                     } else {
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                     }
@@ -2526,6 +2552,8 @@ function CompanySetup(props) {
                                                                 }
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -2590,6 +2618,8 @@ function CompanySetup(props) {
                                                                 }
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -2648,7 +2678,7 @@ function CompanySetup(props) {
                                                     }
                                                 }
 
-                                                refEmployeePhone.current.inputElement.focus({preventScroll: true});
+                                                refEmployeePhone.current.inputElement.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -2690,7 +2720,7 @@ function CompanySetup(props) {
 
                                                                             validateEmployeeForSaving({ keyCode: 9 });
                                                                             setShowEmployeePhones(false);
-                                                                            refEmployeePhone.current.inputElement.focus({preventScroll: true});
+                                                                            refEmployeePhone.current.inputElement.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refEmployeePhonePopupItems.current.push(ref)}
                                                                     >
@@ -2915,7 +2945,7 @@ function CompanySetup(props) {
 
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                         setShowEmployeeEmails(false);
-                                                        refEmployeeEmail.current.focus({preventScroll: true});
+                                                        refEmployeeEmail.current.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -2931,7 +2961,7 @@ function CompanySetup(props) {
 
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                         setShowEmployeeEmails(false);
-                                                        refEmployeeEmail.current.focus({preventScroll: true});
+                                                        refEmployeeEmail.current.focus({ preventScroll: true });
                                                     } else {
                                                         validateEmployeeForSaving({ keyCode: 9 });
                                                     }
@@ -2976,6 +3006,8 @@ function CompanySetup(props) {
                                                             }
                                                         });
                                                         break;
+                                                    default:
+                                                        break;
                                                 }
                                             }
                                         }}
@@ -3013,6 +3045,8 @@ function CompanySetup(props) {
                                                                 email_other: e.target.value
                                                             }
                                                         });
+                                                        break;
+                                                    default:
                                                         break;
                                                 }
                                             }
@@ -3068,7 +3102,7 @@ function CompanySetup(props) {
                                                     }
                                                 }
 
-                                                refEmployeeEmail.current.focus({preventScroll: true});
+                                                refEmployeeEmail.current.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -3110,7 +3144,7 @@ function CompanySetup(props) {
 
                                                                             validateEmployeeForSaving({ keyCode: 9 });
                                                                             setShowEmployeeEmails(false);
-                                                                            refEmployeeEmail.current.focus({preventScroll: true});
+                                                                            refEmployeeEmail.current.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refEmployeeEmailPopupItems.current.push(ref)}
                                                                     >
@@ -3236,7 +3270,10 @@ function CompanySetup(props) {
                                                                     removeAvatarUrl='/removeEmployeeAvatar'
                                                                     origin={props.origin}
                                                                     owner='company'
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-employees`, props.origin);
+                                                                        refCompanyCode.current.focus({ preventScroll: true });
+                                                                    }}
 
                                                                     componentId={moment().format('x')}
 
@@ -3372,7 +3409,7 @@ function CompanySetup(props) {
 
                                                         for (var i = elems.length; i--;) {
                                                             if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus({preventScroll: true});
+                                                                elems[i].focus({ preventScroll: true });
                                                                 break;
                                                             }
                                                         }
@@ -3421,7 +3458,10 @@ function CompanySetup(props) {
                                             tabTimes={222200 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
                                             origin={props.origin}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-agents`, props.origin);
+                                                refCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
                                             isAdmin={props.isAdmin}
@@ -3450,7 +3490,10 @@ function CompanySetup(props) {
                                             tabTimes={222200 + props.tabTimes}
                                             panelName={`${props.panelName}-agents`}
                                             origin={props.origin}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-agents`, props.origin);
+                                                refCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             isAdmin={props.isAdmin}
                                             componentId={moment().format('x')}
@@ -3467,7 +3510,7 @@ function CompanySetup(props) {
                                 </div>
                                 <div className="mochi-button" onClick={() => {
                                     setSelectedAgent({});
-                                    refAgentContactFirstName.current.focus({preventScroll: true});
+                                    refAgentContactFirstName.current.focus({ preventScroll: true });
                                 }}>
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                     <div className="mochi-button-base">Clear</div>
@@ -3669,7 +3712,7 @@ function CompanySetup(props) {
 
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactPhones(false);
-                                                        refAgentContactPhone.current.inputElement.focus({preventScroll: true});
+                                                        refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -3685,7 +3728,7 @@ function CompanySetup(props) {
 
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactPhones(false);
-                                                        refAgentContactPhone.current.inputElement.focus({preventScroll: true});
+                                                        refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                     } else {
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                     }
@@ -3755,6 +3798,8 @@ function CompanySetup(props) {
                                                                 }
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -3819,6 +3864,8 @@ function CompanySetup(props) {
                                                                 }
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -3877,7 +3924,7 @@ function CompanySetup(props) {
                                                     }
                                                 }
 
-                                                refAgentContactPhone.current.inputElement.focus({preventScroll: true});
+                                                refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -3919,7 +3966,7 @@ function CompanySetup(props) {
 
                                                                             validateAgentContactForSaving({ keyCode: 9 });
                                                                             setShowAgentContactPhones(false);
-                                                                            refAgentContactPhone.current.inputElement.focus({preventScroll: true});
+                                                                            refAgentContactPhone.current.inputElement.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refAgentContactPhonePopupItems.current.push(ref)}
                                                                     >
@@ -4145,7 +4192,7 @@ function CompanySetup(props) {
 
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactEmails(false);
-                                                        refAgentContactEmail.current.focus({preventScroll: true});
+                                                        refAgentContactEmail.current.focus({ preventScroll: true });
                                                     }
                                                     break;
 
@@ -4161,7 +4208,7 @@ function CompanySetup(props) {
 
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                         setShowAgentContactEmails(false);
-                                                        refAgentContactEmail.current.focus({preventScroll: true});
+                                                        refAgentContactEmail.current.focus({ preventScroll: true });
                                                     } else {
                                                         validateAgentContactForSaving({ keyCode: 9 });
                                                     }
@@ -4206,6 +4253,8 @@ function CompanySetup(props) {
                                                             }
                                                         });
                                                         break;
+                                                    default:
+                                                        break;
                                                 }
                                             }
                                         }}
@@ -4243,6 +4292,8 @@ function CompanySetup(props) {
                                                                 email_other: e.target.value
                                                             }
                                                         });
+                                                        break;
+                                                    default:
                                                         break;
                                                 }
                                             }
@@ -4298,7 +4349,7 @@ function CompanySetup(props) {
                                                     }
                                                 }
 
-                                                refAgentContactEmail.current.focus({preventScroll: true});
+                                                refAgentContactEmail.current.focus({ preventScroll: true });
                                             }} />
                                     }
                                 </div>
@@ -4340,7 +4391,7 @@ function CompanySetup(props) {
 
                                                                             validateAgentContactForSaving({ keyCode: 9 });
                                                                             setShowAgentContactEmails(false);
-                                                                            refAgentContactEmail.current.focus({preventScroll: true});
+                                                                            refAgentContactEmail.current.focus({ preventScroll: true });
                                                                         }}
                                                                         ref={ref => refAgentContactEmailPopupItems.current.push(ref)}
                                                                     >
@@ -4449,7 +4500,10 @@ function CompanySetup(props) {
                                                                     tabTimes={222200 + props.tabTimes}
                                                                     panelName={`${props.panelName}-agents`}
                                                                     origin={props.origin}
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-agents`, props.origin);
+                                                                        refCompanyCode.current.focus({ preventScroll: true });
+                                                                    }}
 
                                                                     componentId={moment().format('x')}
                                                                     isAdmin={props.isAdmin}
@@ -4585,7 +4639,7 @@ function CompanySetup(props) {
 
                                                         for (var i = elems.length; i--;) {
                                                             if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                elems[i].focus({preventScroll: true});
+                                                                elems[i].focus({ preventScroll: true });
                                                                 break;
                                                             }
                                                         }
@@ -4642,7 +4696,10 @@ function CompanySetup(props) {
                                                 subOrigin='driver'
                                                 owner='company'
                                                 isEditingDriver={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-company-drivers`, props.origin);
+                                                    refCompanyCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedDriverId={selectedDriver.id}
@@ -4681,7 +4738,10 @@ function CompanySetup(props) {
                                                 subOrigin='driver'
                                                 owner='company'
                                                 isEditingDriver={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-company-drivers`, props.origin);
+                                                    refCompanyCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedParent={selectedCompany}
@@ -4715,7 +4775,7 @@ function CompanySetup(props) {
                                                     });
 
                                                     setSelectedDriver({});
-                                                    refDriverCode.current.focus({preventScroll: true});
+                                                    refDriverCode.current.focus({ preventScroll: true });
                                                 }
                                             }).catch(e => {
                                                 console.log('error deleting driver');
@@ -4728,7 +4788,7 @@ function CompanySetup(props) {
                                     title: "Clear",
                                     onClick: () => {
                                         setSelectedDriver({});
-                                        refDriverCode.current.focus({preventScroll: true});
+                                        refDriverCode.current.focus({ preventScroll: true });
                                     },
                                     isEnabled: true,
                                 },
@@ -4797,7 +4857,10 @@ function CompanySetup(props) {
                                                                         subOrigin='driver'
                                                                         owner='company'
                                                                         isEditingDriver={true}
-
+                                                                        closingCallback={() => {
+                                                                            closePanel(`${props.panelName}-company-drivers`, props.origin);
+                                                                            refCompanyCode.current.focus({ preventScroll: true });
+                                                                        }}
 
                                                                         componentId={moment().format('x')}
                                                                         selectedDriverId={driver.id}
@@ -4936,7 +4999,7 @@ function CompanySetup(props) {
 
                                                             for (var i = elems.length; i--;) {
                                                                 if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                    elems[i].focus({preventScroll: true});
+                                                                    elems[i].focus({ preventScroll: true });
                                                                     break;
                                                                 }
                                                             }
@@ -4994,7 +5057,10 @@ function CompanySetup(props) {
                                                 subOrigin='operator'
                                                 owner='company'
                                                 isEditingDriver={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-company-operators`, props.origin);
+                                                    refCompanyCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedDriverId={selectedOperator.id}
@@ -5033,7 +5099,10 @@ function CompanySetup(props) {
                                                 subOrigin='operator'
                                                 owner='company'
                                                 isEditingDriver={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-company-operators`, props.origin);
+                                                    refCompanyCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedParent={selectedCompany}
@@ -5067,7 +5136,7 @@ function CompanySetup(props) {
                                                     });
 
                                                     setSelectedOperator({});
-                                                    refOperatorCode.current.focus({preventScroll: true});
+                                                    refOperatorCode.current.focus({ preventScroll: true });
                                                 }
                                             }).catch(e => {
                                                 console.log('error deleting operator');
@@ -5080,7 +5149,7 @@ function CompanySetup(props) {
                                     title: "Clear",
                                     onClick: () => {
                                         setSelectedOperator({});
-                                        refOperatorCode.current.focus({preventScroll: true});
+                                        refOperatorCode.current.focus({ preventScroll: true });
                                     },
                                     isEnabled: true,
                                 },
@@ -5149,7 +5218,10 @@ function CompanySetup(props) {
                                                                         subOrigin='operator'
                                                                         owner='company'
                                                                         isEditingDriver={true}
-
+                                                                        closingCallback={() => {
+                                                                            closePanel(`${props.panelName}-company-operators`, props.origin);
+                                                                            refCompanyCode.current.focus({ preventScroll: true });
+                                                                        }}
 
                                                                         componentId={moment().format('x')}
                                                                         selectedDriverId={operator.id}
@@ -5295,7 +5367,7 @@ function CompanySetup(props) {
 
                                                             for (var i = elems.length; i--;) {
                                                                 if (elems[i].getAttribute('tabindex') && elems[i].getAttribute('tabindex') === '29') {
-                                                                    elems[i].focus({preventScroll: true});
+                                                                    elems[i].focus({ preventScroll: true });
                                                                     break;
                                                                 }
                                                             }

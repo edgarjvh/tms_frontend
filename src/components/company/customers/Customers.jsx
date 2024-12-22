@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-dupe-keys */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
@@ -715,9 +717,11 @@ const Customers = (props) => {
                 axios.post(props.serverUrl + '/saveCustomerMailingAddress', mailing_address).then(res => {
                     if (res.data.result === 'OK') {
                         setSelectedCustomer(prev => {
-                            {
-                                return { ...prev, mailing_address: res.data.mailing_address }
+                            return {
+                                ...prev,
+                                mailing_address: res.data.mailing_address
                             }
+
                         });
 
                         props.setSelectedCustomer({
@@ -1224,7 +1228,10 @@ const Customers = (props) => {
                 tabTimes={19000 + props.tabTimes}
                 panelName={`${props.panelName}-customer-import`}
                 origin={props.origin}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-customer-import`, props.origin);
+                    refCustomerCode.current.focus({ preventScroll: true });
+                }}
                 componentId={moment().format('x')}
             />
         }
@@ -1279,7 +1286,10 @@ const Customers = (props) => {
                 tabTimes={20000 + props.tabTimes}
                 panelName={`${props.panelName}-customer-search`}
                 origin={props.origin}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-customer-search`, props.origin);
+                    refCustomerCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 customerSearch={customerSearch}
@@ -1475,7 +1485,10 @@ const Customers = (props) => {
                 owner='customer'
                 origin={props.origin}
                 suborigin='customer'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contact-search`, props.origin);
+                    refCustomerName.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
@@ -1530,7 +1543,10 @@ const Customers = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'customer'}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-revenue-information`, props.origin);
+                    refCustomerCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
@@ -1550,7 +1566,10 @@ const Customers = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'customer'}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-order-history`, props.origin);
+                    refCustomerCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
@@ -1586,6 +1605,10 @@ const Customers = (props) => {
                     permissionName='customer documents'
                     onUnmount={() => {
                         console.log('customer documents unmount!');
+                    }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents`, props.origin);
+                        refCustomerCode.current.focus({ preventScroll: true });
                     }}
                 />
             }
@@ -2018,7 +2041,10 @@ const Customers = (props) => {
                 permissionName='customer contacts'
                 origin={props.origin}
                 owner='customer'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contacts`, props.origin);
+                    refCustomerCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
 
@@ -2196,29 +2222,27 @@ const Customers = (props) => {
         }}
             tabIndex={-1}
             onKeyDown={(e) => {
-                let key = e.keyCode || e.which;
-
-                if (key === 27) {
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
                     if ((selectedCustomer?.id || 0) > 0) {
-                        e.stopPropagation();
                         setInitialValues();
                         if (props.isOnPanel) {
                             if (refCustomerCode?.current) {
-                                refCustomerCode.current.focus({
-                                    preventScroll: true,
-                                });
+                                refCustomerCode.current.focus({ preventScroll: true });
                             }
                         } else {
                             if (props.refCustomerCode?.current) {
-                                props.refCustomerCode.current.focus({
-                                    preventScroll: true,
-                                });
+                                props.refCustomerCode.current.focus({ preventScroll: true });
                             }
+                        }
+                    } else {
+                        if (props.isOnPanel){
+                            props.closingCallback();
                         }
                     }
                 }
 
-                if (key === 9) {
+                if (e.key === 'Tab') {
                     if (e.target.type === undefined) {
                         e.preventDefault();
                         if (props.isOnPanel) {
@@ -2238,7 +2262,12 @@ const Customers = (props) => {
                 }
             }}
         >
-
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={{ ...style, zIndex: 0 }}>
@@ -3867,7 +3896,10 @@ const Customers = (props) => {
                                                 permissionName='customer contacts'
                                                 origin={props.origin}
                                                 owner='customer'
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contacts`, props.origin);
+                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
 
@@ -3906,7 +3938,10 @@ const Customers = (props) => {
                                                 tabTimes={137000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contact-list`}
                                                 origin={props.origin}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedCustomerId={selectedCustomer?.id || 0}
@@ -3983,7 +4018,10 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 owner='customer'
                                                 isEditingContact={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contacts`, props.origin);
+                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
 
@@ -5391,7 +5429,10 @@ const Customers = (props) => {
                                                 tabTimes={137000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contact-list`}
                                                 origin={props.origin}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contact-list`, props.origin);
+                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedCustomerId={selectedCustomer?.id || 0}
@@ -5468,7 +5509,10 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 owner='customer'
                                                 isEditingContact={true}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-contacts`, props.origin);
+                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                }}
 
                                                 componentId={moment().format('x')}
 
@@ -5985,6 +6029,10 @@ const Customers = (props) => {
                                                             isAdmin={props.isAdmin}
                                                             componentId={moment().format('x')}
                                                             order_id={order.id}
+                                                            closingCallback={() => {
+                                                                closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                                refCustomerCode.current.focus({ preventScroll: true });
+                                                            }}
                                                         />
                                                     }
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 // noinspection BadExpressionStatementJS
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -157,6 +159,7 @@ const Agents = (props) => {
                 } catch (e) {
 
                 }
+                return true;
             })
 
             if (!sameTarget) {
@@ -775,7 +778,10 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-agent-search`}
                 origin={props.origin}
                 suborigin='agent'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-agent-search`, props.origin);
+                    refAgentCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 customerSearch={agentSearch}
@@ -860,7 +866,10 @@ const Agents = (props) => {
                 owner='agent'
                 origin={props.origin}
                 suborigin='agent'
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contact-search`, props.origin);
+                    refAgentCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 contactSearch={{ search: filters }}
@@ -1228,7 +1237,10 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-revenue-information`}
                 origin={props.origin}
                 suborigin={'agent'}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-revenue-information`, props.origin);
+                    refAgentCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
@@ -1248,7 +1260,10 @@ const Agents = (props) => {
                 panelName={`${props.panelName}-order-history`}
                 origin={props.origin}
                 suborigin={'agent'}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-order-history`, props.origin);
+                    refAgentCode.current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
                 isAdmin={props.isAdmin}
@@ -1269,7 +1284,10 @@ const Agents = (props) => {
                     panelName={`${props.panelName}-documents`}
                     origin={props.origin}
                     suborigin={'company-agent'}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents`, props.origin);
+                        refAgentCode.current.focus({ preventScroll: true });
+                    }}
 
                     componentId={moment().format('x')}
                     selectedOwner={{ ...selectedAgent }}
@@ -1541,18 +1559,18 @@ const Agents = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refAgentsContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if ((selectedAgent?.id || 0) > 0) {
-                    e.stopPropagation();
-
                     setInitialValues();
+                } else {
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -4057,7 +4075,10 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-contacts`, props.origin);
+                                                refAgentCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
 
@@ -4102,7 +4123,10 @@ const Agents = (props) => {
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
                                             owner='agent'
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-contacts`, props.origin);
+                                                refAgentCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
                                             isEditingContact={true}
@@ -5088,7 +5112,10 @@ const Agents = (props) => {
                                                                     removeAvatarUrl='/removeAvatar'
                                                                     origin={props.origin}
                                                                     owner='agent'
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-contacts`, props.origin);
+                                                                        refAgentCode.current.focus({ preventScroll: true });
+                                                                    }}
 
                                                                     componentId={moment().format('x')}
 
@@ -5292,7 +5319,10 @@ const Agents = (props) => {
                                         subOrigin='agent'
                                         owner='agent'
                                         isEditingDriver={true}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-agent-drivers`, props.origin);
+                                            refAgentCode.current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format('x')}
                                         selectedDriverId={selectedDriver.id}
@@ -5331,7 +5361,10 @@ const Agents = (props) => {
                                         subOrigin='agent'
                                         owner='agent'
                                         isEditingDriver={true}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-agent-drivers`, props.origin);
+                                            refAgentCode.current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format('x')}
                                         selectedParent={selectedAgent}
@@ -6441,7 +6474,10 @@ const Agents = (props) => {
                                                         subOrigin='agent'
                                                         owner='agent'
                                                         isEditingDriver={true}
-
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-agent-drivers`, props.origin);
+                                                            refAgentCode.current.focus({ preventScroll: true });
+                                                        }}
 
                                                         componentId={moment().format('x')}
                                                         selectedDriverId={driver.id}
@@ -6527,7 +6563,10 @@ const Agents = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                        refAgentCode.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './OrderImport.css';
@@ -424,6 +426,8 @@ const OrderImport = (props) => {
                                                 }
                                             }
                                         }
+
+                                        return true;
                                     })
 
                                     // handle deliveries
@@ -459,6 +463,8 @@ const OrderImport = (props) => {
                                                 }
                                             }
                                         }
+
+                                        return true;
                                     })
 
                                     // handle events
@@ -559,6 +565,7 @@ const OrderImport = (props) => {
                                             })
                                         }
 
+                                        return true;
                                     });
 
                                     if (po_data !== '') {
@@ -923,6 +930,8 @@ const OrderImport = (props) => {
                                                     }
                                                 }
                                             }
+
+                                            return true;
                                         })
 
                                         // handle deliveries
@@ -958,6 +967,8 @@ const OrderImport = (props) => {
                                                     }
                                                 }
                                             }
+
+                                            return true;
                                         })
 
                                         // handle events
@@ -1058,6 +1069,7 @@ const OrderImport = (props) => {
                                                 })
                                             }
 
+                                            return true;
                                         });
 
                                         if (po_data !== '') {
@@ -1418,6 +1430,8 @@ const OrderImport = (props) => {
                                                 }
                                             }
                                         }
+
+                                        return true;
                                     })
 
                                     // handle deliveries
@@ -1453,6 +1467,8 @@ const OrderImport = (props) => {
                                                 }
                                             }
                                         }
+
+                                        return true;
                                     })
 
                                     // handle events
@@ -1552,7 +1568,7 @@ const OrderImport = (props) => {
                                                 timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                             })
                                         }
-
+                                        return true;
                                     });
 
                                     if (po_data !== '') {
@@ -1917,6 +1933,8 @@ const OrderImport = (props) => {
                                                     }
                                                 }
                                             }
+
+                                            return true;
                                         })
 
                                         // handle deliveries
@@ -1952,6 +1970,8 @@ const OrderImport = (props) => {
                                                     }
                                                 }
                                             }
+
+                                            return true;
                                         })
 
                                         // handle events
@@ -2051,7 +2071,7 @@ const OrderImport = (props) => {
                                                     timestamp: moment(check_call_date, 'MM/DD/YYYY HH:mm:ss').unix()
                                                 })
                                             }
-
+                                            return true;
                                         });
 
                                         if (po_data !== '') {
@@ -2379,14 +2399,13 @@ const OrderImport = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refOrderImportContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if (refInputFile.current.files.length > 0 || orderList.length > 0) {
-                    e.stopPropagation();
-
                     refInputFile.current.value = '';
                     setOrderList([]);
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
@@ -2542,7 +2561,6 @@ const OrderImport = (props) => {
 
                                             const rowContainerClasses = classNames({
                                                 'row-container': true,
-                                                'hidden': false,
                                                 'hidden': false
                                             });
 

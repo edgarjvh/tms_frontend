@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import './Template.css';
 import { connect } from "react-redux";
@@ -1253,6 +1255,10 @@ const Template = (props) => {
                             refBillToCode.current.focus();
                         });
                     }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin);
+                        refName.current.focus({ preventScroll: true });
+                    }}
                 />
             ),
         };
@@ -1413,6 +1419,10 @@ const Template = (props) => {
 
                             refCarrierCode.current.focus();
                         });
+                    }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-carrier-search`, props.origin);
+                        refName.current.focus({ preventScroll: true });
                     }}
                 />
             ),
@@ -1614,6 +1624,10 @@ const Template = (props) => {
                             refShipperCode.current.focus();
                         });
                     }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin);
+                        refName.current.focus({ preventScroll: true });
+                    }}
                 />
             ),
         };
@@ -1813,6 +1827,10 @@ const Template = (props) => {
 
                             refConsigneeCode.current.focus();
                         });
+                    }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin);
+                        refName.current.focus({ preventScroll: true });
                     }}
                 />
             ),
@@ -2042,6 +2060,8 @@ const Template = (props) => {
                     } else {
                         waypoints.push(`${(zip_data?.latitude || '').toString()},${(zip_data?.longitude || '').toString()}`);
                     }
+
+                    return true;
                 })
 
                 let strWaypoints = JSON.stringify(origin) + JSON.stringify(waypoints) + JSON.stringify(destination);
@@ -2369,18 +2389,19 @@ const Template = (props) => {
 
     return (
         <div className='panel-content' tabIndex={0} ref={refTemplateContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27){
+            if (e.key === 'Escape'){
+                e.stopPropagation();
                 if ((selectedTemplate?.id || 0) > 0){
-                    e.stopPropagation();
                     setSelectedTemplate({});
                     refName.current.focus();
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -2919,6 +2940,10 @@ const Template = (props) => {
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
                                                     customer_id={selectedTemplate?.bill_to_customer_id}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        refName.current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -2959,6 +2984,10 @@ const Template = (props) => {
                                                                 }
                                                             })
                                                         }
+                                                    }}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-rating`, props.origin);
+                                                        refName.current.focus({ preventScroll: true });
                                                     }}
                                                 />
                                             ),
@@ -3655,6 +3684,10 @@ const Template = (props) => {
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
                                                     carrier_id={selectedTemplate?.carrier_id}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-carrier`, props.origin);
+                                                        refName.current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -5021,6 +5054,10 @@ const Template = (props) => {
                                                     }
                                                 })
                                             }}
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-template-routing`, props.origin);
+                                                refName.current.focus({ preventScroll: true });
+                                            }}
                                         />
                                     ),
                                 };
@@ -6032,6 +6069,10 @@ const Template = (props) => {
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
                                                     customer_id={selectedShipper?.id}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        refName.current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -8143,6 +8184,10 @@ const Template = (props) => {
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
                                                     customer_id={selectedConsignee?.id}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        refName.current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };

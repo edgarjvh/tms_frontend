@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -630,8 +632,10 @@ const FactoringCompany = (props) => {
                 panelName={`${props.panelName}-factoring-company-search`}
                 origin={props.origin}
                 suborigin={'factoring-company'}
-
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-factoring-company-search`, props.origin);
+                    refFactoringCompanyCode.current.focus({ preventScroll: true });
+                }}
 
                 customerSearch={factoringCompanySearch}
 
@@ -782,8 +786,10 @@ const FactoringCompany = (props) => {
                 owner='factoring-company'
                 origin={props.origin}
                 suborigin='factoring-company'
-
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contact-search`, props.origin)
+                    refFactoringCompanyName.current.focus();
+                }}
 
                 contactSearch={{ search: filters }}
 
@@ -1020,20 +1026,19 @@ const FactoringCompany = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refFactoringCompanyContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if ((selectedFactoringCompany?.id || 0) > 0) {
-                    e.stopPropagation();
-
                     setInitialValues();
                     refFactoringCompanyCode.current.focus();
+                } else {
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
-
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style} >
@@ -2683,8 +2688,10 @@ const FactoringCompany = (props) => {
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
                                             origin={props.origin}
                                             owner='factoring-company'
-
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-contacts`, props.origin);
+                                                refFactoringCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             contactSearchCustomer={{
                                                 ...selectedFactoringCompany,
@@ -2724,7 +2731,10 @@ const FactoringCompany = (props) => {
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
                                             origin={props.origin}
                                             owner='factoring-company'
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-contacts`, props.origin);
+                                                refFactoringCompanyCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             isEditingContact={true}
 
@@ -2976,6 +2986,8 @@ const FactoringCompany = (props) => {
                                                                 phone_other: e.target.value
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -3025,6 +3037,8 @@ const FactoringCompany = (props) => {
                                                                 ...selectedFactoringCompanyContact,
                                                                 phone_other: e.target.value
                                                             });
+                                                            break;
+                                                        default:
                                                             break;
                                                     }
                                                 }
@@ -3403,6 +3417,8 @@ const FactoringCompany = (props) => {
                                                                 email_other: e.target.value
                                                             });
                                                             break;
+                                                        default:
+                                                            break;
                                                     }
                                                 }
                                             }
@@ -3440,6 +3456,8 @@ const FactoringCompany = (props) => {
                                                                 ...selectedFactoringCompanyContact,
                                                                 email_other: e.target.value
                                                             });
+                                                            break;
+                                                        default:
                                                             break;
                                                     }
                                                 }
@@ -3676,8 +3694,10 @@ const FactoringCompany = (props) => {
                                                                     removeAvatarUrl='/removeFactoringCompanyAvatar'
                                                                     origin={props.origin}
                                                                     owner='factoring-company'
-
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-contacts`, props.origin);
+                                                                        refFactoringCompanyCode.current.focus({ preventScroll: false });
+                                                                    }}
 
                                                                     contactSearchCustomer={{
                                                                         ...selectedFactoringCompany,
@@ -3831,8 +3851,10 @@ const FactoringCompany = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'factoring-company'}
-
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-documents`, props.origin);
+                                            refFactoringCompanyCode.current.focus({ preventScroll: false });
+                                        }}
 
                                         selectedOwner={{ ...selectedFactoringCompany }}
                                         selectedOwnerDocument={{
@@ -4051,7 +4073,10 @@ const FactoringCompany = (props) => {
                                                                     componentId={moment().format('x')}
                                                                     isOnPanel={true}
                                                                     origin={props.origin}
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-invoice`, props.origin);
+                                                                        refFactoringCompanyCode.current.focus({ preventScroll: false });
+                                                                    }}
 
                                                                     order_id={order.id}
                                                                 />

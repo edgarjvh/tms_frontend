@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import ToPrint from './ToPrint.jsx';
@@ -260,9 +262,14 @@ const Invoice = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refInvoiceContainer}>
+        <div className="panel-content" tabIndex={0} ref={refInvoiceContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             {loadingTransition(
                 (style, item) =>

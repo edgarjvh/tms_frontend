@@ -1185,7 +1185,10 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-carrier-search`}
                     origin={props.origin}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-carrier-search`, props.origin);
+                        refCarrierName.current.focus({ preventScroll: true });
+                    }}
 
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
@@ -1317,7 +1320,7 @@ const Carriers = props => {
                         })
                             .then(response => {
                                 closePanel(`${props.panelName}-carrier-search`, props.origin);
-                                refCarrierName.current.focus();
+                                refCarrierCode.current.focus();
                             })
                             .catch(e => {
                                 closePanel(`${props.panelName}-carrier-search`, props.origin);
@@ -1595,7 +1598,10 @@ const Carriers = props => {
                     owner="carrier"
                     origin={props.origin}
                     suborigin="carrier"
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-contact-search`, props.origin);
+                        refCarrierCode.current.focus({ preventScroll: true });
+                    }}
 
                     componentId={moment().format("x")}
                     contactSearch={{ search: filters }}
@@ -1835,7 +1841,12 @@ const Carriers = props => {
             component: <FactoringCompany panelName={`${props.panelName}-factoring-company`} title="Factoring Company"
                 tabTimes={11000 + props.tabTimes} origin={props.origin}
                 componentId={moment().format("x")} factoringCompanyId={0}
-                selectedCarrier={{}} />,
+                selectedCarrier={{}}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-factoring-company`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -1886,7 +1897,10 @@ const Carriers = props => {
                     tabTimes={6000 + props.tabTimes}
                     panelName={`${props.panelName}-factoring-company-search`}
                     origin={props.origin}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-factoring-company-search`, props.origin);
+                        refCarrierCode.current.focus({ preventScroll: true });
+                    }}
 
                     suborigin={"factoring-company"}
                     componentId={moment().format("x")}
@@ -1922,7 +1936,12 @@ const Carriers = props => {
                                             origin={props.origin}
                                             componentId={moment().format("x")}
                                             factoringCompanyId={factoringCompanyId}
-                                            selectedCarrier={selectedCarrier} />,
+                                            selectedCarrier={selectedCarrier}
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-factoring-company`, props.origin);
+                                                refCarrierCode.current.focus({ preventScroll: true });
+                                            }}
+                                        />,
                                     };
 
                                     openPanel(panel, props.origin);
@@ -1965,7 +1984,12 @@ const Carriers = props => {
                 tabTimes={11000 + props.tabTimes} origin={props.origin}
                 componentId={moment().format("x")}
                 factoringCompanyId={selectedCarrier.factoring_company.id}
-                selectedCarrier={selectedCarrier} />,
+                selectedCarrier={selectedCarrier}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-factoring-company`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -2335,7 +2359,10 @@ const Carriers = props => {
                         panelName={`${props.panelName}-documents`}
                         origin={props.origin}
                         suborigin={"carrier"}
-
+                        closingCallback={() => {
+                            closePanel(`${props.panelName}-documents`, props.origin);
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }}
 
                         componentId={moment().format("x")}
                         selectedOwner={{ ...selectedCarrier }}
@@ -2366,7 +2393,12 @@ const Carriers = props => {
             component: <RevenueInformation title="Revenue Information" tabTimes={23000 + props.tabTimes}
                 panelName={`${props.panelName}-revenue-information`} origin={props.origin}
                 suborigin={"carrier"} componentId={moment().format("x")}
-                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-revenue-information`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -2379,7 +2411,12 @@ const Carriers = props => {
             component: <EquipmentInformation panelName={`${props.panelName}-equipment-information`}
                 tabTimes={15000 + props.tabTimes} title={"Equipment Information"}
                 origin={props.origin} componentId={moment().format("x")}
-                carrier={selectedCarrier} />,
+                carrier={selectedCarrier}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-equipment-information`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -2391,7 +2428,12 @@ const Carriers = props => {
             component: <OrderHistory title="Order History" tabTimes={24000 + props.tabTimes}
                 panelName={`${props.panelName}-order-history`} origin={props.origin}
                 suborigin={"carrier"} componentId={moment().format("x")}
-                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin} />,
+                selectedCustomer={selectedCarrier} isAdmin={props.isAdmin}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-order-history`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -2484,7 +2526,12 @@ const Carriers = props => {
             panelName: `${props.panelName}-carrier-import`,
             component: <CarrierImport title="Import Carriers" tabTimes={20000 + props.tabTimes}
                 panelName={`${props.panelName}-carrier-import`} origin={props.origin}
-                componentId={moment().format("x")} />,
+                componentId={moment().format("x")}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-carrier-import`, props.origin);
+                    refCarrierCode.current.focus({ preventScroll: true });
+                }}
+            />,
         };
 
         openPanel(panel, props.origin);
@@ -2681,29 +2728,27 @@ const Carriers = props => {
         }}
             tabIndex={-1}
             onKeyDown={(e) => {
-                let key = e.keyCode || e.which;
-
-                if (key === 27) {
+                if (e.key === "Escape") {
+                    e.stopPropagation();
                     if ((selectedCarrier?.id || 0) > 0) {
-                        e.stopPropagation();
                         setInitialValues();
                         if (props.isOnPanel) {
                             if (refCarrierCode?.current) {
-                                refCarrierCode.current.focus({
-                                    preventScroll: true,
-                                });
+                                refCarrierCode.current.focus({ preventScroll: true });
+                            } else {
+                                if (props.refCarrierCode?.current) {
+                                    props.refCarrierCode.current.focus({ preventScroll: true });
+                                }
                             }
-                        } else {
-                            if (props.refCarrierCode?.current) {
-                                props.refCarrierCode.current.focus({
-                                    preventScroll: true,
-                                });
-                            }
+                        }
+                    } else {
+                        if (props.isOnPanel){
+                            props.closingCallback();
                         }
                     }
                 }
 
-                if (key === 9) {
+                if (e.key === "Tab") {
                     if (e.target.type === undefined) {
                         e.preventDefault();
                         if (props.isOnPanel) {
@@ -2723,6 +2768,12 @@ const Carriers = props => {
                 }
             }}
         >
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             {loadingTransition(
                 (style, item) =>
                     item && (
@@ -5309,7 +5360,10 @@ const Carriers = props => {
                                                     permissionName="carrier contacts"
                                                     origin={props.origin}
                                                     owner="carrier"
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-contacts`, props.origin);
+                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
@@ -5358,7 +5412,10 @@ const Carriers = props => {
                                                     origin={props.origin}
                                                     owner="carrier"
                                                     isEditingContact={true}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-contacts`, props.origin);
+                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format("x")}
                                                     contactSearchCustomer={{
@@ -6303,7 +6360,10 @@ const Carriers = props => {
                                                                     permissionName="carrier contacts"
                                                                     origin={props.origin}
                                                                     owner="carrier"
-
+                                                                    closingCallback={() => {
+                                                                        closePanel(`${props.panelName}-contacts`, props.origin);
+                                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                                    }}
 
                                                                     componentId={moment().format("x")}
                                                                     contactSearchCustomer={{
@@ -7364,7 +7424,10 @@ const Carriers = props => {
                                             subOrigin='carrier'
                                             owner='carrier'
                                             isEditingDriver={true}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-carrier-drivers`, props.origin);
+                                                refCarrierCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
                                             selectedDriverId={selectedDriver.id}
@@ -7405,7 +7468,10 @@ const Carriers = props => {
                                             subOrigin='carrier'
                                             owner='carrier'
                                             isEditingDriver={true}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-carrier-drivers`, props.origin);
+                                                refCarrierCode.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
                                             selectedParent={selectedCarrier}
@@ -8192,7 +8258,12 @@ const Carriers = props => {
                                                         origin={props.origin} isOnPanel={true}
                                                         isAdmin={props.isAdmin}
                                                         componentId={moment().format("x")}
-                                                        order_id={order.id} />,
+                                                        order_id={order.id}
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                            refCarrierCode.current.focus({ preventScroll: true });
+                                                        }}
+                                                    />,
                                                 };
 
                                                 openPanel(panel, props.origin);
@@ -8326,7 +8397,10 @@ const Carriers = props => {
                                                         subOrigin='carrier'
                                                         owner='carrier'
                                                         isEditingDriver={true}
-
+                                                        closingCallback={() => {
+                                                            closePanel(`${props.panelName}-carrier-drivers`, props.origin);
+                                                            refCarrierCode.current.focus({ preventScroll: true });
+                                                        }}
 
                                                         componentId={moment().format('x')}
                                                         selectedDriverId={driver.id}

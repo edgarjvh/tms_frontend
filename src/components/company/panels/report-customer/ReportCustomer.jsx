@@ -98,7 +98,7 @@ const ReportCustomer = (props) => {
         ((x?.phone1 || '').toLowerCase().includes(contactPhone.toLowerCase()) || (x?.phone2 || '').toLowerCase().includes(contactPhone.toLowerCase())) &&
         ((x?.email1 || '').toLowerCase().includes(contactEmail.toLowerCase()) || (x?.email2 || '').toLowerCase().includes(contactEmail.toLowerCase()))
     }))
-    
+
   }, [
     code,
     name,
@@ -114,6 +114,7 @@ const ReportCustomer = (props) => {
 
   const onInputKeydown = (e) => {
     if (e.key.toLowerCase() === 'escape') {
+      e.stopPropagation()
       if (code.trim() !== '' ||
         name.trim() !== '' ||
         address1.trim() !== '' ||
@@ -124,7 +125,6 @@ const ReportCustomer = (props) => {
         contactName.trim() !== '' ||
         contactPhone.trim() !== '' ||
         contactEmail.trim() !== '') {
-        e.stopPropagation()
         setCode('')
         setName('')
         setAddress1('')
@@ -137,6 +137,8 @@ const ReportCustomer = (props) => {
         setContactEmail('')
 
         refCode.current.focus({ preventScroll: true })
+      }else{
+        props.closingCallback();
       }
     }
   }
@@ -227,10 +229,69 @@ const ReportCustomer = (props) => {
     }
   }
 
+  const closePanel = (panelName, origin) => {
+    if (origin === 'admin-home') {
+      props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-carrier') {
+      props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-company-setup') {
+      props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-customer') {
+      props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-dispatch') {
+      props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-invoice') {
+      props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-report') {
+      props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-home') {
+      props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-carrier') {
+      props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-customer') {
+      props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-dispatch') {
+      props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-invoice') {
+      props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-load-board') {
+      props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-report') {
+      props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+    }
+  }
+
   return (
     <div className='panel-content reports-main-container-customer' ref={refReportCustomerContainer} tabIndex={props.tabTimes + 0} onKeyDown={onInputKeydown}>
       <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
       <div className="title">{props.title} <span className="list-count">{filteredList.length}</span></div>
+      <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
       <div className="side-title"><div>{props.title}</div></div>
 
       {
@@ -385,6 +446,10 @@ const ReportCustomer = (props) => {
                             isAdmin={props.isAdmin}
                             origin={props.origin}
                             customer_id={item.id}
+                            closingCallback={() => {
+                              closePanel(`${props.panelName}-customer`, props.origin);
+                              refCode.current.focus({ preventScroll: true });
+                            }}
                           />
                         ),
                       };

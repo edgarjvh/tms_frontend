@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -174,7 +176,7 @@ const Drivers = (props) => {
         config: { duration: 100 }
     });
 
-    useEffect(async () => {
+    useEffect(() => {
         setDriverSearchCompany(props.driverSearchCompany || {});
 
         if (props.isEditingDriver) {
@@ -954,8 +956,14 @@ const Drivers = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" ref={refDriversContainer} tabIndex={0} onKeyDown={e => {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="driver-container" style={{ overflow: 'initial' }}>
                 <div className="driver-list-container">
@@ -1149,7 +1157,10 @@ const Drivers = (props) => {
                                                 panelName={`${props.panelName}-driver-documents`}
                                                 origin={props.origin}
                                                 suborigin={'company-driver'}
-                                                
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-driver-documents`, props.origin);
+                                                    refDriversContainer.current.focus({ preventScroll: true });
+                                                }}
                                                 
                                                 componentId={moment().format('x')}
                                                 selectedOwner={{ ...driverSearchCompany.selectedDriver }}

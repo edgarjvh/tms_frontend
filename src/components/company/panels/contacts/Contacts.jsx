@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -848,17 +850,18 @@ const Contacts = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refContactsContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if (isEditingContact) {
-                    e.stopPropagation();
                     setIsEditingContact(false);
                     setTempSelectedContact({});
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="contact-container" tabIndex="0" onKeyDown={(e) => {
                 let key = e.keyCode || e.which;

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import moment from 'moment';
@@ -133,6 +135,10 @@ const Order = (props) => {
                 isOnPanel={true}
                 origin={props.origin}                
                 order_id={(selectedOrder?.id || 0)}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-invoice`, props.origin);
+                    refOrderContainer.current.focus({ preventScroll: true });
+                }}
             />
         }
 
@@ -284,7 +290,12 @@ const Order = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refOrderContainer}>
+        <div className="panel-content" tabIndex={0} ref={refOrderContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
@@ -296,6 +307,7 @@ const Order = (props) => {
             }
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="header-buttons" style={{ marginTop: 10, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
                 <div className="mochi-button" onClick={() => {

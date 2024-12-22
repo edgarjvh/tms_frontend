@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -140,6 +142,8 @@ const Documents = (props) => {
                 break;
         }
 
+        setIsLoading(true);
+
         axios.post(props.serverUrl + getDocumentsUrl, {
             employee_id: props.selectedOwner.id,
             agent_id: props.selectedOwner.id,
@@ -162,11 +166,12 @@ const Documents = (props) => {
                     documents: [...res.data.documents]
                 })
             }
+        }).finally(() => {
+            setIsLoading(false);
+            refTitleInput.current.focus({
+                preventScroll: true
+            })
         });
-
-        refTitleInput.current.focus({
-            preventScroll: true
-        })
     }, [])
 
     const getSizeUnit = (size) => {
@@ -672,15 +677,13 @@ const Documents = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refDocumentsContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27){
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if ((selectedOwnerDocument?.title || '') !== '' ||
-                (selectedOwnerDocument?.subject || '') !== '' ||
-                (selectedOwnerDocument?.tags || '') !== '' ||
-                (selectedOwnerDocumentTags || '') !== '' ||
-                refDocumentInput.current.files.length > 0){
-                    e.stopPropagation();
+                    (selectedOwnerDocument?.subject || '') !== '' ||
+                    (selectedOwnerDocument?.tags || '') !== '' ||
+                    (selectedOwnerDocumentTags || '') !== '' ||
+                    refDocumentInput.current.files.length > 0) {
 
                     setSelectedOwnerDocument({
                         id: 0,
@@ -692,11 +695,14 @@ const Documents = (props) => {
                     refDocumentInput.current.value = "";
                     setCurrentQuickLink('');
                     refTitleInput.current.focus();
+                } else {
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -805,7 +811,7 @@ const Documents = (props) => {
                         </div>
 
                         {
-                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division')) &&
+                            ((selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order' || props.suborigin === 'order-billing' || props.suborigin === 'customer' || props.suborigin === 'division'))) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -857,7 +863,7 @@ const Documents = (props) => {
                         }
 
                         {
-                            (selectedOwner?.is_cancelled || 0) === 0 && ((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing' && props.origin === 'invoice')) &&
+                            ((selectedOwner?.is_cancelled || 0) === 0 && (((props.suborigin === 'company-employee' || props.suborigin === 'company-driver' || props.suborigin === 'company-operator' || props.suborigin === 'order-billing') && props.origin === 'invoice'))) &&
                             <div className={quickTypeLinkClasses} style={{
                                 pointerEvents: ((props.user?.user_code?.is_admin || 0) === 0 &&
                                     (((props.user?.user_code?.permissions || []).find(x => x.name === props.permissionName)?.pivot?.save || 0) === 0 &&
@@ -1700,6 +1706,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['pdf', 'txt', 'htm', 'html', 'tmf', 'log'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
+                            title={`Document Preview - ${selectedOwnerDocument.doc_id}`}
                             src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
@@ -1709,6 +1716,7 @@ const Documents = (props) => {
                             (['webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p', 'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
 
                         <iframe id="frame-preview"
+                            title='Document Preview'
                             src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
@@ -1717,6 +1725,7 @@ const Documents = (props) => {
                         ((selectedOwnerDocument.id || 0) > 0 &&
                             (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         <iframe id="frame-preview"
+                            title='Document Preview'
                             src={('https://view.officeapps.live.com/op/embed.aspx?src=' + (props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }
@@ -1726,6 +1735,7 @@ const Documents = (props) => {
                             (['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'png', 'gif', 'webp', 'tiff', 'tif', 'bmp', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2', 'svg', 'svgz'].includes(selectedOwnerDocument.doc_extension.toLowerCase()))) &&
                         // <div className="img-wrapper"><img src={props.serverUrl + serverDocumentsFolder + selectedOwnerDocument.doc_id} alt="" /></div>
                         <iframe id="frame-preview"
+                            title='Document Preview'
                             src={((props.serverUrl.replace('/api', '')) + serverDocumentsFolder + selectedOwnerDocument.doc_id) + '#toolbar=1&navpanes=0&scrollbar=0'}
                             frameBorder={0} allowFullScreen={true} width="100%" height="100%"></iframe>
                     }

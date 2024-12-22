@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from "react-redux";
 import './Routing.css';
@@ -347,6 +349,8 @@ const Routing = (props) => {
                     } else {
                         waypoints.push(`${(zip_data?.latitude || '').toString()},${(zip_data?.longitude || '').toString()}`);
                     }
+
+                    return true;
                 })
 
                 let strWaypoints = JSON.stringify(origin) + JSON.stringify(waypoints) + JSON.stringify(destination);
@@ -543,6 +547,8 @@ const Routing = (props) => {
                     statusClass = "active";
                 }
             }
+
+            return true;
         });
 
         return (classes + " " + statusClass).trim();
@@ -945,9 +951,15 @@ const Routing = (props) => {
     }
 
     return (
-        <div className="panel-content routing" tabIndex={0} ref={refRoutingContainer}>
+        <div className="panel-content routing" tabIndex={0} ref={refRoutingContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div style={{
                 display: 'grid',
@@ -1002,7 +1014,10 @@ const Routing = (props) => {
                             panelName={`${props.panelName}-routing-map`}
                             componentId={moment().format('x')}
                             origin={props.origin}
-
+                            closingCallback={() => {
+                                closePanel(`${props.panelName}-routing-map`, props.origin);
+                                refRoutingContainer.current.focus({ preventScroll: true });
+                            }}
 
                             selectedOrder={selectedOrder}
                         />
@@ -1115,7 +1130,10 @@ const Routing = (props) => {
                                                                                 isOnPanel={true}
                                                                                 isAdmin={props.isAdmin}
                                                                                 origin={props.origin}
-
+                                                                                closingCallback={() => {
+                                                                                    closePanel(`${props.panelName}-customer`, props.origin);
+                                                                                    refRoutingContainer.current.focus({ preventScroll: true });
+                                                                                }}
 
                                                                                 customer_id={item?.customer?.id}
                                                                             />
@@ -1184,7 +1202,10 @@ const Routing = (props) => {
                                             isOnPanel={true}
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-carrier`, props.origin);
+                                                refRoutingContainer.current.focus({ preventScroll: true });
+                                            }}
 
 
                                             carrier_id={selectedCarrier.id}
@@ -1912,6 +1933,10 @@ const Routing = (props) => {
                                         panelName={`${props.panelName}-rate-conf`}
                                         componentId={moment().format('x')}
                                         selectedOrder={selectedOrder}
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-rate-conf`, props.origin);
+                                            refRoutingContainer.current.focus({ preventScroll: true });
+                                        }}
                                     />
                                 }
 
@@ -2019,7 +2044,10 @@ const Routing = (props) => {
                                                                             isOnPanel={true}
                                                                             isAdmin={props.isAdmin}
                                                                             origin={props.origin}
-
+                                                                            closingCallback={() => {
+                                                                                closePanel(`${props.panelName}-customer`, props.origin);
+                                                                                refRoutingContainer.current.focus({ preventScroll: true });
+                                                                            }}
 
                                                                             customer_id={item?.customer?.id}
                                                                         />
@@ -2166,7 +2194,10 @@ const Routing = (props) => {
                                                                             isOnPanel={true}
                                                                             isAdmin={props.isAdmin}
                                                                             origin={props.origin}
-
+                                                                            closingCallback={() => {
+                                                                                closePanel(`${props.panelName}-customer`, props.origin);
+                                                                                refRoutingContainer.current.focus({ preventScroll: true });
+                                                                            }}
 
                                                                             customer_id={item?.customer?.id}
                                                                         />

@@ -16,7 +16,7 @@ import { useDetectClickOutside } from "react-detect-click-outside";
 import SwiperCore, { Navigation } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css";
-import { Calendar, Ltl, RatingScreen } from "./../panels";
+import { Calendar, CarrierList, Ltl, RatingScreen } from "./../panels";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import {
@@ -1465,7 +1465,10 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin)
+                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                    }}
 
                     componentId={moment().format("x")}
                     customerSearch={companySearch}
@@ -1732,6 +1735,10 @@ const Dispatch = (props) => {
                             refShipperCompanyCode.current.focus();
                         });
                     }}
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin)
+                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                    }}
                 />
             ),
         };
@@ -1797,7 +1804,10 @@ const Dispatch = (props) => {
                     tabTimes={29000}
                     panelName={`${props.panelName}-customer-search`}
                     origin={props.origin}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-customer-search`, props.origin)
+                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                    }}
 
                     suborigin={"customer"}
                     componentId={moment().format("x")}
@@ -2373,7 +2383,10 @@ const Dispatch = (props) => {
                     tabTimes={69000}
                     panelName={`${props.panelName}-carrier-search`}
                     origin={props.origin}
-
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-carrier-search`, props.origin)
+                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                    }}
 
                     suborigin={"carrier"}
                     componentId={moment().format("x")}
@@ -3947,7 +3960,10 @@ const Dispatch = (props) => {
                 tabTimes={95000 + props.tabTimes}
                 panelName={`${props.panelName}-order-import`}
                 origin={props.origin}
-
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-order-import`, props.origin);
+                    (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                }}
 
                 componentId={moment().format('x')}
             />
@@ -4225,49 +4241,50 @@ const Dispatch = (props) => {
     }
 
     return (
-        <div
-            className="dispatch-main-container"
-            style={{
-                borderRadius: props.scale === 1 ? 0 : "20px",
-                background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
-                background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
-                padding: props.isOnPanel ? "10px 0" : 10,
-                position: props.isOnPanel ? "unset" : "relative",
-            }}
+        <div className="dispatch-main-container" style={{
+            borderRadius: props.scale === 1 ? 0 : "20px",
+            background: props.isOnPanel ? "transparent" : "rgb(250, 250, 250)",
+            background: props.isOnPanel ? "transparent" : "-moz-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "-webkit-radial-gradient(center, ellipse cover, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
+            padding: props.isOnPanel ? "10px 0" : 10,
+            position: props.isOnPanel ? "unset" : "relative",
+        }}
             ref={props.isOnPanel ? null : props.refDispatchScreen}
             tabIndex={-1}
             onKeyDown={(e) => {
-                let key = e.keyCode || e.which;
-
-                if (key === 27) {
+                if (e.key === "Escape") {
+                    e.stopPropagation();
                     if ((selectedOrder?.id || 0) > 0) {
-                        e.stopPropagation();
                         dispatchClearBtnClick();
+                    } else {
+                        if (props.isOnPanel){
+                            props.closingCallback();
+                        }
                     }
                 }
 
-                if (key === 9) {
+                if (e.key === "Tab") {
                     if (e.target.type === undefined) {
                         e.preventDefault();
                         if (props.isOnPanel) {
                             if (refOrderNumber?.current) {
-                                refOrderNumber.current.focus({
-                                    preventScroll: true,
-                                });
+                                (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
                             }
                         } else {
                             if (props.refOrderNumber?.current) {
-                                props.refOrderNumber.current.focus({
-                                    preventScroll: true,
-                                });
+                                props.refOrderNumber.current.focus({ preventScroll: true });
                             }
                         }
                     }
                 }
-            }}
-        >
+            }}>
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             {
                 showModalTemplate &&
                 <ModalTemplate
@@ -4342,22 +4359,17 @@ const Dispatch = (props) => {
                                         getOrderByOrderNumber({ keyCode: 9 }, 'previous');
                                     }}></span>
 
-                                    <div
-                                        className="input-box-container"
-                                        style={{
-                                            // width: "9rem",
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                fontSize: "0.7rem",
-                                                color: "rgba(0,0,0,0.7)",
-                                                whiteSpace: "nowrap",
-                                            }}
-                                        >
+                                    <div className="input-box-container" style={{
+                                        // width: "9rem",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                    }}>
+                                        <div style={{
+                                            fontSize: "0.7rem",
+                                            color: "rgba(0,0,0,0.7)",
+                                            whiteSpace: "nowrap",
+                                        }} >
                                             Order Number
                                         </div>
                                         <input
@@ -4368,10 +4380,12 @@ const Dispatch = (props) => {
                                             readOnly={isEditingTemplate || isCreatingTemplate}
                                             onKeyDown={getOrderByOrderNumber}
                                             onChange={(e) => {
-                                                setSelectedOrder({
-                                                    ...selectedOrder,
-                                                    order_number: e.target.value,
-                                                });
+                                                setSelectedOrder(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        order_number: e.target.value
+                                                    }
+                                                })
                                             }}
                                             value={selectedOrder?.order_number || ""}
                                         />
@@ -5796,6 +5810,10 @@ const Dispatch = (props) => {
                                                     panelName={`${props.panelName}-templates`}
                                                     origin={props.origin}
                                                     componentId={moment().format("x")}
+                                                    closingCallback={() => {
+                                                        props.closePanel(`${props.panelName}-templates`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
                                                     deleteCallback={(id) => {
                                                         if ((selectedOrder?.template_id || 0) === id) {
                                                             setSelectedOrder(prev => {
@@ -5844,6 +5862,10 @@ const Dispatch = (props) => {
                                                     origin={props.origin}
                                                     id={selectedOrder?.template_id}
                                                     componentId={moment().format("x")}
+                                                    closingCallback={() => {
+                                                        props.closePanel(`${props.panelName}-templates`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
                                                     deleteCallback={(id) => {
                                                         if ((selectedOrder?.template_id || 0) === id) {
                                                             setSelectedOrder(prev => {
@@ -6262,7 +6284,10 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-
+                                                    closingCallback={() => {
+                                                        props.closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
 
                                                     customer_id={selectedBillToCustomer.id}
                                                 />
@@ -6296,6 +6321,10 @@ const Dispatch = (props) => {
                                                     componentId={moment().format("x")}
                                                     origin={props.origin}
                                                     selectedOrder={selectedOrder}
+                                                    closingCallback={() => {
+                                                        props.closePanel(`${props.panelName}-rating`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -6688,7 +6717,10 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-
+                                                    closingCallback={() => {
+                                                        props.closePanel(props.panelName + '-carrier', props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
 
                                                     carrier_id={selectedCarrier.id}
                                                 />
@@ -8860,6 +8892,10 @@ const Dispatch = (props) => {
                                                             componentId={moment().format("x")}
                                                             origin={props.origin}
                                                             selectedOrder={selectedOrder}
+                                                            closingCallback={() => {
+                                                                closePanel(`${props.panelName}-rating`, props.origin);
+                                                                (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                            }}
                                                         />
                                                     ),
                                                 };
@@ -8907,6 +8943,10 @@ const Dispatch = (props) => {
                                                 origin={props.origin}
                                                 componentId={moment().format("x")}
                                                 selectedOrderId={selectedOrder?.id || 0}
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-rate-conf`, props.origin);
+                                                    (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                }}
                                             />
                                         ),
                                     };
@@ -8938,6 +8978,10 @@ const Dispatch = (props) => {
                                                 componentId={moment().format("x")}
                                                 origin={props.origin}
                                                 selectedOrder={selectedOrder}
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-rating`, props.origin);
+                                                    (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                }}
                                             />
                                         ),
                                     };
@@ -9116,6 +9160,10 @@ const Dispatch = (props) => {
                                         origin={props.origin}
                                         componentId={moment().format("x")}
                                         selectedOrderId={selectedOrder?.id || 0}
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-rate-conf`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
                                     />
                                 ),
                             };
@@ -9147,7 +9195,10 @@ const Dispatch = (props) => {
                                         tabTimes={37000 + props.tabTimes}
                                         panelName={`${props.panelName}-order`}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-order`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format("x")}
                                         selectedOrderId={selectedOrder?.id || 0}
@@ -9182,7 +9233,10 @@ const Dispatch = (props) => {
                                         tabTimes={40000 + props.tabTimes}
                                         panelName={`${props.panelName}-bol`}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-bol`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
@@ -9221,7 +9275,10 @@ const Dispatch = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={"order"}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-documents`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format("x")}
                                         selectedOwner={{ ...selectedOrder }}
@@ -9267,7 +9324,10 @@ const Dispatch = (props) => {
                                         isOnPanel={true}
                                         isAdmin={props.isAdmin}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-load-board`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                     />
                                 ),
@@ -9307,6 +9367,10 @@ const Dispatch = (props) => {
                                         componentId={moment().format("x")}
                                         origin={props.origin}
                                         selectedOrder={selectedOrder}
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-rating`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
                                     />
                                 ),
                             };
@@ -9941,7 +10005,10 @@ const Dispatch = (props) => {
                                         title="Routing"
                                         tabTimes={39000 + props.tabTimes}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-routing`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format("x")}
                                         selectedOrder={selectedOrder}
@@ -10592,7 +10659,10 @@ const Dispatch = (props) => {
                                     componentId={moment().format('x')}
                                     isOnPanel={true}
                                     origin={props.origin}
-
+                                    closingCallback={() => {
+                                        closePanel(`${props.panelName}-invoice`, props.origin);
+                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                    }}
 
                                     order_id={(selectedOrder?.id || 0)}
                                 />
@@ -10808,6 +10878,10 @@ const Dispatch = (props) => {
                                                             }
                                                         }
                                                     }}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -10876,7 +10950,10 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
 
                                                     customer_id={selectedShipperCustomer.id}
                                                 />
@@ -14360,7 +14437,7 @@ const Dispatch = (props) => {
                                                                                     <Ltl
                                                                                         title="LTL Units & Accessorials"
                                                                                         tabTimes={1546484 + props.tabTimes}
-                                                                                        panelName={`${props.panelName}-ltl`}
+                                                                                        panelName={`${props.panelName}-ltl-units`}
                                                                                         origin={props.origin}
                                                                                         componentId={moment().format("x")}
                                                                                         selectedOrderId={selectedOrder.id}
@@ -14552,6 +14629,10 @@ const Dispatch = (props) => {
                                                             setIsSavingDeliveryId(0)
                                                         }
                                                     }}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
                                                 />
                                             ),
                                         };
@@ -14590,7 +14671,10 @@ const Dispatch = (props) => {
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
                                                     origin={props.origin}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
 
                                                     customer_id={selectedConsigneeCustomer.id}
                                                 />
@@ -18098,7 +18182,33 @@ const Dispatch = (props) => {
                                                                         goToTabindex(
                                                                             (54 + props.tabTimes).toString()
                                                                         );
-                                                                        setIsShowingConsigneeSecondPage(false);
+                                                                        
+                                                                        if ((selectedOrder?.load_type_id || 0) === 2) {
+                                                                            let panel = {
+                                                                                panelName: `${props.panelName}-carrier-list`,
+                                                                                component: (
+                                                                                    <CarrierList
+                                                                                        title="Carriers"
+                                                                                        tabTimes={154648410 + props.tabTimes}
+                                                                                        panelName={`${props.panelName}-carrier-list`}
+                                                                                        origin={props.origin}
+                                                                                        componentId={moment().format("x")}
+                                                                                        selectedOrderId={selectedOrder.id}
+                                                                                        setSelectedOrder={setSelectedOrder}
+                                                                                        closingCallback={() => {
+                                                                                            closePanel(`${props.panelName}-carrier-list`, props.origin);
+                                                                                            refCarrierCode.current.focus({ preventScroll: true })
+                                                                                            setIsShowingConsigneeSecondPage(false);
+                                                                                        }}
+                                                                                    />
+                                                                                ),
+                                                                            };
+
+                                                                            openPanel(panel, props.origin);
+                                                                        } else {
+                                                                            refCarrierCode.current.focus({ preventScroll: true });
+                                                                            setIsShowingConsigneeSecondPage(false);
+                                                                        }
                                                                     }
                                                                 }
                                                             }}
@@ -20171,7 +20281,10 @@ const Dispatch = (props) => {
                                         panelName={`${props.panelName}-routing-map`}
                                         componentId={moment().format('x')}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-routing-map`, props.origin);
+                                            (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                        }}
 
                                         selectedOrder={selectedOrder}
                                     />

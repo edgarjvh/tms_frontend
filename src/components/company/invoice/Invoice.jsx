@@ -703,14 +703,14 @@ const Invoice = (props) => {
                     });
 
                     setIsLoading(false);
-                    if (props.isOnPanel){
-                        if (refOrderNumber?.current){
+                    if (props.isOnPanel) {
+                        if (refOrderNumber?.current) {
                             refOrderNumber.current.focus({
                                 preventScroll: true,
                             });
                         }
-                    }else{
-                        if (props.refOrderNumber?.current){
+                    } else {
+                        if (props.refOrderNumber?.current) {
                             props.refOrderNumber.current.focus({
                                 preventScroll: true,
                             });
@@ -720,14 +720,14 @@ const Invoice = (props) => {
             }).catch(e => {
                 console.log('error getting order by id', e);
                 setIsLoading(false);
-                if (props.isOnPanel){
-                    if (refOrderNumber?.current){
+                if (props.isOnPanel) {
+                    if (refOrderNumber?.current) {
                         refOrderNumber.current.focus({
                             preventScroll: true,
                         });
                     }
-                }else{
-                    if (props.refOrderNumber?.current){
+                } else {
+                    if (props.refOrderNumber?.current) {
                         props.refOrderNumber.current.focus({
                             preventScroll: true,
                         });
@@ -740,7 +740,7 @@ const Invoice = (props) => {
     }, [])
 
     useEffect(() => {
-        if (props.refOrderNumber?.current){
+        if (props.refOrderNumber?.current) {
             props.refOrderNumber.current.focus({
                 preventScroll: true
             });
@@ -749,14 +749,14 @@ const Invoice = (props) => {
 
     useEffect(() => {
         if (props.screenFocused) {
-            if (props.isOnPanel){
-                if (refOrderNumber?.current){
+            if (props.isOnPanel) {
+                if (refOrderNumber?.current) {
                     refOrderNumber.current.focus({
                         preventScroll: true,
                     });
                 }
-            }else{
-                if (props.refOrderNumber?.current){
+            } else {
+                if (props.refOrderNumber?.current) {
                     props.refOrderNumber.current.focus({
                         preventScroll: true,
                     });
@@ -2145,11 +2145,9 @@ const Invoice = (props) => {
         }}
             tabIndex={-1}
             onKeyDown={(e) => {
-                let key = e.keyCode || e.which;
-
-                if (key === 27) {
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
                     if ((selectedOrder?.id || 0) > 0) {
-                        e.stopPropagation();
                         setSelectedOrder({});
                         setOrderNumber('');
                         setTripNumber('');
@@ -2160,33 +2158,37 @@ const Invoice = (props) => {
                         setSelectedCarrierDriver({});
                         setSelectedRoute({});
 
-                        if (props.isOnPanel){
-                            if (refOrderNumber?.current){
+                        if (props.isOnPanel) {
+                            if (refOrderNumber?.current) {
                                 refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refOrderNumber?.current){
+                        } else {
+                            if (props.refOrderNumber?.current) {
                                 props.refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
                         }
+                    } else {
+                        if (props.isOnPanel){
+                            props.closingCallback();
+                        }
                     }
                 }
 
-                if (key === 9) {
+                if (e.key === 'Tab') {
                     if (e.target.type === undefined) {
                         e.preventDefault();
-                        if (props.isOnPanel){
-                            if (refOrderNumber?.current){
+                        if (props.isOnPanel) {
+                            if (refOrderNumber?.current) {
                                 refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
                             }
-                        }else{
-                            if (props.refOrderNumber?.current){
+                        } else {
+                            if (props.refOrderNumber?.current) {
                                 props.refOrderNumber.current.focus({
                                     preventScroll: true,
                                 });
@@ -2194,9 +2196,13 @@ const Invoice = (props) => {
                         }
                     }
                 }
-            }}
-        >
-
+            }}>
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
@@ -2349,7 +2355,10 @@ const Invoice = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'order-billing'}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-documents`, props.origin);
+                                            refOrderNumber.current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format('x')}
 
@@ -2390,7 +2399,10 @@ const Invoice = (props) => {
                                         tabTimes={67000 + props.tabTimes}
                                         panelName={`${props.panelName}-invoice-preview`}
                                         origin={props.origin}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-invoice-preview`, props.origin);
+                                            refOrderNumber.current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format('x')}
                                         selectedCompany={props.selectedCompany}
@@ -6106,7 +6118,10 @@ const Invoice = (props) => {
                                         panelName={`${props.panelName}-documents`}
                                         origin={props.origin}
                                         suborigin={'order'}
-
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-documents`, props.origin);
+                                            refOrderNumber.current.focus({ preventScroll: true });
+                                        }}
 
                                         componentId={moment().format('x')}
 
@@ -9925,14 +9940,14 @@ const Invoice = (props) => {
                             setSelectedCarrierDriver({});
                             setSelectedRoute({});
 
-                            if (props.isOnPanel){
-                                if (refOrderNumber?.current){
+                            if (props.isOnPanel) {
+                                if (refOrderNumber?.current) {
                                     refOrderNumber.current.focus({
                                         preventScroll: true,
                                     });
                                 }
-                            }else{
-                                if (props.refOrderNumber?.current){
+                            } else {
+                                if (props.refOrderNumber?.current) {
                                     props.refOrderNumber.current.focus({
                                         preventScroll: true,
                                     });
@@ -10046,7 +10061,10 @@ const Invoice = (props) => {
                                             panelName={`${props.panelName}-documents`}
                                             origin={props.origin}
                                             suborigin={'order-billing'}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-documents`, props.origin);
+                                                refOrderNumber.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
 
@@ -10108,7 +10126,10 @@ const Invoice = (props) => {
                                                     panelName={`${props.panelName}-documents`}
                                                     origin={props.origin}
                                                     suborigin={'order-billing'}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-documents`, props.origin);
+                                                        refOrderNumber.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 
@@ -10166,7 +10187,10 @@ const Invoice = (props) => {
                                             panelName={`${props.panelName}-documents`}
                                             origin={props.origin}
                                             suborigin={'order'}
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-documents`, props.origin);
+                                                refOrderNumber.current.focus({ preventScroll: true });
+                                            }}
 
                                             componentId={moment().format('x')}
 
@@ -10229,7 +10253,10 @@ const Invoice = (props) => {
                                                     panelName={`${props.panelName}-documents`}
                                                     origin={props.origin}
                                                     suborigin={'order'}
-
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-documents`, props.origin);
+                                                        refOrderNumber.current.focus({ preventScroll: true });
+                                                    }}
 
                                                     componentId={moment().format('x')}
 
@@ -10306,6 +10333,10 @@ const Invoice = (props) => {
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
                                             customer_id={selectedBillToCustomer.id}
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-customer`, props.origin);
+                                                refOrderNumber.current.focus({ preventScroll: true });
+                                            }}
                                         />
                                     }
 
@@ -10810,9 +10841,10 @@ const Invoice = (props) => {
                                             isOnPanel={true}
                                             isAdmin={props.isAdmin}
                                             origin={props.origin}
-
-
-
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-carrier`, props.origin);
+                                                refOrderNumber.current.focus({ preventScroll: true });
+                                            }}
                                             carrier_id={selectedCarrier.id}
                                         />
                                     }
@@ -11833,14 +11865,14 @@ const Invoice = (props) => {
                             onClick={() => {
                                 if ((selectedOrder?.id || 0) === 0) {
                                     window.alert('You must load an order first!');
-                                    if (props.isOnPanel){
-                                        if (refOrderNumber?.current){
+                                    if (props.isOnPanel) {
+                                        if (refOrderNumber?.current) {
                                             refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
                                         }
-                                    }else{
-                                        if (props.refOrderNumber?.current){
+                                    } else {
+                                        if (props.refOrderNumber?.current) {
                                             props.refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
@@ -11851,14 +11883,14 @@ const Invoice = (props) => {
 
                                 if ((selectedOrder?.order_invoiced || 0) === 0) {
                                     window.alert('You must approve the customer invoice first!');
-                                    if (props.isOnPanel){
-                                        if (refOrderNumber?.current){
+                                    if (props.isOnPanel) {
+                                        if (refOrderNumber?.current) {
                                             refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
                                         }
-                                    }else{
-                                        if (props.refOrderNumber?.current){
+                                    } else {
+                                        if (props.refOrderNumber?.current) {
                                             props.refOrderNumber.current.focus({
                                                 preventScroll: true,
                                             });
@@ -13237,14 +13269,14 @@ const Invoice = (props) => {
                                                     }).catch(e => {
                                                         console.log(e);
                                                     }).finally(() => {
-                                                        if (props.isOnPanel){
-                                                            if (refOrderNumber?.current){
+                                                        if (props.isOnPanel) {
+                                                            if (refOrderNumber?.current) {
                                                                 refOrderNumber.current.focus({
                                                                     preventScroll: true,
                                                                 });
                                                             }
-                                                        }else{
-                                                            if (props.refOrderNumber?.current){
+                                                        } else {
+                                                            if (props.refOrderNumber?.current) {
                                                                 props.refOrderNumber.current.focus({
                                                                     preventScroll: true,
                                                                 });
@@ -13252,14 +13284,14 @@ const Invoice = (props) => {
                                                         }
                                                     });
                                                 } else {
-                                                    if (props.isOnPanel){
-                                                        if (refOrderNumber?.current){
+                                                    if (props.isOnPanel) {
+                                                        if (refOrderNumber?.current) {
                                                             refOrderNumber.current.focus({
                                                                 preventScroll: true,
                                                             });
                                                         }
-                                                    }else{
-                                                        if (props.refOrderNumber?.current){
+                                                    } else {
+                                                        if (props.refOrderNumber?.current) {
                                                             props.refOrderNumber.current.focus({
                                                                 preventScroll: true,
                                                             });

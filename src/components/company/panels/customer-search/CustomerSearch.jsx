@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './CustomerSearch.css';
@@ -225,9 +227,15 @@ const CustomerSearch = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refCustomerSearchContainer}>
+        <div className="panel-content" tabIndex={0} ref={refCustomerSearchContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             {
                 loadingTransition((style, item) => item &&

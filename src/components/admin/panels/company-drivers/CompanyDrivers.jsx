@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
@@ -706,7 +708,10 @@ const CompanyDrivers = props => {
                 permissionName='customer contacts'
                 origin={props.origin}
                 owner={props.subOrigin}
-                // isEditingContact={true}
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-contacts`, props.origin);
+                    refDriverInfoCode.current.focus({ preventScroll: true });
+                }}
                 
                 
                 componentId={moment().format('x')}
@@ -1065,7 +1070,10 @@ const CompanyDrivers = props => {
                     panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`}
                     origin={props.origin}
                     suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`}
-                    
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`, props.origin);
+                        refDriverInfoCode.current.focus({ preventScroll: true });
+                    }}
                     
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedLicense }}
@@ -1097,7 +1105,10 @@ const CompanyDrivers = props => {
                     panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`}
                     origin={props.origin}
                     suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`}
-                    
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`, props.origin);
+                        refDriverInfoCode.current.focus({ preventScroll: true });
+                    }}
                     
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedMedicalCard }}
@@ -1129,7 +1140,10 @@ const CompanyDrivers = props => {
                     panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`}
                     origin={props.origin}
                     suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`}
-                    
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`, props.origin);
+                        refDriverInfoCode.current.focus({ preventScroll: true });
+                    }}
                     
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedTractor }}
@@ -1161,7 +1175,10 @@ const CompanyDrivers = props => {
                     panelName={`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`}
                     origin={props.origin}
                     suborigin={`company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`}
-                    
+                    closingCallback={() => {
+                        closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`, props.origin);
+                        refDriverInfoCode.current.focus({ preventScroll: true });
+                    }}
                     
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedTrailer }}
@@ -1349,18 +1366,19 @@ const CompanyDrivers = props => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refCompanyDriversContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27){
+            if (e.key === 'Escape'){
+                e.stopPropagation();
                 if ((selectedDriver?.id || 0) > 0){
-                    e.stopPropagation();
                     setInitialValues();
                     refDriverInfoCode.current.focus()
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -2246,7 +2264,7 @@ const CompanyDrivers = props => {
                         <div className="license-image-main-container">
                             {
                                 (selectedLicense?.image || '') !== ''
-                                    ? <img src={(props.serverUrl.replace('api', '')) + 'license-images/' + selectedLicense.image} alt="License Image" />
+                                    ? <img src={(props.serverUrl.replace('api', '')) + 'license-images/' + selectedLicense.image} alt="License" />
                                     : <img src='img/id-card.png' alt="" />
                             }
                         </div>
@@ -2515,7 +2533,7 @@ const CompanyDrivers = props => {
                         <div className="medical-card-image-main-container">
                             {
                                 (selectedMedicalCard?.image || '') !== ''
-                                    ? <img src={(props.serverUrl.replace('api', '')) + 'medical-card-images/' + selectedMedicalCard.image} alt="Medical Card Image" />
+                                    ? <img src={(props.serverUrl.replace('api', '')) + 'medical-card-images/' + selectedMedicalCard.image} alt="Medical Card" />
                                     : <img src='img/id-card.png' alt="" />
                             }
                         </div>
@@ -2551,7 +2569,10 @@ const CompanyDrivers = props => {
                                         permissionName='customer contacts'
                                         origin={props.origin}
                                         owner={props.subOrigin}
-                                        // isEditingContact={true}
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-contacts`, props.origin);
+                                            refDriverInfoCode.current.focus({ preventScroll: true });
+                                        }}
                                         
                                         
                                         componentId={moment().format('x')}
@@ -2589,7 +2610,10 @@ const CompanyDrivers = props => {
                                         origin={props.origin}
                                         owner={props.subOrigin}
                                         isEditingContact={true}
-                                        
+                                        closingCallback={() => {
+                                            closePanel(`${props.panelName}-contacts`, props.origin);
+                                            refDriverInfoCode.current.focus({ preventScroll: true });
+                                        }}
                                         
                                         componentId={moment().format('x')}
 

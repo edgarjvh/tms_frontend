@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -1389,20 +1391,21 @@ const RatingScreen = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refRatingScreenContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if (Object.keys(selectedBillToRating || {}).length > 0 ||
                     (Object.keys(selectedCarrierRating || {}).length > 0)) {
-                    e.stopPropagation();
                     setSelectedBillToRating({});
                     setSelectedCarrierRating({});
                     refBillToRateType.current.focus({ preventScroll: true });
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>

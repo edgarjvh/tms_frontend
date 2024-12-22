@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+import React, {useEffect, useRef} from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $ from 'jquery';
@@ -25,13 +26,11 @@ import {
 } from './../../../../actions';
 
 const FactoringCompanyInvoiceSearch = (props) => {
-    const closePanelBtnClick = (e, name) => {
-        props.setOpenedPanels(props.openedPanels.filter((item, index) => {
-            return item !== name;
-        }));
-    }
+    const refFactoringCompanyInvoiceSearch = useRef();
 
-    var clickCount = 0;
+    useEffect(() => {
+        refFactoringCompanyInvoiceSearch.current.focus({ preventScroll: true });
+    }, [])
 
     const rowClick = (e, f) => {
 
@@ -182,9 +181,14 @@ const FactoringCompanyInvoiceSearch = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" ref={refFactoringCompanyInvoiceSearch} tabIndex={0} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-            <div className="close-btn" title="Close" onClick={e => closePanelBtnClick(e, props.panelName)}><span className="fas fa-times"></span></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
 
             <div className="input-box-container" style={{ marginTop: 20, display: 'flex', alignItems: 'center' }}>

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './CarrierImport.css';
@@ -395,7 +397,7 @@ const CustomerImport = (props) => {
         <div className="panel-content" tabIndex={0} ref={refCarrierImportContainer}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
-
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style} >
@@ -513,7 +515,6 @@ const CustomerImport = (props) => {
 
                                             const rowContainerClasses = classNames({
                                                 'row-container': true,
-                                                'hidden': false,
                                                 'hidden': false
                                             });
 

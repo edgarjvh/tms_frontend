@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import { useTransition, animated } from 'react-spring';
@@ -39,7 +40,12 @@ const ContactList = (props) => {
     }, [])
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refContactListContainer}>
+        <div className="panel-content" tabIndex={0} ref={refContactListContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
@@ -51,7 +57,8 @@ const ContactList = (props) => {
             }
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
-
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
+            
             <div className="filtering-section">
                 <div className="input-box-container grow">
                     <input tabIndex={1 + props.tabTimes} type="text" placeholder="Filter"

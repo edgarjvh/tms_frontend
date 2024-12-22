@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
@@ -112,7 +113,15 @@ const Ltl = (props) => {
     }
   });
 
+  const [hazmatNamesInput, setHazmatNamesInput] = useState('')
   const refHazmatName = useRef()
+  const [hazmatNameItems, setHazmatNameItems] = useState([]);
+  const refHazmatNamePopupItems = useRef([]);
+  const refHazmatNameDropDown = useDetectClickOutside({
+    onTriggered: async () => {
+      setHazmatNameItems([])
+    }
+  });
 
   const [hazmatPackagingInput, setHazmatPackagingInput] = useState('')
   const refHazmatPackaging = useRef()
@@ -228,6 +237,14 @@ const Ltl = (props) => {
     leave: { opacity: 0, top: 'calc(100% + 7px)' },
     config: { duration: 100 },
     reverse: unitClassItems.length > 0
+  });
+
+  const hazmatNameTransition = useTransition(hazmatNameItems.length > 0, {
+    from: { opacity: 0, top: 'calc(100% + 7px)' },
+    enter: { opacity: 1, top: 'calc(100% + 12px)' },
+    leave: { opacity: 0, top: 'calc(100% + 7px)' },
+    config: { duration: 100 },
+    reverse: hazmatNameItems.length > 0
   });
 
   const hazmatPackagingTransition = useTransition(hazmatPackagingItems.length > 0, {
@@ -485,6 +502,7 @@ const Ltl = (props) => {
 
   const handlingUnitsDebounceValue = useDebounce(handlingUnitsInput);
   const unitClassesDebounceValue = useDebounce(unitClassesInput);
+  const hazmatNamesDebounceValue = useDebounce(hazmatNamesInput);
   const hazmatPackagingDebounceValue = useDebounce(hazmatPackagingInput);
   const hazmatClassesDebounceValue = useDebounce(hazmatClassesInput);
   const accessorialsDebounceValue = useDebounce(accessorialsInput);
@@ -517,6 +535,20 @@ const Ltl = (props) => {
 
     (unitClassesInput || '') !== '' ? getData() : setUnitClassItems([])
   }, [unitClassesDebounceValue])
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await axios.post(`${props.serverUrl}/getHazmats`, { name: hazmatNamesDebounceValue });
+      if (response.data.result === 'OK') {
+        setHazmatNameItems(response.data.hazmats.map((item, index) => ({
+          ...item,
+          selected: index === 0
+        })));
+      }
+    }
+
+    (hazmatNamesInput || '') !== '' ? getData() : setHazmatNameItems([])
+  }, [hazmatNamesDebounceValue])
 
   useEffect(() => {
     const getData = async () => {
@@ -590,8 +622,6 @@ const Ltl = (props) => {
     })
   }
 
-
-
   const validateAccessorialForSaving = () => {
     if (!isSavingAccessorial) {
       setIsSavingAccessorial(true)
@@ -620,15 +650,14 @@ const Ltl = (props) => {
 
   return (
     <div className="panel-content" tabIndex={0} ref={refLtlContainer} onKeyDown={(e) => {
-      let key = e.keyCode || e.which;
-
-      if (key === 27) {
+      if (e.key === 'Escape') {
         e.stopPropagation();
         handleClosing(e);
       }
     }}>
       <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
       <div className="title">{props.title}</div>
+      <div className="close-btn" title="Close" onClick={e => { props.onEscCallback() }}><span className="fas fa-times"></span></div>
       <div className="side-title">
         <div>{props.title}</div>
       </div>
@@ -784,6 +813,7 @@ const Ltl = (props) => {
                         textTransform: 'capitalize',
                         textAlign: 'right',
                         paddingRight: 16,
+                        fontWeight: 'bold'
                       }}
                       value={selectedLtlUnit?.handling_unit?.name || ''}
                       onKeyDown={(e) => {
@@ -2203,37 +2233,330 @@ const Ltl = (props) => {
 
               <div className="form-row">
                 <div className={classnames({
-                  'input-box-container': true,
+                  'select-box-container': true,
                   'disabled': (selectedLtlUnit?.hazmat || 0) === 0
                 })} style={{ flexGrow: 1 }}>
-                  <div style={{
-                    fontSize: '0.7rem',
-                    color: 'rgba(0,0,0,0.7)',
-                    whiteSpace: 'nowrap'
-                  }}>HazMat Name</div>
-                  <input
-                    tabIndex={12 + props.tabTimes}
-                    ref={refHazmatName}
-                    type="text"
-                    style={{ textAlign: 'right', fontWeight: 'bold' }}
-                    onInput={(e) => {
-                      setSelectedLtlUnit(prev => {
-                        return {
-                          ...prev,
-                          hazmat_name: e.target.value
+                  <div className="select-box-wrapper">
+                    <div style={{
+                      fontSize: '0.7rem',
+                      color: 'rgba(0,0,0,0.7)',
+                      whiteSpace: 'nowrap'
+                    }}>HazMat Name</div>
+                    <input
+                      tabIndex={12 + props.tabTimes}
+                      ref={refHazmatName}
+                      type="text"
+                      style={{
+                        textTransform: 'capitalize',
+                        textAlign: 'right',
+                        paddingRight: 16,
+                        fontWeight: 'bold'
+                      }}
+                      value={selectedLtlUnit?.hazmat_name || ''}
+                      onKeyDown={(e) => {
+                        let key = e.keyCode || e.which;
+
+                        if (key === 38) { // Arrow Up
+                          e.preventDefault();
+                          if (hazmatNameItems.length > 0) {
+                            let selectedIndex = hazmatNameItems.findIndex(item => item.selected);
+
+                            if (selectedIndex === -1) {
+                              setHazmatNameItems(hazmatNameItems.map((item, index) => {
+                                item.selected = index === 0;
+                                return item;
+                              }))
+                            } else {
+                              setHazmatNameItems(hazmatNameItems.map((item, index) => {
+                                if (selectedIndex === 0) {
+                                  item.selected = index === (hazmatNameItems.length - 1);
+                                } else {
+                                  item.selected = index === (selectedIndex - 1);
+                                }
+                                return item;
+                              }))
+                            }
+
+                            refHazmatNamePopupItems.current.map((r, i) => {
+                              if (r && r.classList.contains('selected')) {
+                                r.scrollIntoView({
+                                  behavior: 'auto',
+                                  block: 'center',
+                                  inline: 'nearest'
+                                })
+                              }
+                              return true;
+                            });
+                          } else {
+                            axios.post(props.serverUrl + '/getHazmats').then(res => {
+                              if (res.data.result === 'OK') {
+                                setHazmatNameItems(res.data.hazmats.map((item, index) => {
+                                  item.selected = (selectedLtlUnit?.hazmat_name || '').toLowerCase() === item.name.toLowerCase();
+                                  return item;
+                                }))
+
+                                refHazmatNamePopupItems.current.map((r, i) => {
+                                  if (r && r.classList.contains('selected')) {
+                                    r.scrollIntoView({
+                                      behavior: 'auto',
+                                      block: 'center',
+                                      inline: 'nearest'
+                                    })
+                                  }
+                                  return true;
+                                });
+                              }
+                            }).catch(e => {
+                              console.log('error getting hazmat classes', e);
+                            })
+                          }
+                        } else if (key === 40) { // Arrow Down
+                          e.preventDefault();
+                          if (hazmatNameItems.length > 0) {
+                            let selectedIndex = hazmatNameItems.findIndex(item => item.selected);
+
+                            if (selectedIndex === -1) {
+                              setHazmatNameItems(hazmatNameItems.map((item, index) => {
+                                item.selected = index === 0;
+                                return item;
+                              }))
+                            } else {
+                              setHazmatNameItems(hazmatNameItems.map((item, index) => {
+                                if (selectedIndex === (hazmatNameItems.length - 1)) {
+                                  item.selected = index === 0;
+                                } else {
+                                  item.selected = index === (selectedIndex + 1);
+                                }
+                                return item;
+                              }))
+                            }
+
+                            refHazmatNamePopupItems.current.map((r, i) => {
+                              if (r && r.classList.contains('selected')) {
+                                r.scrollIntoView({
+                                  behavior: 'auto',
+                                  block: 'center',
+                                  inline: 'nearest'
+                                })
+                              }
+                              return true;
+                            });
+                          } else {
+                            axios.post(props.serverUrl + '/getHazmats').then(res => {
+                              if (res.data.result === 'OK') {
+                                setHazmatNameItems(res.data.hazmats.map((item, index) => {
+                                  item.selected = (selectedLtlUnit?.hazmat_name || '').toLowerCase() === item.name.toLowerCase();
+                                  return item;
+                                }))
+
+                                refHazmatNamePopupItems.current.map((r, i) => {
+                                  if (r && r.classList.contains('selected')) {
+                                    r.scrollIntoView({
+                                      behavior: 'auto',
+                                      block: 'center',
+                                      inline: 'nearest'
+                                    })
+                                  }
+                                  return true;
+                                });
+                              }
+                            }).catch(e => {
+                              console.log('error getting hazmat classes', e);
+                            })
+                          }
+                        } else if (key === 27) { // Escape
+                          if (hazmatNameItems.length > 0) {
+                            e.stopPropagation();
+                            setHazmatNameItems([]);
+                          } else {
+                            handleClosing(e);
+                          }
+
+                        } else if (key === 13) { // Enter
+                          if (hazmatNameItems.length > 0 && hazmatNameItems.findIndex(item => item.selected) > -1) {
+                            setSelectedLtlUnit(prev => {
+                              return {
+                                ...prev,
+                                hazmat_name: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)]?.name,
+                                hazmat_class_id: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_class_id,
+                                hazmat_class: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_class,
+                                hazmat_group: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_group,
+                                hazmat_un_na: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_un_na
+                              }
+                            })
+
+                            window.setTimeout(() => {
+                              setHazmatNameItems([]);
+                              refHazmatName.current.focus();
+                            }, 0);
+                          }
+                        } else if (key === 9) { // Tab
+                          if (hazmatNameItems.length > 0) {
+                            e.preventDefault();
+                            setSelectedLtlUnit(prev => {
+                              return {
+                                ...prev,
+                                hazmat_name: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)]?.name,
+                                hazmat_class_id: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_class_id,
+                                hazmat_class: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_class,
+                                hazmat_group: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_group,
+                                hazmat_un_na: hazmatNameItems[hazmatNameItems.findIndex(item => item.selected)].hazmat_un_na
+                              }
+                            })
+
+                            window.setTimeout(() => {
+                              setHazmatNameItems([]);
+                              refHazmatName.current.focus();
+                            }, 0);
+                          }
                         }
-                      });
-                    }}
-                    onChange={(e) => {
-                      setSelectedLtlUnit(prev => {
-                        return {
-                          ...prev,
-                          hazmat_name: e.target.value
-                        }
-                      });
-                    }}
-                    value={selectedLtlUnit?.hazmat_name || ''}
-                  />
+                      }}
+                      onInput={(e) => {
+                        setHazmatNamesInput(e.target.value)
+                      }}
+                      // onBlur={(e) => {
+                      //   axios.post(props.serverUrl + '/getHazmats').then(res => {
+                      //     if (res.data.result === 'OK') {
+                      //       const exist = res.data.hazmat_classes.find(item => item.name.toLowerCase() === e.target.value.toLowerCase());
+
+                      //       if (!exist) {
+                      //         setSelectedLtlUnit(prev => {
+                      //           return {
+                      //             ...prev,
+                      //             hazmat_class: null,
+                      //             hazmat_class_id: null
+                      //           }
+                      //         })
+                      //       } else {
+                      //         setSelectedLtlUnit(prev => {
+                      //           return {
+                      //             ...prev,
+                      //             hazmat_class: exist,
+                      //             hazmat_class_id: exist.id
+                      //           }
+                      //         })
+                      //       }
+                      //     }
+                      //   }).catch(e => {
+                      //     console.log('error getting hazmat classes', e);
+                      //   })
+                      // }}
+                      onChange={(e) => {
+                        setSelectedLtlUnit(prev => {
+                          return {
+                            ...prev,
+                            hazmat_name: e.target.value
+                          }
+                        });
+                      }}
+                    />
+                    <FontAwesomeIcon className="dropdown-button" icon={faCaretDown} onClick={() => {
+                      if (hazmatNameItems.length > 0) {
+                        setHazmatNameItems([]);
+                      } else {
+                        axios.post(props.serverUrl + '/getHazmats').then(res => {
+                          if (res.data.result === 'OK') {
+                            setHazmatNameItems(res.data.hazmats.map((item, index) => {
+                              item.selected = (selectedLtlUnit?.hazmat_name || '').toLowerCase() === item.name.toLowerCase();
+                              return item;
+                            }))
+
+                            window.setTimeout(() => {
+                              refHazmatNamePopupItems.current.map((r, i) => {
+                                if (r && r.classList.contains('selected')) {
+                                  r.scrollIntoView({
+                                    behavior: 'auto',
+                                    block: 'center',
+                                    inline: 'nearest'
+                                  })
+                                }
+                                return true;
+                              });
+                            }, 0);
+                          }
+                        }).catch(e => {
+                          console.log('error getting hazmat classes', e);
+                        })
+                      }
+
+                      refHazmatName.current.focus();
+                    }} />
+                  </div>
+                  {
+                    hazmatNameTransition((style, item) => item && (
+                      <animated.div
+                        className="mochi-contextual-container"
+                        id="mochi-contextual-container-hazmat-names"
+                        style={{
+                          ...style,
+                          left: '0',
+                          display: 'block'
+                        }}
+                        ref={refHazmatNameDropDown}
+                      >
+                        <div className="mochi-contextual-popup vertical below right"
+                          style={{ height: 150 }}>
+                          <div className="mochi-contextual-popup-content">
+                            <div className="mochi-contextual-popup-wrapper">
+                              {
+                                hazmatNameItems.map((item, index) => {
+                                  const mochiItemNames = classnames({
+                                    'mochi-item': true,
+                                    'selected': item.selected
+                                  });
+
+                                  const searchValue = (selectedLtlUnit?.hazmat_name || '') === '' && (selectedLtlUnit?.hazmat_name || '') !== ''
+                                    ? selectedLtlUnit?.hazmat_name : undefined;
+
+                                  return (
+                                    <div
+                                      key={index}
+                                      className={mochiItemNames}
+                                      id={item.id}
+                                      onClick={() => {
+                                        setSelectedLtlUnit(prev => {
+                                          return {
+                                            ...prev,
+                                            hazmat_name: item?.name || '',
+                                            hazmat_class_id: item?.hazmat_class_id || null,
+                                            hazmat_class: item?.hazmat_class || null,
+                                            hazmat_group: item?.hazmat_group || '',
+                                            hazmat_un_na: item?.hazmat_un_na || '',
+                                          }
+                                        })
+
+                                        window.setTimeout(() => {
+                                          setHazmatNameItems([]);
+                                          refHazmatName.current.focus();
+                                        }, 0);
+                                      }}
+                                      ref={ref => refHazmatNamePopupItems.current.push(ref)}
+                                    >
+                                      {
+                                        searchValue === undefined
+                                          ? item.name
+                                          : <Highlighter
+                                            highlightNameName="mochi-item-highlight-text"
+                                            searchWords={[searchValue]}
+                                            autoEscape={true}
+                                            textToHighlight={item.name}
+                                          />
+                                      }
+                                      {
+                                        item.selected &&
+                                        <FontAwesomeIcon className="dropdown-selected"
+                                          icon={faCaretRight} />
+                                      }
+                                    </div>
+                                  )
+                                })
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </animated.div>
+                    ))
+                  }
                 </div>
 
                 <div className={classnames({
@@ -2254,6 +2577,7 @@ const Ltl = (props) => {
                         textTransform: 'capitalize',
                         textAlign: 'right',
                         paddingRight: 16,
+                        fontWeight: 'bold'
                       }}
                       value={selectedLtlUnit?.hazmat_packaging?.name || ''}
                       onKeyDown={(e) => {

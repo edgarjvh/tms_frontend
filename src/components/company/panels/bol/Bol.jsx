@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import ToPrint from './ToPrint.jsx';
@@ -227,11 +229,11 @@ const Bol = (props) => {
             setFreightChargeTerms3rdParty(true);
         }
 
-        refBolContainer.current.focus({
+        refShipFrom.current.focus({
             preventScroll: true
         })
     }, []);
-
+    
     useEffect(() => {
         if ((props.selected_order?.component_id || '') !== props.componentId) {
             if (((selectedOrder?.id || 0) > 0 && (props.selected_order?.id || 0) > 0) && selectedOrder.id === props.selected_order.id) {
@@ -392,10 +394,15 @@ const Bol = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={props.tabTimesFrom + props.tabTimes + 0} ref={refBolContainer}>
+        <div className="panel-content" tabIndex={props.tabTimesFrom + props.tabTimes + 0} ref={refBolContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
-
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="header-buttons" style={{ marginTop: 10, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
                 <div className="mochi-button" onClick={() => {
                     handlePrint();
@@ -607,6 +614,7 @@ const Bol = (props) => {
                         setShipFromItems([]);
                         refShipFrom.current.focus();
                     }}
+                    noStopPropagationOnEsc={true}
                 />
 
                 <SelectBox

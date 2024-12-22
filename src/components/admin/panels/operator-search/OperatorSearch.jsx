@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from 'react';
 import './OperatorSearch.css';
 import axios from 'axios';
@@ -32,6 +33,7 @@ let delay = 300;
 let prevent = false;
 
 const OperatorSearch = (props) => {
+    const refOperatorSearchContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
     const [operators, setOperators] = useState([]);
 
@@ -59,6 +61,10 @@ const OperatorSearch = (props) => {
                         suborigin={props.suborigin}
                         origin={props.origin}
                         owner={props.owner}
+                        closingCallback={() => {
+                            closePanel(`${props.panelName}-operators`, props.origin);
+                            refOperatorSearchContainer.current.focus({ preventScrol: true });
+                        }}
 
                         operatorSearchCompany={{
                             ...x.company,
@@ -93,6 +99,8 @@ const OperatorSearch = (props) => {
         }).catch(e => {
             console.log('error searching operators', e);
             setIsLoading(false);
+        }).finally(() => {
+            refOperatorSearchContainer.current.focus({ preventScrol: true });
         });
     }, []);
 
@@ -241,9 +249,15 @@ const OperatorSearch = (props) => {
     }
 
     return (
-        <div className="panel-content">
+        <div className="panel-content" ref={refOperatorSearchContainer} tabIndex={0} onKeyDown={e => {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             {
                 loadingTransition((style, item) => item &&

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from "react-redux";
 import './EquipmentInformation.css';
@@ -467,9 +469,8 @@ const EquipmentInformation = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refEquipmentInformationContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
                 if (equipmentInformation?.id ||
                     (equipmentInformation?.equipment?.name || '') !== '' ||
                     equipmentInformation?.equipment_id ||
@@ -480,7 +481,6 @@ const EquipmentInformation = (props) => {
                     (equipmentInformation?.equipment_width_unit || '') !== '' ||
                     (equipmentInformation?.equipment_height || '') !== '' ||
                     (equipmentInformation?.equipment_height_unit || '') !== '') {
-                    e.stopPropagation();
                     setEquipmentInformation({
                         ...equipmentInformation,
                         id: null,
@@ -496,11 +496,14 @@ const EquipmentInformation = (props) => {
                     });
 
                     refEquipment.current.focus();
+                }else{
+                    props.closingCallback();
                 }
-            }
+            }            
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>

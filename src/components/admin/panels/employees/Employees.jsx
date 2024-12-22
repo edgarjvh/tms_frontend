@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -63,7 +65,7 @@ const Employees = (props) => {
     });
 
 
-    useEffect(async () => {
+    useEffect(() => {
         setEmployeeSearchCompany(props.employeeSearchCompany || {});
 
         if (props.isEditingEmployee) {
@@ -499,17 +501,18 @@ const Employees = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refEmployeesContainer} onKeyDown={(e) => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
                 if (isEditingEmployee) {
-                    e.stopPropagation();
                     setIsEditingEmployee(false);
                     setTempSelectedEmployee({});
+                }else{
+                    props.closingCallback();
                 }
             }
         }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
             <div className="employee-container" style={{ overflow: 'initial' }}>
                 <div className="employee-list-container">
@@ -748,7 +751,14 @@ const Employees = (props) => {
                                                 panelName={`${props.panelName}-employee-documents`}
                                                 origin={props.origin}
                                                 suborigin={'company-employee'}
-
+                                                closingCallback={() => {
+                                                    closePanel(`${props.panelName}-employee-documents`, props.origin);
+                                                    if (isEditingEmployee){
+                                                        refPrefix.current.focus({ preventScroll: true });
+                                                    }else{
+                                                        refEmployeesContainer.current.focus({ preventScroll: true });
+                                                    }
+                                                }}
 
                                                 componentId={moment().format('x')}
                                                 selectedOwner={{ ...employeeSearchCompany.selectedEmployee }}

@@ -1,3 +1,5 @@
+/* eslint-disable no-dupe-keys */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -39,7 +41,7 @@ import ReportCarrier from '../panels/report-carrier/ReportCarrier';
 import ReportAgent from '../panels/report-agent/ReportAgent';
 
 const Reports = (props) => {
-
+    const refReportsMainContainer = useRef();
     const [isLoading, setIsLoading] = useState(false);
 
     const loadingTransition = useTransition(isLoading, {
@@ -202,7 +204,13 @@ const Reports = (props) => {
             background: props.isOnPanel ? "transparent" : "radial-gradient(ellipse at center, rgba(250, 250, 250, 1) 0%, rgba(200, 200, 200, 1) 100%)",
             padding: props.isOnPanel ? '10px 0' : 10,
             position: props.isOnPanel ? 'unset' : 'relative'
-        }}>
+        }} ref={refReportsMainContainer}>
+            {
+                (props.isOnPanel) &&
+                <div className="close-btn" title="Close" onClick={e => {
+                    props.closingCallback();
+                }}><span className="fas fa-times"></span></div>
+            }
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style} >

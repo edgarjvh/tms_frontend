@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -1229,9 +1231,40 @@ const RevenueInformation = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refRevenueInformationContainer}>
+        <div className="panel-content" tabIndex={0} ref={refRevenueInformationContainer} onKeyDown={e => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                if ((dateStart || '') !== '' ||
+                    (dateEnd || '') !== '' ||
+                    (cityOrigin || '') !== '' ||
+                    (cityDestination || '') !== '' ||
+                    (stateOrigin || '') !== '' ||
+                    (stateDestination || '') !== '' ||
+                    (billToCode || '') !== '') {
+                    setDateStart('');
+                    setDateEnd('');
+                    setCityOrigin('');
+                    setCityDestination('');
+                    setStateOrigin('');
+                    setStateDestination('');
+                    setZipOrigin('');
+                    setZipDestination('');
+                    setBillToCode('');
+                    if ((props.selectedCustomer?.id || 0) === 0) {
+                        setCustomerCode('');
+                    }
+
+                    setOrders([]);
+
+                    refDateStart.current.inputElement.focus();
+                }else{
+                    props.closingCallback();
+                }
+            }
+        }}>
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div>
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
             <div className="side-title">
                 <div>{props.title}</div>
             </div>
@@ -1847,7 +1880,10 @@ const RevenueInformation = (props) => {
                                                                 isOnPanel={true}
                                                                 isAdmin={props.isAdmin}
                                                                 origin={props.origin}
-
+                                                                closingCallback={() => {
+                                                                    closePanel(`${props.panelName}-customer`, props.origin);
+                                                                    refDateStart.current.inputElement.focus({ preventScroll: true });
+                                                                }}
 
                                                                 customer_id={id}
                                                             />
@@ -1979,7 +2015,10 @@ const RevenueInformation = (props) => {
                                                                                                                         isOnPanel={true}
                                                                                                                         isAdmin={props.isAdmin}
                                                                                                                         origin={props.origin}
-
+                                                                                                                        closingCallback={() => {
+                                                                                                                            closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                                                                                            refDateStart.current.inputElement.focus({ preventScroll: true });
+                                                                                                                        }}
 
 
                                                                                                                         order_id={order.id}
@@ -2106,7 +2145,7 @@ const RevenueInformation = (props) => {
                                                                                             <div
                                                                                                 className="order-info-col order-number">
                                                                                                 Total <span
-                                                                                                style={{fontWeight: 'bold'}}>{group.month}</span>
+                                                                                                    style={{ fontWeight: 'bold' }}>{group.month}</span>
                                                                                             </div>
                                                                                             <div
                                                                                                 className="order-info-col order-totals">

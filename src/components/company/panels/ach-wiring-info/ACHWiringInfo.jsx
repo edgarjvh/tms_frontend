@@ -277,9 +277,7 @@ const ACHWiringInfo = (props) => {
 
     return (
         <div className="ach-wiring-info-content" tabIndex={0} ref={refACHWiringInfoContainer} onKeyDown={e => {
-            let key = e.keyCode || e.which;
-
-            if (key === 27) {
+            if (e.key === 'Escape') {
                 e.stopPropagation();
                 props.closeModal();
             }

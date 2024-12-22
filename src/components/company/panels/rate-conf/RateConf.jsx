@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useRef, useState, useEffect } from 'react';
 import { connect } from "react-redux";
 import CarrierConfirmation from './CarrierConfirmation.jsx';
@@ -271,7 +273,12 @@ const RateConf = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refRateConfContainer}>
+        <div className="panel-content" tabIndex={0} ref={refRateConfContainer} onKeyDown={e => {
+            if (e.key === 'Escape'){
+                e.stopPropagation();
+                props.closingCallback();
+            }
+        }}>
             {
                 loadingTransition((style, item) => item &&
                     <animated.div className='loading-container' style={style}>
@@ -283,7 +290,7 @@ const RateConf = (props) => {
             }
             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
             <div className="title">{props.title}</div><div className="side-title"><div>{props.title}</div></div>
-
+            <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
 
 
             <div className="header-buttons" style={{ marginTop: 10, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
