@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
@@ -213,11 +214,6 @@ const Dispatch = (props) => {
                             : {
                                 ...delivery.customer,
                                 delivery_id: delivery.id,
-                                contact_id: delivery.contact_id,
-                                contact_name: delivery.contact_name,
-                                contact_phone: delivery.contact_phone,
-                                contact_primary_phone: delivery.contact_primary_phone,
-                                contact_phone_ext: delivery.contact_phone_ext,
                                 delivery_date1: delivery.delivery_date1,
                                 delivery_date2: delivery.delivery_date2,
                                 delivery_time1: delivery.delivery_time1,
@@ -226,6 +222,7 @@ const Dispatch = (props) => {
                                 contact_name: delivery.contact_name || "",
                                 contact_phone: delivery.contact_phone || "",
                                 contact_primary_phone: delivery.contact_primary_phone || "work",
+                                contact_phone_ext: delivery.contact_phone_ext,
                                 special_instructions: delivery.special_instructions,
                                 type: delivery.type,
                             }
@@ -18219,7 +18216,7 @@ const Dispatch = (props) => {
                                                                         if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                             delivery.special_instructions = e.target.value;
                                                                         }
-                                                                        return delivery;
+                                                                        return delivery;                                                                        
                                                                     })
                                                                 });
 
