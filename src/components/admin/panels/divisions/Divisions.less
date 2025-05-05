@@ -3,6 +3,8 @@
     display: flex;
     flex-direction: row;
     padding-bottom: 10px;
+    margin-top: 10px;
+    gap: 10px;
 
     .fields-container-row{
         &.grow{
@@ -12,8 +14,7 @@
     }
 
     .form-bordered-box{
-        min-width: 450px;
-        margin-top: 10px;
+        min-width: 400px;
 
         .input-zip-code{
             width: 8rem;
@@ -133,19 +134,19 @@
             }
         }
 
-        .orders-list-container {
+        .orders-list-container, .divisions-list-container {
             width   : 100%;
             height  : 100%;
             position: relative;
 
-            .orders-list-wrapper {
+            .orders-list-wrapper, .divisions-list-wrapper {
                 position  : absolute;
                 width     : 100%;
                 height    : 100%;
                 overflow-y: auto;
                 overflow-x: hidden;
 
-                .orders-list-item {
+                .orders-list-item, .division-list-item {
                     font-size    : 0.7rem;
                     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                     padding      : 5px 0;
@@ -156,11 +157,19 @@
                     overflow     : hidden;
                 }
 
-                .orders-list-item:hover {
+                .division-list-item{
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .orders-list-item:hover, .division-list-item:hover {
                     background-color: rgba(0, 0, 0, 0.1);
                 }
             }
         }
+
+
     }
 
     .form-slider {
@@ -259,20 +268,17 @@
 
     .fields-container-col{
         display: flex;
-        flex-direction: column;
+        flex-direction: column;  
+        gap: 10px;      
 
-        &:not(:first-child){
-            margin-left: 10px;
-        }
-
-        &:last-child{
-            margin-top: 10px;
+        &.grow{
+            flex-grow: 1;
         }
     }
 
-    >.fields-container-col:last-child{
-        flex-grow: 1;
-    }
+    // >.fields-container-col:last-child{
+    //     flex-grow: 1;
+    // }
 
     .buttons-container {
         display       : flex;

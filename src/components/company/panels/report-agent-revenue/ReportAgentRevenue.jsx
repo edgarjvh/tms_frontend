@@ -1,0 +1,3137 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+import React, { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
+import classnames from 'classnames';
+import $, { merge } from 'jquery';
+import Draggable from 'react-draggable';
+import './ReportAgentRevenue.css';
+import MaskedInput from 'react-text-mask';
+import Loader from 'react-loader-spinner';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import { useTransition, useSpring, animated, Transition, config } from 'react-spring';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretUp, faCaretRight, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { useDetectClickOutside } from "react-detect-click-outside";
+import { Calendar } from './../../panels';
+import moment from 'moment';
+import axios from 'axios';
+import NumberFormat from 'react-number-format';
+import * as XLSX from 'xlsx';
+import {
+  setAdminHomePanels,
+  setCompanyHomePanels,
+  setAdminCarrierPanels,
+  setCompanyCarrierPanels,
+  setAdminCompanySetupPanels,
+  setCompanyCompanySetupPanels,
+  setAdminCustomerPanels,
+  setCompanyCustomerPanels,
+  setAdminDispatchPanels,
+  setCompanyDispatchPanels,
+  setAdminInvoicePanels,
+  setCompanyInvoicePanels,
+  setAdminLoadBoardPanels,
+  setCompanyLoadBoardPanels,
+  setAdminReportPanels,
+  setCompanyReportPanels,
+
+} from './../../../../actions';
+
+import {
+  Customers,
+  Dispatch
+} from './../../../company';
+
+// import ToPrint from './ToPrint';
+import { useReactToPrint } from 'react-to-print';
+import { Agents } from '../../../admin/panels';
+import Highlighter from 'react-highlight-words';
+
+const ReportAgentRevenue = (props) => {
+  const refRevenueInformationContainer = useRef();
+  const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
+  const [isDateEndCalendarShown, setIsDateEndCalendarShown] = useState(false);
+
+  const refDateStart = useRef();
+  const refDateEnd = useRef();
+
+  const [preSelectedDateStart, setPreSelectedDateStart] = useState(moment());
+  const [preSelectedDateEnd, setPreSelectedDateEnd] = useState(moment());
+
+  const refDateStartCalendarDropDown = useDetectClickOutside({
+    onTriggered: () => {
+      setIsDateStartCalendarShown(false)
+    }
+  });
+  const refDateEndCalendarDropDown = useDetectClickOutside({
+    onTriggered: () => {
+      setIsDateEndCalendarShown(false)
+    }
+  });
+
+  const refLoadType = useRef();
+  const [loadTypeItems, setLoadTypeItems] = useState([]);
+  const refLoadTypeDropDown = useDetectClickOutside({
+    onTriggered: async () => {
+      await setLoadTypeItems([]);
+    },
+  });
+  const refLoadTypePopupItems = useRef([]);
+
+  const refPrint = useRef();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadingTransition = useTransition(isLoading, {
+    from: { opacity: 0, display: 'block' },
+    enter: { opacity: 1, display: 'block' },
+    leave: { opacity: 0, display: 'none' },
+    reverse: isLoading,
+  });
+
+  const loadTypeTransition = useTransition(loadTypeItems.length > 0, {
+    from: { opacity: 0, top: "calc(100% + 7px)" },
+    enter: { opacity: 1, top: "calc(100% + 12px)" },
+    leave: { opacity: 0, top: "calc(100% + 7px)" },
+    config: { duration: 100 },
+    reverse: loadTypeItems.length > 0,
+  });
+
+  const [noOrdersFound, setNoOrdersFound] = useState(false);
+  const [orders, setOrders] = useState([]);
+
+  const [dateStart, setDateStart] = useState('');
+  const [dateEnd, setDateEnd] = useState('');
+  const [cityOrigin, setCityOrigin] = useState('');
+  const [cityDestination, setCityDestination] = useState('');
+  const [stateOrigin, setStateOrigin] = useState('');
+  const [stateDestination, setStateDestination] = useState('');
+  const [zipOrigin, setZipOrigin] = useState('');
+  const [zipDestination, setZipDestination] = useState('');
+  const [agentCode, setAgentCode] = useState('');
+  const [loadType, setLoadType] = useState({ id: -1, name: 'All' });
+  const [showCustomerTotals, setShowCustomerTotals] = useState(true);
+  const [showYearTotals, setShowYearTotals] = useState(false);
+  const [showMonthTotals, setShowMonthTotals] = useState(false);
+
+  const [url, setUrl] = useState('/getAgentRevenue');
+
+  const getFormattedDates = (date) => {
+    let formattedDate = date;
+
+    try {
+      if (moment(date.trim(), 'MM/DD/YY').format('MM/DD/YY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/DD/YY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/DD/').format('MM/DD/') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/DD/').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/DD').format('MM/DD') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/DD').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/').format('MM/') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM').format('MM') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/D/Y').format('M/D/Y') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/D/Y').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/D/Y').format('MM/D/Y') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/D/Y').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/DD/Y').format('MM/DD/Y') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/DD/Y').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/DD/Y').format('M/DD/Y') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/DD/Y').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/D/YY').format('M/D/YY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/D/YY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/D/YYYY').format('M/D/YYYY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/D/YYYY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/D/YYYY').format('MM/D/YYYY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/D/YYYY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/DD/YYYY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/DD/YYYY').format('M/DD/YYYY') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/DD/YYYY').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/D/').format('M/D/') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/D/').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M/D').format('M/D') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M/D').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'MM/D').format('MM/D') === date.trim()) {
+        formattedDate = moment(date.trim(), 'MM/D').format('MM/DD/YYYY');
+      }
+
+      if (moment(date.trim(), 'M').format('M') === date.trim()) {
+        formattedDate = moment(date.trim(), 'M').format('MM/DD/YYYY');
+      }
+    } catch (e) {
+
+    }
+
+    return formattedDate;
+  }
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    axios.post(props.serverUrl + url, {
+      date_start: dateStart,
+      date_end: dateEnd,
+      city_origin: (cityOrigin || '').trim(),
+      city_destination: (cityDestination || '').trim(),
+      state_origin: (stateOrigin || '').trim(),
+      state_destination: (stateDestination || '').trim(),
+      zip_origin: (zipOrigin || '').trim(),
+      zip_destination: (zipDestination || '').trim(),
+    }).then(res => {
+      if (res.data.result === 'OK') {
+        let newOrders = res.data.orders.map(order => order);
+
+        let currentMonth = '';
+        let currentYear = '';
+        let lastMonth = '';
+        let lastYear = '';
+        let groupedOrders = [];
+        let currentDateGroup = [];
+        let currentYearGroup = [];
+        let currentOrderGroup = [];
+        let lastAgent = { id: 0 };
+        const orderLength = newOrders.length - 1;
+
+        newOrders.map((order, index) => {
+          let currentAgent = {
+            id: order?.agent_id,
+            code: order?.agent_code,
+            name: order?.agent_name
+          };
+          currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
+          currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
+
+          if (lastAgent.id === 0) { // if is the first agent
+            lastAgent = currentAgent;
+            lastMonth = currentMonth;
+            lastYear = currentYear;
+            currentOrderGroup.push(order);
+
+            if (index === orderLength) { // if is the only/last record of the array
+              groupedOrders.push({
+                agent: lastAgent,
+                dateGroup: [{
+                  year: lastYear,
+                  months: [{
+                    month: lastMonth,
+                    year: lastYear,
+                    orders: currentOrderGroup,
+                    showMonthGroup: true
+                  }],
+                  showYearGroup: true
+                }],
+                showCustomerGroup: true
+              });
+            }
+          } else {
+            if (currentAgent.id === lastAgent.id) { // if is the same agent than before
+              if (lastYear !== currentYear) {
+                currentDateGroup.push({
+                  month: lastMonth,
+                  year: lastYear,
+                  orders: currentOrderGroup,
+                  showMonthGroup: true
+                })
+
+                currentYearGroup.push({
+                  year: lastYear,
+                  months: currentDateGroup,
+                  showYearGroup: true
+                });
+
+                lastYear = currentYear;
+                lastMonth = currentMonth;
+                currentDateGroup = [];
+                currentOrderGroup = [];
+                currentOrderGroup.push(order);
+
+                if (index === newOrders.length - 1) {
+                  currentYearGroup.push({
+                    year: lastYear,
+                    months: [{
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    }],
+                    showYearGroup: true
+                  });
+
+                  groupedOrders.push({
+                    agent: lastAgent,
+                    dateGroup: currentYearGroup,
+                    showCustomerGroup: true
+                  });
+                }
+              } else {
+                if (lastMonth !== currentMonth) {
+                  currentDateGroup.push({
+                    month: lastMonth,
+                    year: lastYear,
+                    orders: currentOrderGroup,
+                    showMonthGroup: true
+                  });
+
+                  lastMonth = currentMonth;
+                  lastYear = currentYear;
+
+                  currentOrderGroup = [];
+                  currentOrderGroup.push(order);
+
+                  if (index === newOrders.length - 1) {
+                    currentDateGroup.push({
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    });
+
+                    currentYearGroup.push({
+                      year: lastYear,
+                      months: currentDateGroup,
+                      showYearGroup: true
+                    })
+
+                    groupedOrders.push({
+                      agent: lastAgent,
+                      dateGroup: currentYearGroup,
+                      showCustomerGroup: true
+                    });
+                  }
+                } else {
+                  currentOrderGroup.push(order);
+
+                  if (index === newOrders.length - 1) {
+                    currentDateGroup.push({
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    });
+
+                    currentYearGroup.push({
+                      year: lastYear,
+                      months: currentDateGroup,
+                      showYearGroup: true
+                    })
+
+                    groupedOrders.push({
+                      agent: lastAgent,
+                      dateGroup: currentYearGroup,
+                      showCustomerGroup: true
+                    });
+                  }
+                }
+              }
+            } else {
+              currentDateGroup.push({
+                month: lastMonth,
+                year: lastYear,
+                orders: currentOrderGroup,
+                showMonthGroup: true
+              });
+
+              currentYearGroup.push({
+                year: lastYear,
+                months: currentDateGroup,
+                showYearGroup: true
+              })
+
+              groupedOrders.push({
+                agent: lastAgent,
+                dateGroup: currentYearGroup,
+                showCustomerGroup: true
+              });
+
+              lastMonth = currentMonth;
+              lastYear = currentYear;
+              currentYearGroup = [];
+              currentDateGroup = [];
+              currentOrderGroup = [];
+
+              currentOrderGroup.push(order);
+              lastAgent = currentAgent;
+
+              if (index === newOrders.length - 1) {
+                groupedOrders.push({
+                  agent: lastAgent,
+                  dateGroup: [
+                    {
+                      year: lastYear,
+                      months: [
+                        {
+                          month: lastMonth,
+                          year: lastYear,
+                          orders: currentOrderGroup,
+                          showMonthGroup: true
+                        }
+                      ],
+                      showYearGroup: true
+                    }
+                  ],
+                  showCustomerGroup: true
+                });
+              }
+            }
+          }
+
+          return false;
+        })
+
+        groupedOrders = groupedOrders.map((groupOrder) => {
+          // YEAR AND MONTH TOTALS
+          groupOrder.dateGroup.map((year) => {
+            year.totals = {
+              orderCount: year.months.reduce((a, b) => {
+                return a + b.orders.length;
+              }, 0),
+              customerCharges: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_customer_rating;
+                }, 0);
+              }, 0),
+              carrierCosts: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_carrier_rating;
+                }, 0);
+              }, 0),
+              profit: ((year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_customer_rating;
+                }, 0);
+              }, 0)) - (year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_carrier_rating;
+                }, 0);
+              }, 0))),
+              commissions: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.agent_commission;
+                }, 0);
+              }, 0)
+            }
+
+            year.months.map((month) => {
+              month.totals = {
+                orderCount: month.orders.length,
+                customerCharges: month.orders.reduce((a, b) => {
+                  return a + b.total_customer_rating;
+                }, 0),
+                carrierCosts: month.orders.reduce((a, b) => {
+                  return a + b.total_carrier_rating;
+                }, 0),
+                profit: ((month.orders.reduce((a, b) => {
+                  return a + b.total_customer_rating;
+                }, 0)) - (month.orders.reduce((a, b) => {
+                  return a + b.total_carrier_rating;
+                }, 0))),
+                commissions: month.orders.reduce((a, b) => {
+                  return a + b.agent_commission;
+                }, 0)
+              }
+
+              return month;
+            })
+
+            return year;
+          });
+
+          // CUSTOMER TOTALS
+          groupOrder.totals = {
+            orderCount: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.length;
+              }, 0);
+            }, 0),
+            customerCharges: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_customer_rating;
+                }, 0);
+              }, 0);
+            }, 0),
+            carrierCosts: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_carrier_rating;
+                }, 0);
+              }, 0);
+            }, 0),
+            profit: ((groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_customer_rating;
+                }, 0);
+              }, 0);
+            }, 0)) - (groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_carrier_rating;
+                }, 0);
+              }, 0);
+            }, 0))),
+            commissions: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.agent_commission;
+                }, 0);
+              }, 0);
+            }, 0)
+          }
+
+          return groupOrder;
+        });
+
+        setOrders(groupedOrders)
+
+        setNoOrdersFound(newOrders.length === 0);
+      }
+    }).catch(e => {
+      console.log('Error on getting orders by agents', e);
+    }).finally(() => {
+      setIsLoading(false);
+
+      refDateStart.current.inputElement.focus({
+        preventScroll: true
+      });
+    })
+  }, [])
+
+  const dateStartTransition = useTransition(isDateStartCalendarShown, {
+    from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+    enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+    leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+    reverse: isDateStartCalendarShown,
+    config: { duration: 100 }
+  })
+
+  const dateEndTransition = useTransition(isDateEndCalendarShown, {
+    from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+    enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+    leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+    reverse: isDateEndCalendarShown,
+    config: { duration: 100 }
+  })
+
+  const doSearch = (load_type_id = null) => {
+    if (dateStart !== '' && dateEnd !== '') {
+      let dStart = moment(dateStart, 'MM/DD/YYYY');
+      let dEnd = moment(dateEnd, 'MM/DD/YYYY');
+
+      if (dStart > dEnd) {
+        window.alert('Date End must be greater than the Date Start!');
+        refDateStart.current.inputElement.focus();
+        return;
+      }
+    }
+
+    setIsLoading(true);
+
+    axios.post(props.serverUrl + url, {
+      agent_code: (agentCode || '').trim(),
+      load_type_id: load_type_id || loadType?.id || -1,
+      date_start: dateStart,
+      date_end: dateEnd,
+      city_origin: (cityOrigin || '').trim(),
+      city_destination: (cityDestination || '').trim(),
+      state_origin: (stateOrigin || '').trim(),
+      state_destination: (stateDestination || '').trim(),
+      zip_origin: (zipOrigin || '').trim(),
+      zip_destination: (zipDestination || '').trim()
+    }).then(res => {
+      if (res.data.result === 'OK') {
+        let newOrders = res.data.orders.map(order => order);
+
+        let currentMonth = '';
+        let currentYear = '';
+        let lastMonth = '';
+        let lastYear = '';
+        let groupedOrders = [];
+        let currentDateGroup = [];
+        let currentYearGroup = [];
+        let currentOrderGroup = [];
+        let lastAgent = { id: 0 };
+        const orderLength = newOrders.length - 1;
+
+        newOrders.map((order, index) => {
+          let currentAgent = {
+            id: order?.agent_id,
+            code: order?.agent_code,
+            name: order?.agent_name
+          };
+          currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
+          currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
+
+          if (lastAgent.id === 0) { // if is the first agent
+            lastAgent = currentAgent;
+            lastMonth = currentMonth;
+            lastYear = currentYear;
+            currentOrderGroup.push(order);
+
+            if (index === orderLength) { // if is the only/last record of the array
+              groupedOrders.push({
+                agent: lastAgent,
+                dateGroup: [{
+                  year: lastYear,
+                  months: [{
+                    month: lastMonth,
+                    year: lastYear,
+                    orders: currentOrderGroup,
+                    showMonthGroup: true
+                  }],
+                  showYearGroup: true
+                }],
+                showCustomerGroup: true
+              });
+            }
+          } else {
+            if (currentAgent.id === lastAgent.id) { // if is the same agent than before
+              if (lastYear !== currentYear) {
+                currentDateGroup.push({
+                  month: lastMonth,
+                  year: lastYear,
+                  orders: currentOrderGroup,
+                  showMonthGroup: true
+                })
+
+                currentYearGroup.push({
+                  year: lastYear,
+                  months: currentDateGroup,
+                  showYearGroup: true
+                });
+
+                lastYear = currentYear;
+                lastMonth = currentMonth;
+                currentDateGroup = [];
+                currentOrderGroup = [];
+                currentOrderGroup.push(order);
+
+                if (index === newOrders.length - 1) {
+                  currentYearGroup.push({
+                    year: lastYear,
+                    months: [{
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    }],
+                    showYearGroup: true
+                  });
+
+                  groupedOrders.push({
+                    agent: lastAgent,
+                    dateGroup: currentYearGroup,
+                    showCustomerGroup: true
+                  });
+                }
+              } else {
+                if (lastMonth !== currentMonth) {
+                  currentDateGroup.push({
+                    month: lastMonth,
+                    year: lastYear,
+                    orders: currentOrderGroup,
+                    showMonthGroup: true
+                  });
+
+                  lastMonth = currentMonth;
+                  lastYear = currentYear;
+
+                  currentOrderGroup = [];
+                  currentOrderGroup.push(order);
+
+                  if (index === newOrders.length - 1) {
+                    currentDateGroup.push({
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    });
+
+                    currentYearGroup.push({
+                      year: lastYear,
+                      months: currentDateGroup,
+                      showYearGroup: true
+                    })
+
+                    groupedOrders.push({
+                      agent: lastAgent,
+                      dateGroup: currentYearGroup,
+                      showCustomerGroup: true
+                    });
+                  }
+                } else {
+                  currentOrderGroup.push(order);
+
+                  if (index === newOrders.length - 1) {
+                    currentDateGroup.push({
+                      month: lastMonth,
+                      year: lastYear,
+                      orders: currentOrderGroup,
+                      showMonthGroup: true
+                    });
+
+                    currentYearGroup.push({
+                      year: lastYear,
+                      months: currentDateGroup,
+                      showYearGroup: true
+                    })
+
+                    groupedOrders.push({
+                      agent: lastAgent,
+                      dateGroup: currentYearGroup,
+                      showCustomerGroup: true
+                    });
+                  }
+                }
+              }
+            } else {
+              currentDateGroup.push({
+                month: lastMonth,
+                year: lastYear,
+                orders: currentOrderGroup,
+                showMonthGroup: true
+              });
+
+              currentYearGroup.push({
+                year: lastYear,
+                months: currentDateGroup,
+                showYearGroup: true
+              })
+
+              groupedOrders.push({
+                agent: lastAgent,
+                dateGroup: currentYearGroup,
+                showCustomerGroup: true
+              });
+
+              lastMonth = currentMonth;
+              lastYear = currentYear;
+              currentYearGroup = [];
+              currentDateGroup = [];
+              currentOrderGroup = [];
+
+              currentOrderGroup.push(order);
+              lastAgent = currentAgent;
+
+              if (index === newOrders.length - 1) {
+                groupedOrders.push({
+                  agent: lastAgent,
+                  dateGroup: [
+                    {
+                      year: lastYear,
+                      months: [
+                        {
+                          month: lastMonth,
+                          year: lastYear,
+                          orders: currentOrderGroup,
+                          showMonthGroup: true
+                        }
+                      ],
+                      showYearGroup: true
+                    }
+                  ],
+                  showCustomerGroup: true
+                });
+              }
+            }
+          }
+
+          return false;
+        })
+
+        groupedOrders = groupedOrders.map((groupOrder) => {
+          // YEAR AND MONTH TOTALS
+          groupOrder.dateGroup.map((year) => {
+            year.totals = {
+              orderCount: year.months.reduce((a, b) => {
+                return a + b.orders.length;
+              }, 0),
+              customerCharges: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_customer_rating;
+                }, 0);
+              }, 0),
+              carrierCosts: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_carrier_rating;
+                }, 0);
+              }, 0),
+              profit: ((year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_customer_rating;
+                }, 0);
+              }, 0)) - (year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.total_carrier_rating;
+                }, 0);
+              }, 0))),
+              commissions: year.months.reduce((a, b) => {
+                return a + b.orders.reduce((c, d) => {
+                  return c + d.agent_commission;
+                }, 0);
+              }, 0)
+            }
+
+            year.months.map((month) => {
+              month.totals = {
+                orderCount: month.orders.length,
+                customerCharges: month.orders.reduce((a, b) => {
+                  return a + b.total_customer_rating;
+                }, 0),
+                carrierCosts: month.orders.reduce((a, b) => {
+                  return a + b.total_carrier_rating;
+                }, 0),
+                profit: ((month.orders.reduce((a, b) => {
+                  return a + b.total_customer_rating;
+                }, 0)) - (month.orders.reduce((a, b) => {
+                  return a + b.total_carrier_rating;
+                }, 0))),
+                commissions: month.orders.reduce((a, b) => {
+                  return a + b.agent_commission;
+                }, 0)
+              }
+
+              return month;
+            })
+
+            return year;
+          });
+
+          // CUSTOMER TOTALS
+          groupOrder.totals = {
+            orderCount: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.length;
+              }, 0);
+            }, 0),
+            customerCharges: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_customer_rating;
+                }, 0);
+              }, 0);
+            }, 0),
+            carrierCosts: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_carrier_rating;
+                }, 0);
+              }, 0);
+            }, 0),
+            profit: ((groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_customer_rating;
+                }, 0);
+              }, 0);
+            }, 0)) - (groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.total_carrier_rating;
+                }, 0);
+              }, 0);
+            }, 0))),
+            commissions: groupOrder.dateGroup.reduce((a, b) => {
+              return a + b.months.reduce((c, d) => {
+                return c + d.orders.reduce((e, f) => {
+                  return e + f.agent_commission;
+                }, 0);
+              }, 0);
+            }, 0)
+          }
+
+          return groupOrder;
+        });
+
+        setOrders(groupedOrders)
+
+        setNoOrdersFound(newOrders.length === 0);
+      }
+    }).catch(e => {
+      console.log('Error on getting orders by agents', e);
+    }).finally(() => {
+      setIsLoading(false);
+
+      refDateStart.current.inputElement.focus({
+        preventScroll: true
+      });
+    })
+  }
+
+  const openPanel = (panel, origin) => {
+    if (origin === 'admin-home') {
+      if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminHomePanels([...props.adminHomePanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-carrier') {
+      if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-company-setup') {
+      if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-customer') {
+      if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-dispatch') {
+      if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-invoice') {
+      if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+      }
+    }
+
+    if (origin === 'admin-report') {
+      if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setAdminReportPanels([...props.adminReportPanels, panel]);
+      }
+    }
+
+    if (origin === 'company-home') {
+      if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+      }
+    }
+
+    if (origin === 'company-carrier') {
+      if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+      }
+    }
+
+    if (origin === 'company-customer') {
+      if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+      }
+    }
+
+    if (origin === 'company-dispatch') {
+      if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+      }
+    }
+
+    if (origin === 'company-invoice') {
+      if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+      }
+    }
+
+    if (origin === 'company-load-board') {
+      if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+      }
+    }
+
+    if (origin === 'company-report') {
+      if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+        props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+      }
+    }
+  }
+
+  const closePanel = (panelName, origin) => {
+    if (origin === 'admin-home') {
+      props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-carrier') {
+      props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-company-setup') {
+      props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-customer') {
+      props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-dispatch') {
+      props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-invoice') {
+      props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'admin-report') {
+      props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-home') {
+      props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-carrier') {
+      props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-customer') {
+      props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-dispatch') {
+      props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-invoice') {
+      props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-load-board') {
+      props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+    }
+
+    if (origin === 'company-report') {
+      props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
+    }
+  }
+
+  const handlePrint = useReactToPrint({
+    pageStyle: () => {
+      return `
+                @media print {
+                    @page {
+                        size: 8.5in 11in !important; 
+                        margin: 7mm;                        
+                    }
+                    .page-block {
+                        page-break-after: auto !important;
+                        page-break-beforer: auto !important; 
+                        page-break-inside: avoid !important;
+                    } 
+                    .no-print{
+                        display:none !important;
+                    } 
+                    .container-sheet{
+                        box-shadow: initial !important;
+                        margin: 0 !important
+                    }
+                }
+            `
+    },
+    content: () => refPrint.current,
+  });
+
+  const handleExport = () => {
+    if (orders.length > 0) {
+      const startingRowData = 3;
+      let rowCount = 0;
+      let merges = [];
+      let title = [
+        {
+          A: 'Revenue Information'
+        },
+        {}
+      ]
+
+      let table = [
+        {
+          A: 'Order Date',
+          B: 'Order Number',
+          C: 'Customer Charges',
+          D: 'Carrier Costs',
+          E: 'Profit',
+          F: 'Percentage'
+        }
+      ]
+
+      merges.push(XLSX.utils.decode_range('A1:F1'));
+      merges.push(XLSX.utils.decode_range('A2:F2'));
+
+      orders.map((item1, index1) => {
+        const { id, code, code_number, name, city, state } = item1.agent;
+        const { dateGroup } = item1;
+        rowCount++;
+
+        merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+        table.push({
+          A: `Bill To: ${code}${(code_number || 0) > 0 ? code_number : ''} - ${name} - ${city}, ${state}`
+        });
+
+        (dateGroup || []).map((item2, index2) => {
+          const { months } = item2;
+          rowCount++;
+
+          merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+          table.push({
+            A: item2.year
+          });
+
+          (months || []).map((item3, index3) => {
+            const { orders } = item3;
+            rowCount++;
+
+            merges.push(XLSX.utils.decode_range(`A${startingRowData + rowCount}:F${startingRowData + rowCount}`));
+
+            table.push({
+              A: item3.month
+            });
+
+            (orders || []).map((order, index4) => {
+              rowCount++;
+
+              table.push({
+                A: moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY'),
+                B: order.order_number,
+                C: `$${new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(
+                  order.total_customer_rating
+                )}`,
+                D: `$${new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(
+                  order.total_carrier_rating
+                )}`,
+                E: `$${new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(
+                  order.total_customer_rating - order.total_carrier_rating
+                )}`,
+                F: `${((order.total_customer_rating > 0 || order.total_carrier_rating > 0)
+                  ?
+                  ((order.total_customer_rating - order.total_carrier_rating) * 100)
+                  /
+                  (
+                    order.total_customer_rating > 0
+                      ? order.total_customer_rating
+                      : order.total_carrier_rating
+                  )
+                  : 0).toFixed(2)}%`
+              })
+
+              return true;
+            })
+
+            return true;
+          })
+
+          return true;
+        })
+
+        return true;
+      })
+
+      rowCount++;
+
+      table.push({
+        A: 'Totals',
+        B: `Orders: ${orders.reduce((a, b) => {
+          return a + b.totals.orderCount
+        }, 0)}`,
+        C: `$${new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(
+          orders.reduce((a, b) => {
+            return a + b.totals.customerCharges
+          }, 0)
+        )}`,
+        D: `$${new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(
+          orders.reduce((a, b) => {
+            return a + b.totals.carrierCosts
+          }, 0)
+        )}`,
+        E: `$${new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(
+          orders.reduce((a, b) => {
+            return a + b.totals.customerCharges
+          }, 0) - orders.reduce((a, b) => {
+            return a + b.totals.carrierCosts
+          }, 0)
+        )}`,
+        F: `${((orders.reduce((a, b) => {
+          return a + b.totals.customerCharges
+        }, 0) > 0 || orders.reduce((a, b) => {
+          return a + b.totals.carrierCosts
+        }, 0) > 0)
+          ? ((orders.reduce((a, b) => {
+            return a + b.totals.customerCharges
+          }, 0) - orders.reduce((a, b) => {
+            return a + b.totals.carrierCosts
+          }, 0)) * 100)
+          /
+          (
+            orders.reduce((a, b) => {
+              return a + b.totals.customerCharges
+            }, 0) > 0
+              ? orders.reduce((a, b) => {
+                return a + b.totals.customerCharges
+              }, 0)
+              : orders.reduce((a, b) => {
+                return a + b.totals.carrierCosts
+              }, 0)
+          )
+          : 0).toFixed(2)}%`
+      });
+
+      const finalData = [...title, ...table];
+
+      const book = XLSX.utils.book_new();
+      const sheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
+      sheet['!merges'] = merges;
+
+      const colLengths = [
+        20, 20, 20, 20, 20, 20
+      ]
+
+      let properties = [];
+
+      colLengths.forEach((col) => {
+        properties.push({
+          width: col
+        });
+      });
+
+      sheet['!cols'] = properties;
+
+      XLSX.utils.book_append_sheet(book, sheet, 'Revenue Information');
+
+      XLSX.writeFile(book, 'Revenue Information.xlsx');
+    }
+  }
+
+  return (
+    <div className="panel-content" tabIndex={0} ref={refRevenueInformationContainer} onKeyDown={e => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        if ((dateStart || '') !== '' ||
+          (dateEnd || '') !== '' ||
+          (cityOrigin || '') !== '' ||
+          (cityDestination || '') !== '' ||
+          (stateOrigin || '') !== '' ||
+          (stateDestination || '') !== '' ||
+          (agentCode || '') !== '') {
+          setDateStart('');
+          setDateEnd('');
+          setCityOrigin('');
+          setCityDestination('');
+          setStateOrigin('');
+          setStateDestination('');
+          setZipOrigin('');
+          setZipDestination('');
+          setAgentCode('');
+          setLoadType({
+            id: -1,
+            name: 'All'
+          });
+
+          setOrders([]);
+
+          refDateStart.current.inputElement.focus();
+        } else {
+          props.closingCallback();
+        }
+      }
+    }}>
+      <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
+      <div className="title">{props.title}</div>
+      <div className="close-btn" title="Close" onClick={e => { props.closingCallback() }}><span className="fas fa-times"></span></div>
+      <div className="side-title">
+        <div>{props.title}</div>
+      </div>
+
+      {
+        (orders || []).length > 0 &&
+        <div style={{ display: 'none' }}>
+          {/* <ToPrint
+            ref={refPrint}
+            orders={orders}
+          /> */}
+        </div>
+
+      }
+
+      {
+        loadingTransition((style, item) => item &&
+          <animated.div className='loading-container' style={style}>
+            <div className="loading-container-wrapper">
+              <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
+            </div>
+          </animated.div>
+        )
+      }
+
+      <div className="order-fields-container report-agent-revenue">
+
+        <div className="search-fields">
+          <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
+            <div className="select-box-wrapper">
+              <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date
+                Start
+              </div>
+              <MaskedInput
+                tabIndex={1 + props.tabTimes}
+                mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                guide={false} type="text"
+                ref={refDateStart}
+                onKeyDown={(e) => {
+                  let key = e.keyCode || e.which;
+
+                  if (key >= 37 && key <= 40) {
+                    let tempDateStart = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateStart || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateStart(tempDateStart);
+
+                    if (isDateStartCalendarShown) {
+                      e.preventDefault();
+
+                      if (key === 37) { // left - minus 1
+                        setPreSelectedDateStart(preSelectedDateStart.clone().subtract(1, 'day'));
+                      }
+
+                      if (key === 38) { // up - minus 7
+                        setPreSelectedDateStart(preSelectedDateStart.clone().subtract(7, 'day'));
+                      }
+
+                      if (key === 39) { // right - plus 1
+                        setPreSelectedDateStart(preSelectedDateStart.clone().add(1, 'day'));
+                      }
+
+                      if (key === 40) { // down - plus 7
+                        setPreSelectedDateStart(preSelectedDateStart.clone().add(7, 'day'));
+                      }
+
+
+                    } else {
+                      setIsDateStartCalendarShown(true);
+                    }
+                  }
+
+                  if (key === 13) {
+                    let tempDateStart = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateStart || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateStart(tempDateStart);
+
+                    if (isDateStartCalendarShown) {
+                      tempDateStart = preSelectedDateStart.clone().format('MM/DD/YYYY');
+
+                      setDateStart(tempDateStart);
+
+                      setIsDateStartCalendarShown(false);
+                    }
+                  }
+
+                  if (key === 9) {
+                    let tempDateStart = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateStart || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateStart(tempDateStart);
+
+                    if (isDateStartCalendarShown) {
+                      tempDateStart = preSelectedDateStart.clone().format('MM/DD/YYYY');
+
+                      setDateStart(tempDateStart);
+
+                      setIsDateStartCalendarShown(false);
+                    }
+                  }
+
+                }}
+                onBlur={e => {
+                  setDateStart(getFormattedDates(dateStart))
+                }}
+                onInput={e => {
+                  setDateStart(e.target.value)
+                }}
+                onChange={e => {
+                  setDateStart(e.target.value)
+                }}
+                value={dateStart || ''}
+              />
+
+              <FontAwesomeIcon className="dropdown-button calendar" icon={faCalendarAlt} onClick={(e) => {
+                e.stopPropagation();
+
+                if (isDateStartCalendarShown) {
+                  setIsDateStartCalendarShown(false);
+                  setIsDateEndCalendarShown(false);
+                } else {
+                  window.setTimeout(() => {
+                    setIsDateStartCalendarShown(true);
+                    setIsDateEndCalendarShown(false);
+                  }, 0);
+
+                  if (moment((dateStart || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (dateStart || '').trim()) {
+                    setPreSelectedDateStart(moment(dateStart, 'MM/DD/YYYY'));
+                  } else {
+                    setPreSelectedDateStart(moment());
+                  }
+
+                  refDateStart.current.inputElement.focus();
+                }
+              }} />
+            </div>
+
+            {
+              dateStartTransition((style, item) => item &&
+                (<animated.div
+                  className="mochi-contextual-container"
+                  id="mochi-contextual-container-revenue-information-start-date"
+                  style={{
+                    ...style,
+                    left: '0px',
+                  }}
+                  ref={refDateStartCalendarDropDown}
+                >
+                  <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
+                    <div className="mochi-contextual-popup-content">
+                      <div className="mochi-contextual-popup-wrapper">
+                        <Calendar
+                          value={moment((dateStart || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (dateStart || '').trim()
+                            ? moment(dateStart, 'MM/DD/YYYY')
+                            : moment()}
+                          onChange={(day) => {
+                            setDateStart(day.format('MM/DD/YYYY'))
+                          }}
+                          closeCalendar={() => {
+                            setIsDateStartCalendarShown(false);
+                          }}
+                          preDay={preSelectedDateStart}
+                          onChangePreDay={(preDay) => {
+                            setPreSelectedDateStart(preDay);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </animated.div>)
+              )
+            }
+          </div>
+          <div className="input-box-container city">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City Origin
+            </div>
+            <input type="text"
+              tabIndex={3 + props.tabTimes}
+              onInput={(e) => {
+                setCityOrigin(e.target.value)
+              }}
+              onChange={(e) => {
+                setCityOrigin(e.target.value)
+              }}
+              value={cityOrigin || ''}
+            />
+          </div>
+          <div className="input-box-container state">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State Origin
+            </div>
+            <input type="text"
+              tabIndex={5 + props.tabTimes}
+              style={{ textTransform: 'uppercase' }}
+              maxLength={2}
+              onInput={(e) => {
+                setStateOrigin(e.target.value)
+              }}
+              onChange={(e) => {
+                setStateOrigin(e.target.value)
+              }}
+              value={stateOrigin || ''}
+            />
+          </div>
+          <div className="input-box-container zip">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip Origin
+            </div>
+            <input type="text"
+              tabIndex={7 + props.tabTimes}
+              maxLength={10}
+              onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (
+                  key === 9 || // TAB
+                  (key >= 48 && key <= 57) || // NUMBER
+                  (key >= 96 && key <= 105) || // NUMBER
+                  (key === 8 || key === 46) || // BACKSPACE - DELETE
+                  (key >= 37 && key <= 40) // ARROW KEYS
+                ) {
+                } else {
+                  e.preventDefault();
+                }
+              }}
+              onInput={(e) => {
+                setZipOrigin(e.target.value)
+              }}
+              onChange={(e) => {
+                setZipOrigin(e.target.value)
+              }}
+              value={zipOrigin || ''}
+            />
+          </div>
+          <div className="input-box-container">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Agent Code
+            </div>
+            <input type="text"
+              tabIndex={9 + props.tabTimes}
+              maxLength={10}
+              style={{ textTransform: 'uppercase' }}
+              onInput={(e) => {
+                setAgentCode(e.target.value)
+              }}
+              onChange={(e) => {
+                setAgentCode(e.target.value)
+              }}
+              value={agentCode || ''}
+            />
+          </div>
+          <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
+            <input type="checkbox"
+              id={props.panelName + '-cbox-revenue-information-show-year-totals-btn'}
+              onChange={(e) => {
+                setShowYearTotals(e.target.checked);
+              }}
+              checked={showYearTotals} />
+            <label htmlFor={props.panelName + '-cbox-revenue-information-show-year-totals-btn'}
+              style={{ fontSize: '0.7rem' }}>
+              <div className="label-text">Show Year Totals</div>
+              <div className="input-toggle-btn"></div>
+            </label>
+          </div>
+          <div className="button-container">
+            <div className="mochi-button" onClick={() => {
+              setDateStart('');
+              setDateEnd('');
+              setCityOrigin('');
+              setCityDestination('');
+              setStateOrigin('');
+              setStateDestination('');
+              setZipOrigin('');
+              setZipDestination('');
+              setAgentCode('');
+              setLoadType({
+                id: -1,
+                name: 'All'
+              });
+
+              setOrders([]);
+
+              refDateStart.current.inputElement.focus();
+            }}>
+              <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+              <div className="mochi-button-base">Clear</div>
+              <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+            </div>
+          </div>
+
+          <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
+            <div className="select-box-wrapper">
+              <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Date End
+              </div>
+              <MaskedInput
+                tabIndex={2 + props.tabTimes}
+                mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                guide={false} type="text"
+                ref={refDateEnd}
+                onKeyDown={(e) => {
+                  let key = e.keyCode || e.which;
+
+                  if (key >= 37 && key <= 40) {
+                    let tempDateEnd = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateEnd || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateEnd(tempDateEnd);
+
+                    if (isDateEndCalendarShown) {
+                      e.preventDefault();
+
+                      if (key === 37) { // left - minus 1
+                        setPreSelectedDateEnd(preSelectedDateEnd.clone().subtract(1, 'day'));
+                      }
+
+                      if (key === 38) { // up - minus 7
+                        setPreSelectedDateEnd(preSelectedDateEnd.clone().subtract(7, 'day'));
+                      }
+
+                      if (key === 39) { // right - plus 1
+                        setPreSelectedDateEnd(preSelectedDateEnd.clone().add(1, 'day'));
+                      }
+
+                      if (key === 40) { // down - plus 7
+                        setPreSelectedDateEnd(preSelectedDateEnd.clone().add(7, 'day'));
+                      }
+                    } else {
+                      setIsDateEndCalendarShown(true);
+                    }
+                  }
+
+                  if (key === 13) {
+                    let tempDateEnd = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateEnd || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateEnd(tempDateEnd);
+
+                    if (isDateEndCalendarShown) {
+                      tempDateEnd = preSelectedDateEnd.clone().format('MM/DD/YYYY');
+
+                      setDateEnd(tempDateEnd);
+
+                      setIsDateEndCalendarShown(false);
+                    }
+                  }
+
+                  if (key === 9) {
+                    let tempDateEnd = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(dateEnd || ''), 'MM/DD/YYYY');
+                    setPreSelectedDateEnd(tempDateEnd);
+
+                    if (isDateEndCalendarShown) {
+                      tempDateEnd = preSelectedDateEnd.clone().format('MM/DD/YYYY');
+
+                      setDateEnd(tempDateEnd);
+
+                      setIsDateEndCalendarShown(false);
+                    }
+                  }
+
+                }}
+                onBlur={e => {
+                  setDateEnd(getFormattedDates(dateEnd))
+                }}
+                onInput={e => {
+                  setDateEnd(e.target.value)
+                }}
+                onChange={e => {
+                  setDateEnd(e.target.value)
+                }}
+                value={dateEnd || ''}
+              />
+
+              <FontAwesomeIcon className="dropdown-button calendar" icon={faCalendarAlt} onClick={(e) => {
+                e.stopPropagation();
+
+                if (isDateEndCalendarShown) {
+                  setIsDateEndCalendarShown(false);
+                  setIsDateStartCalendarShown(false);
+                } else {
+                  window.setTimeout(() => {
+                    setIsDateEndCalendarShown(true);
+                    setIsDateStartCalendarShown(false);
+                  }, 0);
+
+                  if (moment((dateEnd || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (dateEnd || '').trim()) {
+                    setPreSelectedDateEnd(moment(dateEnd, 'MM/DD/YYYY'));
+                  } else {
+                    setPreSelectedDateEnd(moment());
+                  }
+
+                  refDateEnd.current.inputElement.focus();
+                }
+              }} />
+            </div>
+
+            {
+              useTransition(isDateEndCalendarShown, {
+                from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+                enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+                leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+                reverse: isDateEndCalendarShown,
+                config: { duration: 100 }
+              })((style, item) => item &&
+                (<animated.div
+                  className="mochi-contextual-container"
+                  id="mochi-contextual-container-revenue-information-end-date"
+                  style={{
+                    ...style,
+                    left: '0px',
+                  }}
+                  ref={refDateEndCalendarDropDown}
+                >
+                  <div className="mochi-contextual-popup vertical below right" style={{ height: 275 }}>
+                    <div className="mochi-contextual-popup-content">
+                      <div className="mochi-contextual-popup-wrapper">
+                        <Calendar
+                          value={moment((dateEnd || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (dateEnd || '').trim()
+                            ? moment(dateEnd, 'MM/DD/YYYY')
+                            : moment()}
+                          onChange={(day) => {
+                            setDateEnd(day.format('MM/DD/YYYY'))
+                          }}
+                          closeCalendar={() => {
+                            setIsDateEndCalendarShown(false);
+                          }}
+                          preDay={preSelectedDateEnd}
+                          onChangePreDay={(preDay) => {
+                            setPreSelectedDateEnd(preDay);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </animated.div>)
+              )
+            }
+          </div>
+          <div className="input-box-container city">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>City
+              Destination
+            </div>
+            <input type="text"
+              tabIndex={4 + props.tabTimes}
+              onInput={(e) => {
+                setCityDestination(e.target.value)
+              }}
+              onChange={(e) => {
+                setCityDestination(e.target.value)
+              }}
+              value={cityDestination || ''}
+            />
+          </div>
+          <div className="input-box-container state">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>State
+              Destination
+            </div>
+            <input type="text"
+              tabIndex={6 + props.tabTimes}
+              maxLength={2}
+              style={{ textTransform: 'uppercase' }}
+              onInput={(e) => {
+                setStateDestination(e.target.value)
+              }}
+              onChange={(e) => {
+                setStateDestination(e.target.value)
+              }}
+              value={stateDestination || ''}
+            />
+          </div>
+          <div className="input-box-container zip">
+            <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Zip
+              Destination
+            </div>
+            <input type="text"
+              tabIndex={8 + props.tabTimes}
+              maxLength={10}
+              onKeyDown={(e) => {
+                let key = e.keyCode || e.which;
+
+                if (
+                  key === 9 || // TAB
+                  (key >= 48 && key <= 57) || // NUMBER
+                  (key >= 96 && key <= 105) || // NUMBER
+                  (key === 8 || key === 46) || // BACKSPACE - DELETE
+                  (key >= 37 && key <= 40) // ARROW KEYS
+                ) {
+                } else {
+                  e.preventDefault();
+                }
+              }}
+              onInput={(e) => {
+                setZipDestination(e.target.value)
+              }}
+              onChange={(e) => {
+                setZipDestination(e.target.value)
+              }}
+              value={zipDestination || ''}
+            />
+          </div>
+          <div className="select-box-container" style={{ flexGrow: 1 }}>
+            <div className="select-box-wrapper">
+              <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Load Type</div>
+              <input
+                type="text"
+                tabIndex={10 + props.tabTimes}
+                ref={refLoadType}
+                onKeyDown={(e) => {
+                  let key = e.keyCode || e.which;
+
+                  switch (key) {
+                    case 37:
+                    case 38: // arrow left | arrow up
+                      e.preventDefault();
+                      if (loadTypeItems.length > 0) {
+                        let selectedIndex = loadTypeItems.findIndex(
+                          (item) => item.selected
+                        );
+
+                        if (selectedIndex === -1) {
+                          setLoadTypeItems(
+                            loadTypeItems.map((item, index) => {
+                              item.selected = index === 0;
+                              return item;
+                            })
+                          );
+                        } else {
+                          setLoadTypeItems(
+                            loadTypeItems.map((item, index) => {
+                              if (selectedIndex === 0) {
+                                item.selected =
+                                  index === loadTypeItems.length - 1;
+                              } else {
+                                item.selected =
+                                  index === selectedIndex - 1;
+                              }
+                              return item;
+                            })
+                          );
+                        }
+
+                        refLoadTypePopupItems.current.map((r, i) => {
+                          if (r && r.classList.contains("selected")) {
+                            r.scrollIntoView({
+                              behavior: "auto",
+                              block: "center",
+                              inline: "nearest",
+                            });
+                          }
+                          return true;
+                        });
+                      } else {
+                        axios.post(props.serverUrl + "/getLoadTypes", { withAll: 1 }).then((res) => {
+                          if (res.data.result === "OK") {
+                            setLoadTypeItems(res.data.load_types.map((item) => {
+                              item.selected = item.id === (loadType?.id || -1);
+                              return item;
+                            }));
+
+                            refLoadTypePopupItems.current.map((r, i) => {
+                              if (r && r.classList.contains("selected")) {
+                                r.scrollIntoView({
+                                  behavior: "auto",
+                                  block: "center",
+                                  inline: "nearest",
+                                });
+                              }
+                              return true;
+                            });
+                          }
+                        }).catch(async (e) => {
+                          console.log("error getting load types", e);
+                        });
+                      }
+                      break;
+
+                    case 39:
+                    case 40: // arrow right | arrow down
+                      e.preventDefault();
+                      if (loadTypeItems.length > 0) {
+                        let selectedIndex = loadTypeItems.findIndex((item) => item.selected);
+
+                        if (selectedIndex === -1) {
+                          setLoadTypeItems(loadTypeItems.map((item, index) => {
+                            item.selected = index === 0;
+                            return item;
+                          }));
+                        } else {
+                          setLoadTypeItems(loadTypeItems.map((item, index) => {
+                            if (selectedIndex === loadTypeItems.length - 1) {
+                              item.selected = index === 0;
+                            } else {
+                              item.selected = index === selectedIndex + 1;
+                            }
+                            return item;
+                          }));
+                        }
+
+                        refLoadTypePopupItems.current.map((r, i) => {
+                          if (r && r.classList.contains("selected")) {
+                            r.scrollIntoView({
+                              behavior: "auto",
+                              block: "center",
+                              inline: "nearest",
+                            });
+                          }
+                          return true;
+                        });
+                      } else {
+                        axios.post(props.serverUrl + "/getLoadTypes", { withAll: 1 }).then((res) => {
+                          if (res.data.result === "OK") {
+                            setLoadTypeItems(res.data.load_types.map((item) => {
+                              item.selected = item.id === (loadType?.id || -1);
+                              return item;
+                            }));
+
+                            refLoadTypePopupItems.current.map((r, i) => {
+                              if (r && r.classList.contains("selected")) {
+                                r.scrollIntoView({
+                                  behavior: "auto",
+                                  block: "center",
+                                  inline: "nearest",
+                                });
+                              }
+                              return true;
+                            });
+                          }
+                        }).catch(async (e) => {
+                          console.log("error getting load types", e);
+                        });
+                      }
+                      break;
+
+                    case 27: // escape
+                      e.preventDefault();
+                      setLoadTypeItems([]);
+                      break;
+
+                    case 13: // enter
+                      if (loadTypeItems.length > 0 && loadTypeItems.findIndex((item) => item.selected) > -1) {
+                        setLoadType({
+                          id: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].id,
+                          name: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].name
+                        });
+
+                        setLoadTypeItems([]);
+                        window.setTimeout(() => {
+                          doSearch(loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].id);
+                        }, 10)
+                      }
+                      break;
+
+                    case 9: // tab
+                      e.preventDefault();
+                      if (loadTypeItems.length > 0 && loadTypeItems.findIndex((item) => item.selected) > -1) {
+                        setLoadType({
+                          id: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].id,
+                          name: loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].name
+                        });
+
+                        setLoadTypeItems([]);
+                        window.setTimeout(() => {
+                          doSearch(loadTypeItems[loadTypeItems.findIndex((item) => item.selected)].id);
+                        }, 10)
+                      } else {
+                        doSearch();
+                      }
+                      break;
+
+                    default:
+                      break;
+                  }
+                }}
+                onBlur={() => {
+                  if ((loadType?.id || -1) === 0) {
+                    setLoadType({
+                      id: -1,
+                      name: 'All'
+                    });
+                  }
+                }}
+                onInput={(e) => {
+                  setLoadType({
+                    id: 0,
+                    name: e.target.value
+                  })
+
+                  if (e.target.value.trim() === "") {
+                    setLoadTypeItems([]);
+                  } else {
+                    axios.post(props.serverUrl + "/getLoadTypes", { withAll: 1, name: e.target.value.trim(), }).then((res) => {
+                      if (res.data.result === "OK") {
+                        setLoadTypeItems(res.data.load_types.map((item) => {
+                          item.selected = item.id === -1;
+                          return item;
+                        }));
+                      }
+                    }).catch(async (e) => {
+                      console.log("error getting load types", e);
+                    });
+                  }
+                }}
+                onChange={(e) => {
+                  setLoadType({
+                    id: 0,
+                    name: e.target.value
+                  })
+                }}
+                value={loadType?.name || ""}
+              />
+              <FontAwesomeIcon
+                className="dropdown-button"
+                style={{
+                  position: 'relative',
+                  top: 'unset',
+                  right: 'unset',
+                  transform: 'unset'
+                }}
+                icon={faCaretDown}
+                onClick={() => {
+                  if (loadTypeItems.length > 0) {
+                    setLoadTypeItems([]);
+                  } else {
+                    axios.post(props.serverUrl + "/getLoadTypes", { withAll: 1 }).then((res) => {
+                      if (res.data.result === "OK") {
+                        setLoadTypeItems(res.data.load_types.map((item) => {
+                          item.selected = item.id === (loadType?.id || -1);
+                          return item;
+                        }));
+
+                        refLoadTypePopupItems.current.map((r, i) => {
+                          if (r && r.classList.contains("selected")) {
+                            r.scrollIntoView({
+                              behavior: "auto",
+                              block: "center",
+                              inline: "nearest",
+                            });
+                          }
+                          return true;
+                        });
+                      }
+                    }).catch(async (e) => {
+                      console.log("error getting load types", e);
+                    });
+                  }
+
+                  refLoadType.current.focus();
+                }}
+              />
+            </div>
+
+            {loadTypeTransition(
+              (style, item) =>
+                item && (
+                  <animated.div
+                    className="mochi-contextual-container"
+                    id="mochi-contextual-container-load-type"
+                    style={{
+                      ...style,
+                      left: "-50%",
+                      display: "block",
+                    }}
+                    ref={refLoadTypeDropDown}
+                  >
+                    <div
+                      className="mochi-contextual-popup vertical below"
+                      style={{ height: 150 }}
+                    >
+                      <div className="mochi-contextual-popup-content">
+                        <div className="mochi-contextual-popup-wrapper">
+                          {loadTypeItems.map((item, index) => {
+                            const mochiItemClasses = classnames({
+                              "mochi-item": true,
+                              selected: item.selected,
+                            });
+
+                            const searchValue = undefined;
+
+                            return (
+                              <div
+                                key={index}
+                                className={mochiItemClasses}
+                                id={item.id}
+                                onClick={() => {
+                                  setLoadType({
+                                    id: item.id,
+                                    name: item.name,
+                                  });
+
+                                  window.setTimeout(() => {
+                                    setLoadTypeItems([]);
+                                    doSearch(item.id);
+                                  }, 10);
+                                }}
+                                ref={(ref) => refLoadTypePopupItems.current.push(ref)}
+                              >
+                                {searchValue === undefined ? (
+                                  item.name
+                                ) : (
+                                  <Highlighter
+                                    highlightClassName="mochi-item-highlight-text"
+                                    searchWords={[searchValue]}
+                                    autoEscape={true}
+                                    textToHighlight={item.name}
+                                  />
+                                )}
+                                {item.selected && (
+                                  <FontAwesomeIcon
+                                    className="dropdown-selected"
+                                    icon={faCaretRight}
+                                  />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </animated.div>
+                )
+            )}
+          </div>
+          <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
+            <input type="checkbox"
+              id={props.panelName + '-cbox-revenue-information-show-month-totals-btn'}
+              onChange={(e) => {
+                setShowMonthTotals(e.target.checked);
+              }}
+              checked={showMonthTotals} />
+            <label htmlFor={props.panelName + '-cbox-revenue-information-show-month-totals-btn'}
+              style={{ fontSize: '0.7rem' }}>
+              <div className="label-text">Show Month Totals</div>
+              <div className="input-toggle-btn"></div>
+            </label>
+          </div>
+          <div className="button-container">
+            <div>
+              <div className="mochi-button" onClick={() => { doSearch() }}>
+                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                <div className="mochi-button-base">Find</div>
+                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div className="order-info-container report-agent-revenue">
+        <div className="form-bordered-box" style={{
+          backgroundColor: (orders || []).length > 0 ? 'rgba(0,0,0,0.1)' : 'transparent'
+        }}>
+          <div className="form-header">
+            <div className="top-border top-border-left"></div>
+            <div className="top-border top-border-middle"></div>
+            <div className="form-buttons">
+              <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
+                // handleExport();
+              }}>
+                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                <div className="mochi-button-base">Export</div>
+                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+              </div>
+
+              <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
+                // handlePrint();
+              }}>
+                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                <div className="mochi-button-base">Print</div>
+                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+              </div>
+            </div>
+            <div className="top-border top-border-right"></div>
+          </div>
+
+          {
+            noOrdersFound &&
+            <div className="no-orders-found">No Orders Were Found</div>
+          }
+
+          {
+            (orders || []).length > 0 &&
+            <div className="order-info-header">
+              <div className="order-info-header-wrapper">
+                <div className="order-info-col bill-to">Load Type</div>
+                <div className="order-info-col order-date">Order Date</div>
+                <div className="order-info-col order-number">Order Number</div>
+                <div className="order-info-col customer-charges">Customer Charges</div>
+                <div className="order-info-col carrier-costs">Carrier Costs</div>
+                <div className="order-info-col profit">Profit</div>
+                <div className="order-info-col percentage">Percentage</div>
+                <div className="order-info-col commission">Commission</div>
+                <div className="order-info-col paid">Paid</div>
+              </div>
+            </div>
+          }
+
+          {
+            (orders || []).length > 0 &&
+            <div className="order-info-wrapper">
+              {
+                (orders || []).map((groupOrder, index1) => {
+                  const { id, code, name } = groupOrder.agent;
+                  const { dateGroup } = groupOrder;
+                  const customerOrdersClasses = classnames({
+                    'customer-orders': true,
+                    'hidden': !groupOrder.showCustomerGroup
+                  })
+
+                  return (
+                    <div className="customer-container" key={index1}>
+                      <div className="customer-info">
+                        <span>Agent</span>
+                        <span className="agent-code" onClick={() => {
+
+                        }}>{code}</span>-
+                        <span>{name}</span>
+
+                        <FontAwesomeIcon
+                          icon={groupOrder.showCustomerGroup ? faCaretDown : faCaretUp}
+                          style={{
+                            color: groupOrder.showCustomerGroup ? '000000' : '#2bc1ff',
+                            fontSize: '1.2rem',
+                            cursor: "pointer"
+                          }} onClick={() => {
+                            setOrders(orders.map((order, i) => {
+                              if (index1 === i) {
+                                order.showCustomerGroup = !order.showCustomerGroup;
+                              }
+
+                              return order;
+                            }))
+                          }} />
+                      </div>
+
+                      <div className={customerOrdersClasses}>
+                        {
+                          (dateGroup || []).map((yearGroup, index2) => {
+                            const { months } = yearGroup;
+                            const yearOrdersClasses = classnames({
+                              'year-orders': true,
+                              'hidden': !yearGroup.showYearGroup
+                            })
+
+                            return (
+                              <div className="year-container" key={index2}>
+
+                                <div className="year-info">
+                                  <span>{yearGroup.year}</span>
+
+                                  <FontAwesomeIcon
+                                    icon={yearGroup.showYearGroup ? faCaretDown : faCaretUp}
+                                    style={{
+                                      color: yearGroup.showYearGroup ? '000000' : '#2bc1ff',
+                                      fontSize: '1.2rem',
+                                      cursor: "pointer",
+                                      marginLeft: 10
+                                    }} onClick={() => {
+                                      setOrders(orders.map((order, i) => {
+                                        if (index1 === i) {
+                                          order.dateGroup.map((year, x) => {
+                                            if (index2 === x) {
+                                              year.showYearGroup = !year.showYearGroup;
+                                            }
+
+                                            return year;
+                                          })
+                                        }
+
+                                        return order;
+                                      }))
+                                    }} />
+                                </div>
+
+                                <div className={yearOrdersClasses}>
+                                  {
+                                    (months || []).map((group, index3) => {
+                                      const { orders } = group;
+                                      const monthOrdersClasses = classnames({
+                                        'month-orders': true,
+                                        'hidden': !group.showMonthGroup
+                                      })
+
+                                      return (
+                                        <div className="month-container"
+                                          key={index3}>
+                                          <div className="month-info">
+                                            <span>{group.month}</span>
+
+                                            <FontAwesomeIcon
+                                              icon={group.showMonthGroup ? faCaretDown : faCaretUp}
+                                              style={{
+                                                color: group.showMonthGroup ? '000000' : '#2bc1ff',
+                                                fontSize: '1.2rem',
+                                                cursor: "pointer",
+                                                marginLeft: 10
+                                              }} onClick={() => {
+                                                setOrders(_orders => _orders.map((order, i) => {
+                                                  if (index1 === i) {
+                                                    order.dateGroup.map((year, x) => {
+                                                      if (index2 === x) {
+                                                        year.months.map((month, y) => {
+                                                          if (index3 === y) {
+                                                            month.showMonthGroup = !month.showMonthGroup;
+                                                          }
+
+                                                          return month;
+                                                        })
+                                                      }
+
+                                                      return year;
+                                                    })
+                                                  }
+
+                                                  return order;
+                                                }))
+                                              }} />
+                                          </div>
+
+                                          <div className={monthOrdersClasses}>
+                                            {
+                                              orders.map((order, index4) => {
+                                                return (
+                                                  <div
+                                                    className="date-group-order-item"
+                                                    key={index4}
+                                                    onClick={() => {
+                                                      let panel = {
+                                                        panelName: `${props.panelName}-dispatch`,
+                                                        component:
+                                                          <Dispatch
+                                                            pageName={'Dispatch Page'}
+                                                            panelName={`${props.panelName}-dispatch`}
+                                                            title='Dispatch'
+                                                            tabTimes={1000 + (props.tabTimes || 0)}
+                                                            isOnPanel={true}
+                                                            isAdmin={props.isAdmin}
+                                                            origin={props.origin}
+                                                            closingCallback={() => {
+                                                              closePanel(`${props.panelName}-dispatch`, props.origin);
+                                                              refDateStart.current.inputElement.focus({ preventScroll: true });
+                                                            }}
+
+
+                                                            order_id={order.id}
+                                                          />
+                                                      }
+
+                                                      openPanel(panel, props.origin);
+                                                    }}>
+                                                    <div className="order-info-col bill-to">
+                                                      {order?.load_type || ''}
+                                                    </div>
+
+                                                    <div className="order-info-col order-date">
+                                                      {
+                                                        moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY')
+                                                      }
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col order-number">
+                                                      {
+                                                        order.order_number
+                                                      }
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col customer-charges">
+                                                      <NumberFormat
+                                                        className={classnames({
+                                                          'negative-number': order.total_customer_rating < 0
+                                                        })}
+                                                        value={order.total_customer_rating}
+                                                        thousandsGroupStyle="thousand"
+                                                        thousandSeparator={true}
+                                                        decimalScale={2}
+                                                        fixedDecimalScale={true}
+                                                        prefix={'$ '}
+                                                        type="text"
+                                                        displayType={'text'}
+                                                        readOnly={true}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col carrier-costs">
+                                                      <NumberFormat
+                                                        className={classnames({
+                                                          'negative-number': order.total_carrier_rating < 0
+                                                        })}
+                                                        value={order.total_carrier_rating}
+                                                        thousandsGroupStyle="thousand"
+                                                        thousandSeparator={true}
+                                                        decimalScale={2}
+                                                        fixedDecimalScale={true}
+                                                        prefix={'$ '}
+                                                        type="text"
+                                                        displayType={'text'}
+                                                        readOnly={true}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col profit">
+                                                      <NumberFormat
+                                                        className={classnames({
+                                                          'negative-number': (order.total_customer_rating - order.total_carrier_rating) < 0
+                                                        })}
+                                                        value={(order.total_customer_rating - order.total_carrier_rating)}
+                                                        thousandsGroupStyle="thousand"
+                                                        thousandSeparator={true}
+                                                        decimalScale={2}
+                                                        fixedDecimalScale={true}
+                                                        prefix={'$ '}
+                                                        type="text"
+                                                        displayType={'text'}
+                                                        readOnly={true}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col percentage">
+                                                      <NumberFormat
+                                                        className={classnames({
+                                                          'negative-number': (
+                                                            (order.total_customer_rating > 0 || order.total_carrier_rating > 0)
+                                                              ?
+                                                              ((order.total_customer_rating - order.total_carrier_rating) * 100)
+                                                              /
+                                                              (
+                                                                order.total_customer_rating > 0
+                                                                  ? order.total_customer_rating
+                                                                  : order.total_carrier_rating
+                                                              )
+                                                              : 0) < 0
+                                                        })}
+                                                        value={
+                                                          (
+                                                            (order.total_customer_rating > 0 || order.total_carrier_rating > 0)
+                                                              ?
+                                                              ((order.total_customer_rating - order.total_carrier_rating) * 100)
+                                                              /
+                                                              (
+                                                                order.total_customer_rating > 0
+                                                                  ? order.total_customer_rating
+                                                                  : order.total_carrier_rating
+                                                              )
+                                                              : 0)
+                                                        }
+                                                        thousandsGroupStyle="thousand"
+                                                        thousandSeparator={true}
+                                                        decimalScale={2}
+                                                        fixedDecimalScale={true}
+                                                        prefix={''}
+                                                        suffix={'%'}
+                                                        type="text"
+                                                        displayType={'text'}
+                                                        readOnly={true}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      className="order-info-col commission">
+                                                      <NumberFormat
+                                                        className={classnames({
+                                                          'negative-number': order.agent_commission < 0
+                                                        })}
+                                                        value={order.agent_commission}
+                                                        thousandsGroupStyle="thousand"
+                                                        thousandSeparator={true}
+                                                        decimalScale={2}
+                                                        fixedDecimalScale={true}
+                                                        prefix={'$ '}
+                                                        type="text"
+                                                        displayType={'text'}
+                                                        readOnly={true}
+                                                      />
+                                                    </div>
+
+                                                    <div className="order-info-col paid">
+                                                      <input type="checkbox" checked={(order?.agent_date_paid || '') !== ''} readOnly />
+                                                    </div>
+                                                  </div>
+                                                )
+                                              })
+                                            }
+                                          </div>
+
+                                          {
+                                            showMonthTotals &&
+                                            <div className="month-totals">
+                                              <div
+                                                className="order-info-col order-number">
+                                                Total <span
+                                                  style={{ fontWeight: 'bold' }}>{group.month}</span>
+                                              </div>
+                                              <div
+                                                className="order-info-col order-totals">
+                                                <span style={{
+                                                  fontWeight: 'bold',
+                                                  color: 'rgba(0, 0, 0, 0.7)',
+                                                  marginRight: 10
+                                                }}>
+                                                  Orders:</span>
+                                                {group.totals.orderCount}
+                                              </div>
+                                              <div
+                                                className="order-info-col customer-charges">
+                                                <NumberFormat
+                                                  className={classnames({
+                                                    'negative-number': (group.totals.customerCharges) < 0
+                                                  })}
+                                                  value={group.totals.customerCharges}
+                                                  thousandsGroupStyle="thousand"
+                                                  thousandSeparator={true}
+                                                  decimalScale={2}
+                                                  fixedDecimalScale={true}
+                                                  prefix={'$ '}
+                                                  type="text"
+                                                  onValueChange={(values) => {
+                                                  }}
+                                                  displayType={'text'}
+                                                  readOnly={true}
+                                                />
+                                              </div>
+                                              <div
+                                                className="order-info-col carrier-costs">
+                                                <NumberFormat
+                                                  className={classnames({
+                                                    'negative-number': (group.totals.carrierCosts) < 0
+                                                  })}
+                                                  value={group.totals.carrierCosts}
+                                                  thousandsGroupStyle="thousand"
+                                                  thousandSeparator={true}
+                                                  decimalScale={2}
+                                                  fixedDecimalScale={true}
+                                                  prefix={'$ '}
+                                                  type="text"
+                                                  onValueChange={(values) => {
+                                                  }}
+                                                  displayType={'text'}
+                                                  readOnly={true}
+                                                />
+                                              </div>
+                                              <div
+                                                className="order-info-col profit">
+                                                <NumberFormat
+                                                  className={classnames({
+                                                    'negative-number': (group.totals.profit) < 0
+                                                  })}
+                                                  value={group.totals.profit}
+                                                  thousandsGroupStyle="thousand"
+                                                  thousandSeparator={true}
+                                                  decimalScale={2}
+                                                  fixedDecimalScale={true}
+                                                  prefix={'$ '}
+                                                  type="text"
+                                                  onValueChange={(values) => {
+                                                  }}
+                                                  displayType={'text'}
+                                                  readOnly={true}
+                                                />
+                                              </div>
+                                              <div
+                                                className="order-info-col percentage">
+                                                <NumberFormat
+                                                  className={classnames({
+                                                    'negative-number': (
+                                                      (group.totals.customerCharges > 0 || group.totals.carrierCosts > 0)
+                                                        ? (group.totals.profit * 100)
+                                                        /
+                                                        (
+                                                          group.totals.customerCharges > 0
+                                                            ? group.totals.customerCharges
+                                                            : group.totals.carrierCosts
+                                                        )
+                                                        : 0
+                                                    ) < 0
+                                                  })}
+                                                  value={
+                                                    (group.totals.customerCharges > 0 || group.totals.carrierCosts > 0)
+                                                      ? (group.totals.profit * 100)
+                                                      /
+                                                      (
+                                                        group.totals.customerCharges > 0
+                                                          ? group.totals.customerCharges
+                                                          : group.totals.carrierCosts
+                                                      )
+                                                      : 0
+                                                  }
+                                                  thousandsGroupStyle="thousand"
+                                                  thousandSeparator={true}
+                                                  decimalScale={2}
+                                                  fixedDecimalScale={true}
+                                                  prefix={''}
+                                                  suffix={'%'}
+                                                  type="text"
+                                                  onValueChange={(values) => {
+
+                                                  }}
+                                                  displayType={'text'}
+                                                  readOnly={true}
+                                                />
+                                              </div>
+                                              <div
+                                                className="order-info-col commission">
+                                                <NumberFormat
+                                                  className={classnames({
+                                                    'negative-number': (group.totals.commissions) < 0
+                                                  })}
+                                                  value={group.totals.commissions}
+                                                  thousandsGroupStyle="thousand"
+                                                  thousandSeparator={true}
+                                                  decimalScale={2}
+                                                  fixedDecimalScale={true}
+                                                  prefix={'$ '}
+                                                  type="text"
+                                                  onValueChange={(values) => {
+                                                  }}
+                                                  displayType={'text'}
+                                                  readOnly={true}
+                                                />
+                                              </div>
+                                              <div className="order-info-col paid"></div>
+                                            </div>
+                                          }
+                                        </div>
+                                      )
+                                    })
+                                  }
+                                </div>
+
+                                {
+                                  showYearTotals &&
+                                  <div className="year-totals">
+                                    <div className="order-info-col order-number">
+                                      Total <span
+                                        style={{ fontWeight: 'bold' }}>{yearGroup.year}</span>
+                                    </div>
+                                    <div className="order-info-col order-totals">
+                                      <span style={{
+                                        fontWeight: 'bold',
+                                        color: 'rgba(0, 0, 0, 0.7)',
+                                        marginRight: 10
+                                      }}>
+                                        Orders:</span>
+                                      {yearGroup.totals.orderCount}
+                                    </div>
+                                    <div
+                                      className="order-info-col customer-charges">
+                                      <NumberFormat
+                                        className={classnames({
+                                          'negative-number': (yearGroup.totals.customerCharges) < 0
+                                        })}
+                                        value={yearGroup.totals.customerCharges}
+                                        thousandsGroupStyle="thousand"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                        prefix={'$ '}
+                                        type="text"
+                                        onValueChange={(values) => {
+                                        }}
+                                        displayType={'text'}
+                                        readOnly={true}
+                                      />
+                                    </div>
+                                    <div className="order-info-col carrier-costs">
+                                      <NumberFormat
+                                        className={classnames({
+                                          'negative-number': (yearGroup.totals.carrierCosts) < 0
+                                        })}
+                                        value={yearGroup.totals.carrierCosts}
+                                        thousandsGroupStyle="thousand"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                        prefix={'$ '}
+                                        type="text"
+                                        onValueChange={(values) => {
+                                        }}
+                                        displayType={'text'}
+                                        readOnly={true}
+                                      />
+                                    </div>
+                                    <div className="order-info-col profit">
+                                      <NumberFormat
+                                        className={classnames({
+                                          'negative-number': (yearGroup.totals.profit) < 0
+                                        })}
+                                        value={yearGroup.totals.profit}
+                                        thousandsGroupStyle="thousand"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                        prefix={'$ '}
+                                        type="text"
+                                        onValueChange={(values) => {
+                                        }}
+                                        displayType={'text'}
+                                        readOnly={true}
+                                      />
+                                    </div>
+                                    <div className="order-info-col percentage">
+                                      <NumberFormat
+                                        className={classnames({
+                                          'negative-number': (
+                                            (yearGroup.totals.customerCharges > 0 || yearGroup.totals.carrierCosts > 0)
+                                              ? (yearGroup.totals.profit * 100)
+                                              /
+                                              (
+                                                yearGroup.totals.customerCharges > 0
+                                                  ? yearGroup.totals.customerCharges
+                                                  : yearGroup.totals.carrierCosts
+                                              )
+                                              : 0
+                                          ) < 0
+                                        })}
+                                        value={
+                                          (yearGroup.totals.customerCharges > 0 || yearGroup.totals.carrierCosts > 0)
+                                            ? (yearGroup.totals.profit * 100)
+                                            /
+                                            (
+                                              yearGroup.totals.customerCharges > 0
+                                                ? yearGroup.totals.customerCharges
+                                                : yearGroup.totals.carrierCosts
+                                            )
+                                            : 0
+                                        }
+                                        thousandsGroupStyle="thousand"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                        prefix={''}
+                                        suffix={'%'}
+                                        type="text"
+                                        onValueChange={(values) => {
+
+                                        }}
+                                        displayType={'text'}
+                                        readOnly={true}
+                                      />
+                                    </div>
+                                    <div className="order-info-col commission">
+                                      <NumberFormat
+                                        className={classnames({
+                                          'negative-number': (yearGroup.totals.commissions) < 0
+                                        })}
+                                        value={yearGroup.totals.commissions}
+                                        thousandsGroupStyle="thousand"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                        prefix={'$ '}
+                                        type="text"
+                                        onValueChange={(values) => {
+                                        }}
+                                        displayType={'text'}
+                                        readOnly={true}
+                                      />
+                                    </div>
+                                    <div className="order-info-col paid"></div>
+                                  </div>
+                                }
+                              </div>
+                            )
+                          })
+                        }
+                      </div>
+
+                      {
+                        showCustomerTotals &&
+                        <div className="customer-totals">
+                          <div className="order-info-col order-number">Total <span
+                            style={{ fontWeight: 'bold' }}>
+                            {code}</span></div>
+                          <div className="order-info-col order-totals">
+                            <span style={{
+                              fontWeight: 'bold',
+                              color: 'rgba(0, 0, 0, 0.7)',
+                              marginRight: 10
+                            }}>Orders:</span>
+                            {groupOrder.totals.orderCount}
+                          </div>
+                          <div className="order-info-col customer-charges">
+                            <NumberFormat
+                              className={classnames({
+                                'negative-number': (groupOrder.totals.customerCharges) < 0
+                              })}
+                              value={groupOrder.totals.customerCharges}
+                              thousandsGroupStyle="thousand"
+                              thousandSeparator={true}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
+                              prefix={'$ '}
+                              type="text"
+                              onValueChange={(values) => {
+                              }}
+                              displayType={'text'}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div className="order-info-col carrier-costs">
+                            <NumberFormat
+                              className={classnames({
+                                'negative-number': (groupOrder.totals.carrierCosts) < 0
+                              })}
+                              value={groupOrder.totals.carrierCosts}
+                              thousandsGroupStyle="thousand"
+                              thousandSeparator={true}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
+                              prefix={'$ '}
+                              type="text"
+                              onValueChange={(values) => {
+                              }}
+                              displayType={'text'}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div className="order-info-col profit">
+                            <NumberFormat
+                              className={classnames({
+                                'negative-number': (groupOrder.totals.profit) < 0
+                              })}
+                              value={groupOrder.totals.profit}
+                              thousandsGroupStyle="thousand"
+                              thousandSeparator={true}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
+                              prefix={'$ '}
+                              type="text"
+                              onValueChange={(values) => {
+                              }}
+                              displayType={'text'}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div className="order-info-col percentage">
+                            <NumberFormat
+                              className={classnames({
+                                'negative-number': (
+                                  (groupOrder.totals.customerCharges > 0 || groupOrder.totals.carrierCosts > 0)
+                                    ? (groupOrder.totals.profit * 100)
+                                    /
+                                    (
+                                      groupOrder.totals.customerCharges > 0
+                                        ? groupOrder.totals.customerCharges
+                                        : groupOrder.totals.carrierCosts
+                                    )
+                                    : 0
+                                ) < 0
+                              })}
+                              value={
+                                (groupOrder.totals.customerCharges > 0 || groupOrder.totals.carrierCosts > 0)
+                                  ? (groupOrder.totals.profit * 100)
+                                  /
+                                  (
+                                    groupOrder.totals.customerCharges > 0
+                                      ? groupOrder.totals.customerCharges
+                                      : groupOrder.totals.carrierCosts
+                                  )
+                                  : 0
+                              }
+                              thousandsGroupStyle="thousand"
+                              thousandSeparator={true}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
+                              prefix={''}
+                              suffix={'%'}
+                              type="text"
+                              onValueChange={(values) => {
+
+                              }}
+                              displayType={'text'}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div className="order-info-col commission">
+                            <NumberFormat
+                              className={classnames({
+                                'negative-number': (groupOrder.totals.commissions) < 0
+                              })}
+                              value={groupOrder.totals.commissions}
+                              thousandsGroupStyle="thousand"
+                              thousandSeparator={true}
+                              decimalScale={2}
+                              fixedDecimalScale={true}
+                              prefix={'$ '}
+                              type="text"
+                              onValueChange={(values) => {
+                              }}
+                              displayType={'text'}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div className="order-info-col paid"></div>
+                        </div>
+                      }
+                    </div>
+                  )
+                })
+              }
+            </div>
+          }
+
+          {
+            (orders || []).length > 0 && <div style={{ flexGrow: 1 }}></div>
+          }
+          {
+            (orders || []).length > 0 &&
+            <div className="order-info-footer">
+              <div className="order-info-footer-wrapper">
+                <div className="order-info-col order-number">Totals</div>
+                <div className="order-info-col order-totals">
+                  <span style={{
+                    fontWeight: 'bold',
+                    color: 'rgba(0, 0, 0, 0.7)',
+                    marginRight: 10
+                  }}>Orders:</span>
+                  {
+                    orders.reduce((a, b) => {
+                      return a + b.totals.orderCount
+                    }, 0)
+                  }
+                </div>
+                <div className="order-info-col customer-charges">
+                  <NumberFormat
+                    className={classnames({
+                      'negative-number': (orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                      }, 0)) < 0
+                    })}
+                    value={
+                      new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(
+                        orders.reduce((a, b) => {
+                          return a + b.totals.customerCharges
+                        }, 0)
+                      )
+                    }
+                    thousandsGroupStyle="thousand"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix={'$ '}
+                    type="text"
+                    onValueChange={(values) => {
+                    }}
+                    displayType={'text'}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="order-info-col carrier-costs">
+                  <NumberFormat
+                    className={classnames({
+                      'negative-number': (orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                      }, 0)) < 0
+                    })}
+                    value={
+                      new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(
+                        orders.reduce((a, b) => {
+                          return a + b.totals.carrierCosts
+                        }, 0)
+                      )
+                    }
+                    thousandsGroupStyle="thousand"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix={'$ '}
+                    type="text"
+                    onValueChange={(values) => {
+                    }}
+                    displayType={'text'}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="order-info-col profit">
+                  <NumberFormat
+                    className={classnames({
+                      'negative-number': (orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                      }, 0) - orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                      }, 0)) < 0
+                    })}
+                    value={
+                      new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(
+                        orders.reduce((a, b) => {
+                          return a + b.totals.customerCharges
+                        }, 0) - orders.reduce((a, b) => {
+                          return a + b.totals.carrierCosts
+                        }, 0)
+                      )
+                    }
+                    thousandsGroupStyle="thousand"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix={'$ '}
+                    type="text"
+                    onValueChange={(values) => {
+                    }}
+                    displayType={'text'}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="order-info-col percentage">
+                  <NumberFormat
+                    className={classnames({
+                      'negative-number': (
+                        (orders.reduce((a, b) => {
+                          return a + b.totals.customerCharges
+                        }, 0) > 0 || orders.reduce((a, b) => {
+                          return a + b.totals.carrierCosts
+                        }, 0) > 0)
+                          ? ((orders.reduce((a, b) => {
+                            return a + b.totals.customerCharges
+                          }, 0) - orders.reduce((a, b) => {
+                            return a + b.totals.carrierCosts
+                          }, 0)) * 100)
+                          /
+                          (
+                            orders.reduce((a, b) => {
+                              return a + b.totals.customerCharges
+                            }, 0) > 0
+                              ? orders.reduce((a, b) => {
+                                return a + b.totals.customerCharges
+                              }, 0)
+                              : orders.reduce((a, b) => {
+                                return a + b.totals.carrierCosts
+                              }, 0)
+                          )
+                          : 0
+                      ) < 0
+                    })}
+                    value={
+                      (orders.reduce((a, b) => {
+                        return a + b.totals.customerCharges
+                      }, 0) > 0 || orders.reduce((a, b) => {
+                        return a + b.totals.carrierCosts
+                      }, 0) > 0)
+                        ? ((orders.reduce((a, b) => {
+                          return a + b.totals.customerCharges
+                        }, 0) - orders.reduce((a, b) => {
+                          return a + b.totals.carrierCosts
+                        }, 0)) * 100)
+                        /
+                        (
+                          orders.reduce((a, b) => {
+                            return a + b.totals.customerCharges
+                          }, 0) > 0
+                            ? orders.reduce((a, b) => {
+                              return a + b.totals.customerCharges
+                            }, 0)
+                            : orders.reduce((a, b) => {
+                              return a + b.totals.carrierCosts
+                            }, 0)
+                        )
+                        : 0
+                    }
+                    thousandsGroupStyle="thousand"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix={''}
+                    suffix={'%'}
+                    type="text"
+                    onValueChange={(values) => {
+
+                    }}
+                    displayType={'text'}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="order-info-col carrier-costs">
+                  <NumberFormat
+                    className={classnames({
+                      'negative-number': (orders.reduce((a, b) => {
+                        return a + b.totals.commissions
+                      }, 0)) < 0
+                    })}
+                    value={
+                      new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      }).format(
+                        orders.reduce((a, b) => {
+                          return a + b.totals.commissions
+                        }, 0)
+                      )
+                    }
+                    thousandsGroupStyle="thousand"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix={'$ '}
+                    type="text"
+                    onValueChange={(values) => {
+                    }}
+                    displayType={'text'}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="order-info-col paid"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const mapStateToProps = (state) => {
+  return {
+    scale: state.systemReducers.scale,
+    serverUrl: state.systemReducers.serverUrl,
+    adminHomePanels: state.adminReducers.adminHomePanels,
+    companyHomePanels: state.companyReducers.companyHomePanels,
+    adminCompanySetupPanels: state.companySetupReducers.adminCompanySetupPanels,
+    companyCompanySetupPanels: state.companySetupReducers.companyCompanySetupPanels,
+    adminCarrierPanels: state.carrierReducers.adminCarrierPanels,
+    companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
+    adminCustomerPanels: state.customerReducers.adminCustomerPanels,
+    companyCustomerPanels: state.customerReducers.companyCustomerPanels,
+    adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
+    companyDispatchPanels: state.dispatchReducers.companyDispatchPanels,
+    adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
+    companyInvoicePanels: state.invoiceReducers.companyInvoicePanels,
+    adminLoadBoardPanels: state.loadBoardReducers.adminLoadBoardPanels,
+    companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
+    adminReportPanels: state.reportReducers.adminReportPanels,
+    companyReportPanels: state.reportReducers.companyReportPanels,
+
+  }
+}
+
+export default connect(mapStateToProps, {
+  setAdminHomePanels,
+  setCompanyHomePanels,
+  setAdminCarrierPanels,
+  setCompanyCarrierPanels,
+  setAdminCompanySetupPanels,
+  setCompanyCompanySetupPanels,
+  setAdminCustomerPanels,
+  setCompanyCustomerPanels,
+  setAdminDispatchPanels,
+  setCompanyDispatchPanels,
+  setAdminInvoicePanels,
+  setCompanyInvoicePanels,
+  setAdminLoadBoardPanels,
+  setCompanyLoadBoardPanels,
+  setAdminReportPanels,
+  setCompanyReportPanels,
+
+})(ReportAgentRevenue)

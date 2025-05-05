@@ -393,7 +393,7 @@ const FactoringCompany = (props) => {
                 contact.zip_code = selectedFactoringCompany.zip;
             }
 
-            axios.post(props.serverUrl + '/saveFactoringCompanyContact', contact).then(res => {
+            axios.post(props.serverUrl + '/saveFactoringCompanyContact', {...contact, owner_id: selectedFactoringCompany.id}).then(res => {
                 if (res.data.result === 'OK') {
                     let mailing_contact = selectedFactoringCompany?.mailing_address?.mailing_contact || {};
 
@@ -639,15 +639,18 @@ const FactoringCompany = (props) => {
 
                 customerSearch={factoringCompanySearch}
 
-                callback={async (factoringCompany) => {
-                    if (factoringCompany) {
-                        await setSelectedFactoringCompany(factoringCompany);
-                        await setSelectedFactoringCompanyContact((factoringCompany.contacts || []).find(c => c.is_primary === 1) || {});
-                        await closePanel(`${props.panelName}-factoring-company-search`, props.origin);
+                callback={(factoringCompanyId) => {
+                    setIsLoading(true);
+                    axios.post(props.serverUrl + "/getFactoringCompanyById", { id: factoringCompanyId }).then(res => {
+                        setSelectedFactoringCompany(res.data.factoring_company);
+                        setSelectedFactoringCompanyContact((res.data.factoring_company.contacts || []).find(c => c.is_primary === 1) || {});
+                    }).catch(e => {
+                        console.log('error getting factoring company by id', e);
+                    }).finally(() => {
+                        setIsLoading(false);
+                        closePanel(`${props.panelName}-factoring-company-search`, props.origin);
                         refFactoringCompanyName.current.focus();
-                    } else {
-                        refFactoringCompanyCode.current.focus();
-                    }
+                    });
                 }}
             />
         }
@@ -2682,28 +2685,40 @@ const FactoringCompany = (props) => {
                                             title='Contacts'
                                             tabTimes={22000 + props.tabTimes}
                                             panelName={`${props.panelName}-contacts`}
+                                            selectedOwner={selectedFactoringCompany}
+                                            getContactsUrl='/getContactsByFactoringCompanyId'
                                             savingContactUrl='/saveFactoringCompanyContact'
                                             deletingContactUrl='/deleteFactoringCompanyContact'
                                             uploadAvatarUrl='/uploadFactoringCompanyAvatar'
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
+                                            permissionName='carrier contacts'
                                             origin={props.origin}
                                             owner='factoring-company'
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-contacts`, props.origin);
                                                 refFactoringCompanyCode.current.focus({ preventScroll: true });
                                             }}
+                                            savingCallback={(contact, contacts) => {
+                                                setSelectedFactoringCompany(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
 
-                                            contactSearchCustomer={{
-                                                ...selectedFactoringCompany,
-                                                selectedContact: {
-                                                    ...selectedFactoringCompanyContact,
-                                                    address1: (selectedFactoringCompany?.address1 || '').toLowerCase() === (selectedFactoringCompanyContact?.address1 || '').toLowerCase() ? (selectedFactoringCompany?.address1 || '') : (selectedFactoringCompanyContact?.address1 || ''),
-                                                    address2: (selectedFactoringCompany?.address2 || '').toLowerCase() === (selectedFactoringCompanyContact?.address2 || '').toLowerCase() ? (selectedFactoringCompany?.address2 || '') : (selectedFactoringCompanyContact?.address2 || ''),
-                                                    city: (selectedFactoringCompany?.city || '').toLowerCase() === (selectedFactoringCompanyContact?.city || '').toLowerCase() ? (selectedFactoringCompany?.city || '') : (selectedFactoringCompanyContact?.city || ''),
-                                                    state: (selectedFactoringCompany?.state || '').toLowerCase() === (selectedFactoringCompanyContact?.state || '').toLowerCase() ? (selectedFactoringCompany?.state || '') : (selectedFactoringCompanyContact?.state || ''),
-                                                    zip_code: (selectedFactoringCompany?.zip || '').toLowerCase() === (selectedFactoringCompanyContact?.zip_code || '').toLowerCase() ? (selectedFactoringCompany?.zip || '') : (selectedFactoringCompanyContact?.zip_code || ''),
+                                                if ((selectedFactoringCompanyContact?.id || 0) === contact.id) {
+                                                    setSelectedFactoringCompanyContact(contact);
                                                 }
                                             }}
+                                            deletingCallback={(contactId, contacts) => {
+                                                setSelectedFactoringCompany(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
+
+                                                if ((selectedFactoringCompanyContact?.id || 0) === contactId) {
+                                                    setSelectedFactoringCompanyContact({});
+                                                }
+                                            }}
+
+                                            componentId={moment().format('x')}
+                                            selectedContactId={selectedFactoringCompanyContact.id}
                                         />
                                     }
 
@@ -2725,23 +2740,40 @@ const FactoringCompany = (props) => {
                                             title='Contacts'
                                             tabTimes={22000 + props.tabTimes}
                                             panelName={`${props.panelName}-contacts`}
+                                            selectedOwner={selectedFactoringCompany}
+                                            getContactsUrl='/getContactsByFactoringCompanyId'
                                             savingContactUrl='/saveFactoringCompanyContact'
                                             deletingContactUrl='/deleteFactoringCompanyContact'
                                             uploadAvatarUrl='/uploadFactoringCompanyAvatar'
                                             removeAvatarUrl='/removeFactoringCompanyAvatar'
+                                            permissionName='carrier contacts'
                                             origin={props.origin}
                                             owner='factoring-company'
+                                            isEditingContact={true}
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-contacts`, props.origin);
                                                 refFactoringCompanyCode.current.focus({ preventScroll: true });
                                             }}
+                                            savingCallback={(contact, contacts) => {
+                                                setSelectedFactoringCompany(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
 
-                                            isEditingContact={true}
-
-                                            contactSearchCustomer={{
-                                                ...selectedFactoringCompany,
-                                                selectedContact: { id: 0, factoring_company_id: selectedFactoringCompany?.id }
+                                                if ((selectedFactoringCompanyContact?.id || 0) === contact.id) {
+                                                    setSelectedFactoringCompanyContact(contact);
+                                                }
                                             }}
+                                            deletingCallback={(contactId, contacts) => {
+                                                setSelectedFactoringCompany(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
+
+                                                if ((selectedFactoringCompanyContact?.id || 0) === contactId) {
+                                                    setSelectedFactoringCompanyContact({});
+                                                }
+                                            }}
+
+                                            componentId={moment().format('x')}
                                         />
                                     }
 
@@ -3688,21 +3720,40 @@ const FactoringCompany = (props) => {
                                                                     title='Contacts'
                                                                     tabTimes={22000 + props.tabTimes}
                                                                     panelName={`${props.panelName}-contacts`}
+                                                                    selectedOwner={selectedFactoringCompany}
+                                                                    getContactsUrl='/getContactsByFactoringCompanyId'
                                                                     savingContactUrl='/saveFactoringCompanyContact'
                                                                     deletingContactUrl='/deleteFactoringCompanyContact'
                                                                     uploadAvatarUrl='/uploadFactoringCompanyAvatar'
                                                                     removeAvatarUrl='/removeFactoringCompanyAvatar'
+                                                                    permissionName='carrier contacts'
                                                                     origin={props.origin}
                                                                     owner='factoring-company'
                                                                     closingCallback={() => {
                                                                         closePanel(`${props.panelName}-contacts`, props.origin);
-                                                                        refFactoringCompanyCode.current.focus({ preventScroll: false });
+                                                                        refFactoringCompanyCode.current.focus({ preventScroll: true });
+                                                                    }}
+                                                                    savingCallback={(contact, contacts) => {
+                                                                        setSelectedFactoringCompany(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+
+                                                                        if ((selectedFactoringCompanyContact?.id || 0) === contact.id) {
+                                                                            setSelectedFactoringCompanyContact(contact);
+                                                                        }
+                                                                    }}
+                                                                    deletingCallback={(contactId, contacts) => {
+                                                                        setSelectedFactoringCompany(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+
+                                                                        if ((selectedFactoringCompanyContact?.id || 0) === contactId) {
+                                                                            setSelectedFactoringCompanyContact({});
+                                                                        }
                                                                     }}
 
-                                                                    contactSearchCustomer={{
-                                                                        ...selectedFactoringCompany,
-                                                                        selectedContact: contact
-                                                                    }}
+                                                                    componentId={moment().format('x')}
+                                                                    selectedContactId={contact.id}
                                                                 />
                                                             }
 

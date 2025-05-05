@@ -574,7 +574,7 @@ const EquipmentInformation = (props) => {
                             onInput={e => {
                                 setEquipmentInformation({
                                     ...equipmentInformation, carrier: {
-                                        ...equipmentInformation.carrier,
+                                        ...equipmentInformation?.carrier,
                                         name: e.target.value
                                     }
                                 })
@@ -1777,14 +1777,14 @@ const EquipmentInformation = (props) => {
 
                                         refEquipment.current.focus();
                                     }}>
-                                        <div className="equipment-list-col tcol equipment">{eq.equipment.name}</div>
-                                        <div className="equipment-list-col tcol units">{eq.units}</div>
+                                        <div className="equipment-list-col tcol equipment">{eq?.name || ''}</div>
+                                        <div className="equipment-list-col tcol units">{eq?.units || ''}</div>
                                         <div
-                                            className="equipment-list-col tcol equipment_length">{(eq.equipment_length || '') === '' ? '' : eq.equipment_length + ((eq.equipment_length_unit || '') === 'ft' ? '\'' : (eq.equipment_length_unit || '') === 'in' ? '"' : '')}</div>
+                                            className="equipment-list-col tcol equipment_length">{(eq?.equipment_length || '') === '' ? '' : eq.equipment_length + ((eq.equipment_length_unit || '') === 'ft' ? '\'' : (eq.equipment_length_unit || '') === 'in' ? '"' : '')}</div>
                                         <div
-                                            className="equipment-list-col tcol equipment_width">{(eq.equipment_width || '') === '' ? '' : eq.equipment_width + ((eq.equipment_width_unit || '') === 'ft' ? '\'' : (eq.equipment_width_unit || '') === 'in' ? '"' : '')}</div>
+                                            className="equipment-list-col tcol equipment_width">{(eq?.equipment_width || '') === '' ? '' : eq.equipment_width + ((eq.equipment_width_unit || '') === 'ft' ? '\'' : (eq.equipment_width_unit || '') === 'in' ? '"' : '')}</div>
                                         <div
-                                            className="equipment-list-col tcol equipment_height">{(eq.equipment_height || '') === '' ? '' : eq.equipment_height + ((eq.equipment_height_unit || '') === 'ft' ? '\'' : (eq.equipment_height_unit || '') === 'in' ? '"' : '')}</div>
+                                            className="equipment-list-col tcol equipment_height">{(eq?.equipment_height || '') === '' ? '' : eq.equipment_height + ((eq.equipment_height_unit || '') === 'ft' ? '\'' : (eq.equipment_height_unit || '') === 'in' ? '"' : '')}</div>
                                         <div className="equipment-list-col tcol equipment-selected">
 
                                             {

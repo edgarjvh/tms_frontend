@@ -8,3 +8,4 @@ export * from './dispatchActions';
 export * from './loadBoardActions';
 export * from './companySetupActions';
 export * from './reportsActions';
+export * from './userActions';

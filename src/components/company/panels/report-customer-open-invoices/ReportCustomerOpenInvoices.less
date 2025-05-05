@@ -1,0 +1,443 @@
+.order-fields-container.report-customer-open-invoices {
+  display       : flex;
+  flex-direction: column;
+  margin        : 20px 0 15px;
+  flex-grow     : 0 !important;
+
+  .search-fields{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto 5rem;
+      grid-template-rows: 1fr 1fr;
+      align-items: center !important;
+      grid-gap: 0.2rem;
+
+      .select-box-container{
+          margin-right: 0 !important;
+           &.date{
+               input{
+                  padding-right: 20px;
+               }
+           }
+      }
+
+      .input-code{
+          width: unset !important;
+      }
+
+      .button-container{
+          display: flex;
+          justify-content: space-evenly;
+      }
+
+      > div{
+          align-items: center;
+      }
+
+      input{
+          text-align: right;
+          font-weight: bold;
+      }
+  }
+
+  .row-fields {
+      display      : flex;
+      margin-bottom: 5px;
+
+      .input-box-container:not(:last-child) {
+          margin-right: 2px;
+      }
+
+      .input-box-container.date {
+          width: 8rem;
+      }
+
+      .input-box-container.city {
+          flex-grow: 1;
+      }
+
+      .input-box-container.state {
+          width: 8rem;
+      }
+
+      .input-box-container.zip {
+          width: 8rem;
+      }
+
+      .input-box-container.input-code {
+          width         : 8rem;
+          text-transform: uppercase;
+      }
+
+      .button-container {
+          width                : 8rem;
+          display              : grid;
+          grid-template-columns: 1fr 1fr;
+
+          >div {
+              display        : flex;
+              justify-content: center;
+              align-items    : center;
+
+              .mochi-button {
+                  display: flex;
+              }
+          }
+      }
+  }    
+}
+
+.order-info-container.report-customer-open-invoices {
+  flex-grow     : 1;
+  display       : flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+
+  .form-bordered-box {
+      flex-grow: 1;
+      padding  : 0;
+
+      .form-header{
+          z-index: 3;
+      }
+
+      .no-orders-found {
+          position      : absolute;
+          top           : 50%;
+          left          : 50%;
+          transform     : translate(-50%, -50%);
+          text-transform: uppercase;
+          color         : rgba(0, 0, 0, 0.5)
+      }
+
+      .order-info-header {    
+          justify-self: flex-start;
+          position    : relative;
+          height      : 35px;
+
+          &::before {
+              content      : '';
+              position     : absolute;
+              height       : 10px;
+              width        : 100%;
+              box-shadow   : 0 0 7px 1px rgba(0, 0, 0, 1);
+              z-index      : 1;
+              bottom       : 0;
+              left         : 0;
+              border-radius: 100%;
+          }
+
+          .order-info-header-wrapper {
+              position             : absolute;
+              width                : 100%;
+              height               : 100%;
+              top                  : 1px;
+              left                 : 0;
+              display              : grid;
+              grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+              z-index              : 2;
+              background           : rgb(255, 255, 255);
+              /* Old browsers */
+              background           : -moz-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* FF3.6-15 */
+              background           : -webkit-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* Chrome10-25,Safari5.1-6 */
+              background           : radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+              filter               : progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
+              /* IE6-9 fallback on horizontal gradient */
+
+              .order-info-col {
+                  text-align     : center;
+                  font-size      : 0.9rem;
+                  font-weight    : bold;
+                  text-decoration: underline;
+                  font-style     : italic;
+                  white-space    : nowrap;
+                  padding        : 10px;
+
+                  &.order-totals {
+                      font-weight: bold;
+                  }
+              }
+          }
+      }
+
+      .order-info-footer {
+          justify-self: flex-end;
+          position    : relative;
+          height      : 35px;
+
+          &::before {
+              content      : '';
+              position     : absolute;
+              height       : 10px;
+              width        : 100%;
+              box-shadow   : 0 0 7px 1px rgba(0, 0, 0, 1);
+              z-index      : 1;
+              top          : 0;
+              left         : 0;
+              border-radius: 100%;
+          }
+
+          .order-info-footer-wrapper {
+              position             : absolute;
+              width                : 100%;
+              height               : 100%;
+              top                  : 0;
+              left                 : 0;
+              display              : grid;
+              grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+              z-index              : 2;
+              background           : rgb(255, 255, 255);
+              /* Old browsers */
+              background           : -moz-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* FF3.6-15 */
+              background           : -webkit-radial-gradient(center, ellipse cover, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* Chrome10-25,Safari5.1-6 */
+              background           : radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 18%, rgba(255, 255, 255, 1) 18%, rgba(211, 211, 211, 1) 100%);
+              /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+              filter               : progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#d3d3d3', GradientType=1);
+              /* IE6-9 fallback on horizontal gradient */
+
+              .order-info-col {
+                  text-align: center;
+                  font-size : 0.9rem;
+                  padding   : 10px;
+
+                  &.order-totals {
+                      font-weight: bold;
+                  }
+              }
+          }
+      }
+
+      .order-info-wrapper {
+          position  : absolute;
+          width     : 100%;
+          height    : calc(100% - 65px);
+          top       : 40px;
+          left      : 0;
+          overflow-y: auto;
+          padding   : 5px 0;
+          
+          .customer-container {
+              margin-bottom: 10px;
+
+              &:first-child {
+                  margin-top: 5px;
+              }
+
+              .customer-info {
+                  font-size       : 0.9rem;
+                  font-weight     : bold;
+                  padding         : 3px 10px;
+                  background-color: rgba(0, 0, 0, 0.2);
+                  color           : rgba(0, 0, 0, 0.7);
+
+                  span:not(:first-child) {
+                      margin: 0 10px;
+                  }
+
+                  span:first-child {
+                      font-weight: normal;
+                      color      : black;
+                  }
+
+                  span.customer-bill-to-code{
+                      cursor: pointer;
+
+                      &:hover{
+                          text-decoration: underline;
+                      }
+                  }
+              }
+
+              .customer-orders{
+                  //-webkit-transition: max-height 0.5s ease-in-out;
+                  //-moz-transition: max-height 0.5s ease-in-out;
+                  //-o-transition: max-height 0.5s ease-in-out;
+                  //-ms-transition: max-height 0.5s ease-in-out;
+                  //transition: max-height 0.5s ease-in-out;
+                  overflow: hidden;
+                  max-height: 50000px;
+
+                  &.hidden{
+                      max-height: 0px;
+                  }
+
+                  .year-container{
+                      width: 100%;
+
+                      &:not(:first-child){
+                          .year-info{
+                              margin-top: 5px;
+                          }
+                      }
+
+                      .year-info{
+                          text-align: left;
+                          padding: 2px 10px;
+                          font-size: 0.8rem;
+                          font-weight: bold;
+                          background-color: rgba(0, 0, 0, 0.1);
+                          display: flex;
+                          align-items: center;
+                          box-shadow: 0 1px 2px 1px rgba(0,0,0,0.5);
+
+                      }
+
+                      .year-orders{
+                          overflow: hidden;
+                          max-height: 50000px;
+
+                          &.hidden{
+                              max-height: 0px;
+                          }
+
+                          .month-container{
+                              width: 100%;
+
+                              &:not(:first-child){
+                                  .month-info{
+                                      margin-top: 5px;
+                                  }
+                              }
+
+                              .month-info{
+                                  text-align: center;
+                                  padding: 0 10px;
+                                  font-size: 0.8rem;
+                                  background-color: rgba(0, 0, 0, 0.05);
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                              }
+
+                              .month-orders{
+                                  overflow: hidden;
+                                  max-height: 50000px;
+
+                                  &.hidden{
+                                      max-height: 0px;
+                                  }
+
+                                  .date-group-order-item {
+                                      display              : grid;
+                                      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
+                                      cursor               : default;
+                                      transition           : ease 0.3s;
+                                      border-bottom        : 1px solid rgba(0, 0, 0, 0.1);
+
+                                      &.cancelled {
+                                          background-color: rgba(255, 0, 0, 0.3);
+                                      }
+
+                                      &:hover {
+                                          background-color: rgba(96, 171, 248, 0.3);
+                                      }
+
+                                      .order-info-col {
+                                          text-align: center;
+                                          font-size : 0.9rem;
+                                          padding   : 10px;
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+
+              //.customer-orders {
+              //    display: flex;
+              //    flex-direction: column;
+              //
+              //    .date-group-info{
+              //        text-align: center;
+              //        font-size: 0.8rem;
+              //        background-color: rgba(0, 0, 0, 0.05);
+              //
+              //    }
+              //
+              //    .date-group-orders{
+              //
+              //
+              //        .date-group-totals{
+              //            display              : grid;
+              //            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+              //
+              //            .order-info-col {
+              //                text-align: center;
+              //                font-size : 0.9rem;
+              //                padding   : 10px;
+              //            }
+              //        }
+              //    }
+              //
+              //
+              //}
+
+              .customer-totals {
+                  display              : grid;
+                  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+                  font-size            : 0.9rem;
+                  padding              : 2px 0;
+                  margin-top           : 5px;
+                  background-color: rgba(43,193,255,0.3);
+
+                  .order-info-col {
+                      text-align : center;
+                      font-size  : 0.9rem;
+                      font-weight: bold;
+
+                      &:first-child{
+                          text-align : left;
+                          padding-left: 10px;
+                      }
+                  }
+              }
+
+              .year-totals {
+                  display              : grid;
+                  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+                  font-size            : 0.9rem;
+                  padding              : 2px 0;
+                  margin-top           : 5px;
+                  background-color: rgba(0, 0, 0, 0.1);
+
+                  .order-info-col {
+                      text-align : center;
+                      font-size  : 0.9rem;
+                      font-weight: bold;
+
+                      &:first-child{
+                          text-align : center;
+                          padding-left: 10px;
+                      }
+                  }
+              }
+
+              .month-totals {
+                  display              : grid;
+                  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+                  font-size            : 0.9rem;
+                  padding              : 2px 0;
+                  margin-top           : 5px;
+                  background-color: rgba(0, 0, 0, 0.05);
+
+                  .order-info-col {
+                      text-align : center;
+                      font-size  : 0.9rem;
+                      font-weight: bold;
+
+                      &:first-child{
+                          text-align : center;
+                          padding-left: 10px;
+                      }
+                  }
+              }
+          }
+      }
+  }
+}
+

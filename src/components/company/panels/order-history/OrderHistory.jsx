@@ -1565,7 +1565,7 @@ const OrderHistory = (props) => {
                 </div>
 
             </div>
-            <div className="order-info-container">
+            <div className="order-info-container order-history">
                 <div className="form-bordered-box" style={{
                     backgroundColor: (orders || []).length > 0 ? 'rgba(0,0,0,0.1)' : 'transparent'
                 }}>

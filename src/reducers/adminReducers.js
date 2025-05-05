@@ -19,7 +19,8 @@ export const adminReducers = (state = {
     setupCompanyScreenFocused: false,
     invoiceScreenFocused: false,
     adminOpenedPanels: [],
-    adminHomePanels: []
+    adminHomePanels: [],
+    adminSuperOrigin: ''
 }, action) => {
     switch (action.type) {
         case adminConstants.SET_ADMIN_OPENED_PANELS:
@@ -114,7 +115,7 @@ export const adminReducers = (state = {
                 invoiceScreenFocused: action.payload ? false : state.invoiceScreenFocused,
             }
             break;
-            case adminConstants.SET_INVOICE_SCREEN_FOCUSED:
+        case adminConstants.SET_INVOICE_SCREEN_FOCUSED:
             state = {
                 ...state,
                 invoiceScreenFocused: action.payload,
@@ -126,17 +127,25 @@ export const adminReducers = (state = {
                 setupCompanyScreenFocused: action.payload ? false : state.setupCompanyScreenFocused,
             }
             break;
-            case adminConstants.SET_ADMIN_HOME_PANELS:
+        case adminConstants.SET_ADMIN_HOME_PANELS:
             state = {
                 ...state,
                 adminHomePanels: (action.payload || []).map(item => {
-                    if (!item?.right){
+                    if (!item?.right) {
                         item.right = 0
                     }
                     return item;
                 })
             }
             break;
+
+        case adminConstants.SET_ADMIN_SUPER_ORIGIN:
+            state = {
+                ...state,
+                adminSuperOrigin: action.payload
+            }
+            break;
+
         default:
             break;
     }

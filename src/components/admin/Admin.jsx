@@ -4,12 +4,12 @@ import './Admin.css';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import { useTransition, animated } from 'react-spring';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
 import { useDetectClickOutside } from "react-detect-click-outside";
 import Draggable from 'react-draggable';
 import axios from 'axios';
-import moment from 'moment';
+
+import { useHotkeys, useHotkeysContext } from 'react-hotkeys-hook';
 
 import {
     setMainScreen,
@@ -179,8 +179,11 @@ import {
     setAdminDispatchPanels
 } from '../../actions/dispatchActions';
 
+import { setAdminSuperOrigin } from '../../actions/adminActions';
+
 import { Dispatch, Customers, Carriers, Reports, Invoice } from './../company';
 import { AdminHome, CompanySetup } from './';
+import PersonalContacts from '../company/panels/personal-contacts/PersonalContacts';
 
 function Admin(props) {
     const [chatOptionItems, setChatOptionItems] = useState([
@@ -226,11 +229,78 @@ function Admin(props) {
         'is-showing': props.mainScreen === 'admin'
     })
 
+    const { enableScope, disableScope } = useHotkeysContext();
+
     const userClick = () => {
         props.setMainScreen('company');
+        enableScope('company');
+        disableScope('admin');
     }
 
-    const homehBtnClick = async () => {
+    useHotkeys('alt+u', () => {
+        userClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+h', () => {
+        homeBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+c', () => {
+        customersBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+a', () => {
+        carriersBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+d', () => {
+        dispatchBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+s', () => {
+        companySetupBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+i', () => {
+        invoiceBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+r', () => {
+        reportsBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    useHotkeys('alt+o', () => {
+        openPersonalContactsPanel();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['admin']
+    })
+
+    const homeBtnClick = async () => {
         let curPages = props.pages;
 
         if (curPages.indexOf('admin home') === -1) {
@@ -242,6 +312,7 @@ function Admin(props) {
         }
 
         props.setMainAdminScreenFocused(true);
+        props.setAdminSuperOrigin('admin-home');
     }
 
     const dispatchBtnClick = async () => {
@@ -256,6 +327,7 @@ function Admin(props) {
         }
 
         props.setDispatchScreenFocused(true);
+        props.setAdminSuperOrigin('admin-dispatch');
     }
 
     const customersBtnClick = async () => {
@@ -270,6 +342,7 @@ function Admin(props) {
         }
 
         props.setCustomerScreenFocused(true);
+        props.setAdminSuperOrigin('admin-customer');
     }
 
     const carriersBtnClick = async () => {
@@ -284,6 +357,7 @@ function Admin(props) {
         }
 
         props.setCarrierScreenFocused(true);
+        props.setAdminSuperOrigin('admin-carrier');
     }
 
     const invoiceBtnClick = async () => {
@@ -298,6 +372,7 @@ function Admin(props) {
         }
 
         props.setInvoiceScreenFocused(true);
+        props.setAdminSuperOrigin('admin-invoice');
     }
 
     const reportsBtnClick = async () => {
@@ -312,6 +387,7 @@ function Admin(props) {
         }
 
         props.setReportsScreenFocused(true);
+        props.setAdminSuperOrigin('admin-report');
     }
 
     const companySetupBtnClick = async () => {
@@ -326,6 +402,7 @@ function Admin(props) {
         }
 
         props.setSetupCompanyScreenFocused(true);
+        props.setAdminSuperOrigin('admin-company-setup');
     }
 
     const adminHomePanelTransition = useTransition(props.adminHomePanels, {
@@ -663,141 +740,105 @@ function Admin(props) {
                 props.setAdminReportPanels([...props.adminReportPanels, panel]);
             }
         }
+
+        if (origin === 'company-home') {
+            if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyHomePanels([...props.companyHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-carrier') {
+            if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-customer') {
+            if (props.companyCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyCustomerPanels([...props.companyCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-dispatch') {
+            if (props.companyDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyDispatchPanels([...props.companyDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-invoice') {
+            if (props.companyInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyInvoicePanels([...props.companyInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'company-load-board') {
+            if (props.companyLoadBoardPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyLoadBoardPanels([...props.companyLoadBoardPanels, panel]);
+            }
+        }
+
+        if (origin === 'company-report') {
+            if (props.companyReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setCompanyReportPanels([...props.companyReportPanels, panel]);
+            }
+        }
     }
 
     const closePanel = (panelName, origin) => {
         if (origin === 'admin-home') {
-            let currentAdminHomePanels = [...props.adminHomePanels.filter(panel => panel.panelName !== panelName)];
             props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
-
-            let adminHomePanelsLength = currentAdminHomePanels.length;
-
-            if (adminHomePanelsLength > 0) {
-                let lastPanelName = currentAdminHomePanels[adminHomePanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminHomePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
         }
 
         if (origin === 'admin-carrier') {
-            let currentAdminCarrierPanels = [...props.adminCarrierPanels.filter(panel => panel.panelName !== panelName)];
-            props.setAdminCarrierPanels(currentAdminCarrierPanels);
-
-            let adminCarrierPanelsLength = currentAdminCarrierPanels.length;
-
-            if (adminCarrierPanelsLength > 0) {
-                let lastPanelName = currentAdminCarrierPanels[adminCarrierPanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminCarrierPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refAdminCarrierCode?.current) {
-                    refAdminCarrierCode.current.focus();
-                }
-            }
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'admin-company-setup') {
-            let currentAdminCompanySetupPanels = [...props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName)];
-            props.setAdminCompanySetupPanels(currentAdminCompanySetupPanels);
-
-            let adminCompanySetupPanelsLength = currentAdminCompanySetupPanels.length;
-
-            if (adminCompanySetupPanelsLength > 0) {
-                let lastPanelName = currentAdminCompanySetupPanels[adminCompanySetupPanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminCompanySetupPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'admin-customer') {
-            let currentAdminCustomerPanels = [...props.adminCustomerPanels.filter(panel => panel.panelName !== panelName)];
-            props.setAdminCustomerPanels(currentAdminCustomerPanels);
-
-            let adminCustomerPanelsLength = currentAdminCustomerPanels.length;
-
-            if (adminCustomerPanelsLength > 0) {
-                let lastPanelName = currentAdminCustomerPanels[adminCustomerPanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminCustomerPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refAdminCustomerCode?.current) {
-                    refAdminCustomerCode.current.focus();
-                }
-            }
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'admin-dispatch') {
-            let currentAdminDispatchPanels = [...props.adminDispatchPanels.filter(panel => panel.panelName !== panelName)];
-            props.setAdminDispatchPanels(currentAdminDispatchPanels);
-
-            let adminDispatchPanelsLength = currentAdminDispatchPanels.length;
-
-            if (adminDispatchPanelsLength > 0) {
-                let lastPanelName = currentAdminDispatchPanels[adminDispatchPanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminDispatchPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refAdminDispatchOrderNumber?.current) {
-                    refAdminDispatchOrderNumber.current.focus();
-                }
-            }
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'admin-invoice') {
-            let currentAdminInvoicePanels = [...props.adminInvoicePanels.filter(panel => panel.panelName !== panelName)];
-            props.setAdminInvoicePanels(currentAdminInvoicePanels);
-
-            let adminInvoicePanelsLength = currentAdminInvoicePanels.length;
-
-            if (adminInvoicePanelsLength > 0) {
-                let lastPanelName = currentAdminInvoicePanels[adminInvoicePanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminInvoicePanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refAdminInvoiceOrderNumber?.current) {
-                    refAdminInvoiceOrderNumber.current.focus();
-                }
-            }
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'admin-report') {
-            let currentAdminReportPanels = [...props.adminReportPanels.filter(panel => panel.panelName !== panelName)];
             props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
 
-            let adminReportPanelsLength = currentAdminReportPanels.length;
+        if (origin === 'company-home') {
+            props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
+        }
 
-            if (adminReportPanelsLength > 0) {
-                let lastPanelName = currentAdminReportPanels[adminReportPanelsLength - 1]?.panelName || '';
-                let refEl = (refAdminReportsPanels.current || []).find(x => x.id === `${origin}-panel-${lastPanelName}`);
+        if (origin === 'company-carrier') {
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
 
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
+        if (origin === 'company-customer') {
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-dispatch') {
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-invoice') {
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-load-board') {
+            props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'company-report') {
+            props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
         }
     }
 
@@ -810,6 +851,25 @@ function Admin(props) {
         'screen-content': true,
         'pro': true
     })
+
+    const openPersonalContactsPanel = () => {
+        let panel = {
+            panelName: `${props.panelName}-personal-contacts`,
+            component: <PersonalContacts
+                title='Personal Contacts'
+                tabTimes={moment().unix() + props.tabTimes}
+                panelName={`${props.panelName}-personal-contacts`}
+                origin={props.adminSuperOrigin}
+                owner='user'
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-personal-contacts`, props.adminSuperOrigin);
+                }}
+                componentId={moment().format('x')}
+            />
+        }
+
+        openPanel(panel, props.adminSuperOrigin);
+    }
 
     return (
         <div className={containerCls}>
@@ -882,6 +942,14 @@ function Admin(props) {
                                 <div className="mochi-button-base">Video</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
+
+                            <div className="mochi-button" onClick={() => {
+                                openPersonalContactsPanel();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Contacts</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
                         </div>
                         <div className="section">
                             <div className="mochi-input-decorator">
@@ -892,7 +960,7 @@ function Admin(props) {
                             <div className={classnames({
                                 'mochi-button': true,
                                 'screen-focused': props.mainAdminScreenFocused
-                            })} onClick={homehBtnClick}>
+                            })} onClick={homeBtnClick}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Home</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1618,7 +1686,9 @@ const mapStateToProps = state => {
         adminCustomerPanels: state.customerReducers.adminCustomerPanels,
         adminDispatchPanels: state.dispatchReducers.adminDispatchPanels,
         adminInvoicePanels: state.invoiceReducers.adminInvoicePanels,
-        adminReportPanels: state.reportReducers.adminReportPanels
+        adminReportPanels: state.reportReducers.adminReportPanels,
+
+        adminSuperOrigin: state.adminReducers.adminSuperOrigin,
     }
 }
 
@@ -1720,5 +1790,7 @@ export default connect(mapStateToProps, {
     setAdminCustomerPanels,
     setAdminDispatchPanels,
     setAdminInvoicePanels,
-    setAdminReportPanels
+    setAdminReportPanels,
+
+    setAdminSuperOrigin
 })(Admin)

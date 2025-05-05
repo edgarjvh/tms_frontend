@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux';
 import Company from './company/Company.jsx';
 import Admin from './admin/Admin.jsx';
@@ -16,6 +16,7 @@ import {
     setMainScreen,
     setLoginMessage
 } from './../actions';
+import { HotkeysProvider } from 'react-hotkeys-hook';
 
 function Root(props) {
     const [isLoading, setIsLoading] = useState(true);
@@ -28,9 +29,9 @@ function Root(props) {
     });
 
     useEffect(() => {
-        function checkUser(){
-            axios.post(props.serverUrl + '/getCompanyById', {id: props.companyId}).then(async res => {
-                if (res.data.result === 'OK'){
+        function checkUser() {
+            axios.post(props.serverUrl + '/getCompanyById', { id: props.companyId }).then(async res => {
+                if (res.data.result === 'OK') {
                     props.setSelectedCompany(res.data.company);
 
                     axios.get(props.serverUrl + '/user', {
@@ -48,10 +49,10 @@ function Root(props) {
                 }
             }).catch(error => {
                 console.log(error)
-            });            
+            });
         }
 
-        checkUser();        
+        checkUser();
     }, []);
 
     const rootCls = classnames({
@@ -75,7 +76,7 @@ function Root(props) {
                     <animated.div className='loading-container' style={style} >
                         <div className="loading-container-wrapper">
                             <Loader type="Circles" color="#009bdd" height={40} width={40} visible={item} />
-                            <div style={{marginLeft: 10}}>Loading System Data...</div>
+                            <div style={{ marginLeft: 10 }}>Loading System Data...</div>
                         </div>
                     </animated.div>
                 )
@@ -85,12 +86,14 @@ function Root(props) {
                 !isLoading ?
                     ((props.user?.id || 0) > 0)
                         ?
+                        <HotkeysProvider initiallyActiveScopes={['company']}>
                             <div>
                                 <Company className={companyClasses} />
                                 <Admin className={adminClasses} />
                             </div>
+                        </HotkeysProvider>
                         :
-                            <Login />
+                        <Login />
                     : ''
             }
 
@@ -102,7 +105,7 @@ function Root(props) {
                     opacity: 0.1,
                     transform: 'scale(1.5)'
 
-                }}/>
+                }} />
             }
         </div>
     )

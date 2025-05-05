@@ -838,7 +838,7 @@ const LoadBoard = (props) => {
             onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                     e.stopPropagation();
-                    if (props.isOnPanel){
+                    if (props.isOnPanel) {
                         props.closingCallback();
                     }
                 }
@@ -2332,27 +2332,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.bol_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedShipperCustomer?.bol_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={30 + props.tabTimes} type="text"
+                                                                    placeholder="BOL Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedShipperCustomer?.bol_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                     <div style={{
@@ -2363,27 +2370,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.po_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedShipperCustomer?.po_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={31 + props.tabTimes} type="text"
+                                                                    placeholder="PO Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedShipperCustomer?.po_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                 </div>
@@ -2392,27 +2406,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedShipperCustomer?.ref_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedShipperCustomer?.ref_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={32 + props.tabTimes} type="text"
+                                                                    placeholder="Ref Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedShipperCustomer?.ref_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                     <div style={{
@@ -2713,27 +2734,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedConsigneeCustomer?.bol_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedConsigneeCustomer?.bol_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={49 + props.tabTimes} type="text"
+                                                                    placeholder="BOL Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedConsigneeCustomer?.bol_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                     <div style={{
@@ -2744,27 +2772,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedConsigneeCustomer?.po_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedConsigneeCustomer?.po_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={50 + props.tabTimes} type="text"
+                                                                    placeholder="PO Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedConsigneeCustomer?.po_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                 </div>
@@ -2773,27 +2808,34 @@ const LoadBoard = (props) => {
                                                     <div className="input-box-container grow"
                                                         style={{ flexGrow: 1, flexBasis: '100%' }}>
                                                         {
-                                                            (selectedConsigneeCustomer?.ref_numbers || '').split('|').map((item, index) => {
-                                                                if (item.trim() !== '') {
-                                                                    return (
-                                                                        <div key={index} style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            fontSize: '0.6rem',
-                                                                            backgroundColor: 'rgba(0,0,0,0.2)',
-                                                                            padding: '1px 5px',
-                                                                            borderRadius: '10px',
-                                                                            marginRight: '2px',
-                                                                            cursor: 'default'
-                                                                        }} title={item}>
-                                                                            <span className="automatic-email-inputted"
-                                                                                style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
-                                                                        </div>
-                                                                    )
-                                                                } else {
-                                                                    return false;
-                                                                }
-                                                            })
+                                                            (selectedConsigneeCustomer?.ref_numbers || '').trim().replace('|', '') === ''
+                                                                ? <input tabIndex={51 + props.tabTimes} type="text"
+                                                                    placeholder="Ref Numbers"
+                                                                    onChange={e => {
+                                                                    }}
+                                                                    value={''}
+                                                                />
+                                                                : (selectedConsigneeCustomer?.ref_numbers || '').split('|').map((item, index) => {
+                                                                    if (item.trim() !== '') {
+                                                                        return (
+                                                                            <div key={index} style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontSize: '0.6rem',
+                                                                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                                                                padding: '1px 5px',
+                                                                                borderRadius: '10px',
+                                                                                marginRight: '2px',
+                                                                                cursor: 'default'
+                                                                            }} title={item}>
+                                                                                <span className="automatic-email-inputted"
+                                                                                    style={{ whiteSpace: 'nowrap' }}>{item.toLowerCase()}</span>
+                                                                            </div>
+                                                                        )
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+                                                                })
                                                         }
                                                     </div>
                                                     <div style={{

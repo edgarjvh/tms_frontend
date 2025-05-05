@@ -199,6 +199,7 @@
 }
 .mochi-button-warning > .mochi-button-base {
   color: #ff4a4a;
+  user-select: none !important;
 }
 .mochi-button:active:hover:not([disabled]).mochi-button-warning > .mochi-button-bar {
   background-color: #ff4a4a;
@@ -212,12 +213,14 @@
   padding: 0px;
   line-height: inherit;
   font-size: 70%;
+  user-select: none !important;
 }
 .mochi-view-select-button > .mochi-button-base {
   height: 34px;
   line-height: 34px;
   vertical-align: middle;
   font-size: inherit;
+  user-select: none !important;
 }
 .mochi-button-base {
   display: inline-block;
@@ -235,6 +238,7 @@
   height: initial;
   text-transform: none;
   text-align: center;
+  user-select: none !important;
   -webkit-transition: letter-spacing 0.1s ease-in-out;
   -moz-transition: letter-spacing 0.1s ease-in-out;
   -o-transition: letter-spacing 0.1s ease-in-out;
@@ -244,6 +248,7 @@
 .mochi-button-base.wrap {
   white-space: normal !important;
   text-align: center;
+  user-select: none !important;
 }
 /* ButtonColors.css */
 .mochi-button-affirmative > .mochi-button-base,

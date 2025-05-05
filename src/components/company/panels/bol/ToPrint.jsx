@@ -365,7 +365,15 @@ export default class ToPrint extends Component {
                                     alignItems: 'center',
                                     padding: 5
                                 }}>
-                                    <span style={{ marginRight: 5 }}>Carrier Name: </span> <span style={{ fontWeight: 'normal' }}>{(this.props.selectedOrder?.carrier?.name || '')}</span>
+                                    <span style={{ marginRight: 5 }}>Carrier Name: </span>
+                                    <span style={{ fontWeight: 'normal' }}>{(this.props.selectedOrder?.carrier?.name || '')}</span>
+                                    {
+                                        (this.props.selectedOrder?.carrier?.mc_number || '') !== ''
+                                            ? <span style={{ marginLeft: 5, fontWeight: 'normal', fontStyle: 'italic' }}>MC# {this.props.selectedOrder?.carrier?.mc_number}</span>
+                                            : (this.props.selectedOrder?.carrier?.dot_number || '') !== ''
+                                                ? <span style={{ marginLeft: 5, fontWeight: 'normal', fontStyle: 'italic' }}>DOT# {this.props.selectedOrder?.carrier?.dot_number}</span>
+                                                : ''
+                                    }
                                 </div>
                                 <div style={{ ...this.styleFieldData, padding: 10 }}>
                                     <div style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

@@ -49,7 +49,8 @@ import {
     setCompanyReportPanels,
 
     setSelectedCompany,
-    setSelectedCompanyDriver as setSelectedDriver
+    setSelectedCompanyDriver as setSelectedDriver,
+    setSelectedOrder
 } from './../../../../actions';
 
 import {
@@ -57,7 +58,8 @@ import {
     Calendar,
     Contacts,
     Modal as AgentModal,
-    CustomerSearch, ContactSearch, RevenueInformation, OrderHistory
+    CustomerSearch, ContactSearch, RevenueInformation, OrderHistory,
+    ACHWiringInfo
 } from './../../../company/panels';
 
 import { MainForm } from './../../../company/forms';
@@ -74,6 +76,7 @@ const Agents = (props) => {
     const [selectedAgent, setSelectedAgent] = useState({});
     const [selectedContact, setSelectedContact] = useState({});
     const [selectedPrimaryContact, setSelectedPrimaryContact] = useState({});
+    const [showingACHWiringInfo, setShowingACHWiringInfo] = useState(false);
 
     const [selectedNote, setSelectedNote] = useState({});
 
@@ -308,6 +311,14 @@ const Agents = (props) => {
         reverse: divisionItems.length > 0
     });
 
+    const achWiringInfoTransition = useTransition(showingACHWiringInfo, {
+        from: { opacity: 0 },
+        enter: { opacity: 1 },
+        leave: { opacity: 0 },
+        reverse: showingACHWiringInfo,
+        config: { duration: 100 },
+    });
+
     const handledPrintAgentInformation = useReactToPrint({
         // pageStyle: () => {
         //     return `
@@ -369,6 +380,8 @@ const Agents = (props) => {
             axios.post(props.serverUrl + '/getAgentById', { id: props.selectedAgent.id }).then(res => {
                 setSelectedAgent({ ...(res.data.agent || {}) });
                 setSelectedContact({ ...((res.data.agent?.contacts || []).find(c => c.is_primary === 1) || {}) });
+
+                getAgentOrders(res.data.agent);
                 setIsLoading(false);
             }).catch(e => {
                 console.log('error getting agent', e);
@@ -536,6 +549,12 @@ const Agents = (props) => {
                             ...props.selectedCompany,
                             agents: res.data.agents
                         })
+
+                        props.setSelectedOrder({
+                            agent_code: selectedAgent.code,
+                            agent_pay_brokerage: selectedAgent.agent_pay_brokerage,
+                            agent_pay_et3: selectedAgent.agent_pay_et3
+                        })
                     }
 
                     setIsSavingAgent(false);
@@ -579,7 +598,7 @@ const Agents = (props) => {
                 selectedContact.zip_code = selectedAgent?.zip;
             }
 
-            axios.post(props.serverUrl + '/saveAgentContact', selectedContact).then(res => {
+            axios.post(props.serverUrl + '/saveAgentContact', { ...selectedContact, owner_id: selectedAgent.id }).then(res => {
                 if (res.data.result === 'OK') {
                     let mailing_contact = selectedAgent?.mailing_address?.mailing_contact || {};
 
@@ -1986,6 +2005,19 @@ const Agents = (props) => {
                         <div className="form-title">Mailing Address</div>
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
+                            <div className="mochi-button"
+                                onClick={() => {
+                                    if ((selectedAgent?.id || 0) > 0) {
+                                        setShowingACHWiringInfo(true);
+                                    } else {
+                                        window.alert("You must select an agent first!");
+                                    }
+                                }}
+                            >
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">ACH/Wiring Info</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
                             <div className="mochi-button" onClick={remitToAddressBtn}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Remit to address is the same</div>
@@ -4069,6 +4101,8 @@ const Agents = (props) => {
                                             title='Contacts'
                                             tabTimes={22000 + props.tabTimes}
                                             panelName={`${props.panelName}-contacts`}
+                                            selectedOwner={selectedAgent}
+                                            getContactsUrl='/getContactsByAgentId'
                                             savingContactUrl='/saveAgentContact'
                                             deletingContactUrl='/deleteAgentContact'
                                             uploadAvatarUrl='/uploadAgentContactAvatar'
@@ -4079,23 +4113,27 @@ const Agents = (props) => {
                                                 closePanel(`${props.panelName}-contacts`, props.origin);
                                                 refAgentCode.current.focus({ preventScroll: true });
                                             }}
+                                            savingCallback={(contact, contacts) => {
+                                                setSelectedAgent(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
 
-                                            componentId={moment().format('x')}
-
-                                            contactSearchCustomer={{
-                                                ...selectedAgent,
-                                                selectedContact: {
-                                                    ...selectedContact,
-                                                    address1: (selectedAgent?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedAgent?.address1 || '') : (selectedContact?.address1 || ''),
-                                                    address2: (selectedAgent?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedAgent?.address2 || '') : (selectedContact?.address2 || ''),
-                                                    city: (selectedAgent?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedAgent?.city || '') : (selectedContact?.city || ''),
-                                                    state: (selectedAgent?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedAgent?.state || '') : (selectedContact?.state || ''),
-                                                    zip_code: (selectedAgent?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedAgent?.zip || '') : (selectedContact?.zip_code || ''),
+                                                if ((selectedContact?.id || 0) === contact.id) {
+                                                    setSelectedContact(contact);
                                                 }
                                             }}
-                                            selectedAgent={selectedAgent}
-                                            setSelectedAgent={setSelectedAgent}
-                                            setSelectedAgentContact={setSelectedContact}
+                                            deletingCallback={(contactId, contacts) => {
+                                                setSelectedAgent(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
+
+                                                if ((selectedContact?.id || 0) === contactId) {
+                                                    setSelectedContact({});
+                                                }
+                                            }}
+
+                                            componentId={moment().format('x')}
+                                            selectedContactId={selectedContact?.id}
                                         />
                                     }
 
@@ -4117,28 +4155,39 @@ const Agents = (props) => {
                                             title='Contacts'
                                             tabTimes={22000 + props.tabTimes}
                                             panelName={`${props.panelName}-contacts`}
+                                            selectedOwner={selectedAgent}
+                                            getContactsUrl='/getContactsByAgentId'
                                             savingContactUrl='/saveAgentContact'
                                             deletingContactUrl='/deleteAgentContact'
                                             uploadAvatarUrl='/uploadAgentContactAvatar'
                                             removeAvatarUrl='/removeDivisioContactAvatar'
                                             origin={props.origin}
+                                            isEditingContact={true}
                                             owner='agent'
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-contacts`, props.origin);
                                                 refAgentCode.current.focus({ preventScroll: true });
                                             }}
+                                            savingCallback={(contact, contacts) => {
+                                                setSelectedAgent(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
 
-                                            componentId={moment().format('x')}
-                                            isEditingContact={true}
+                                                if ((selectedContact?.id || 0) === contact.id) {
+                                                    setSelectedContact(contact);
+                                                }
+                                            }}
+                                            deletingCallback={(contactId, contacts) => {
+                                                setSelectedAgent(prev => {
+                                                    return { ...prev, contacts: contacts }
+                                                })
 
-                                            contactSearchCustomer={{
-                                                ...selectedAgent,
-                                                selectedContact: { id: 0, agent_id: selectedAgent?.id }
+                                                if ((selectedContact?.id || 0) === contactId) {
+                                                    setSelectedContact({});
+                                                }
                                             }}
 
-                                            selectedAgent={selectedAgent}
-                                            setSelectedAgent={setSelectedAgent}
-                                            setSelectedAgentContact={setSelectedContact}
+                                            componentId={moment().format('x')}
                                         />
                                     }
 
@@ -5106,23 +5155,39 @@ const Agents = (props) => {
                                                                     title='Contacts'
                                                                     tabTimes={22000 + props.tabTimes}
                                                                     panelName={`${props.panelName}-contacts`}
-                                                                    savingContactUrl='/saveContact'
-                                                                    deletingContactUrl='/deleteContact'
-                                                                    uploadAvatarUrl='/uploadAvatar'
-                                                                    removeAvatarUrl='/removeAvatar'
+                                                                    selectedOwner={selectedAgent}
+                                                                    getContactsUrl='/getContactsByAgentId'
+                                                                    savingContactUrl='/saveAgentContact'
+                                                                    deletingContactUrl='/deleteAgentContact'
+                                                                    uploadAvatarUrl='/uploadAgentContactAvatar'
+                                                                    removeAvatarUrl='/removeDivisioContactAvatar'
                                                                     origin={props.origin}
                                                                     owner='agent'
                                                                     closingCallback={() => {
                                                                         closePanel(`${props.panelName}-contacts`, props.origin);
                                                                         refAgentCode.current.focus({ preventScroll: true });
                                                                     }}
+                                                                    savingCallback={(contact, contacts) => {
+                                                                        setSelectedAgent(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+
+                                                                        if ((selectedContact?.id || 0) === contact.id) {
+                                                                            setSelectedContact(contact);
+                                                                        }
+                                                                    }}
+                                                                    deletingCallback={(contactId, contacts) => {
+                                                                        setSelectedAgent(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+
+                                                                        if ((selectedContact?.id || 0) === contactId) {
+                                                                            setSelectedContact({});
+                                                                        }
+                                                                    }}
 
                                                                     componentId={moment().format('x')}
-
-                                                                    contactSearchCustomer={{
-                                                                        ...selectedAgent,
-                                                                        selectedContact: contact
-                                                                    }}
+                                                                    selectedContactId={contact.id}
                                                                 />
                                                             }
 
@@ -6563,14 +6628,12 @@ const Agents = (props) => {
                                                     origin={props.origin}
                                                     isOnPanel={true}
                                                     isAdmin={props.isAdmin}
+                                                    componentId={moment().format('x')}
+                                                    order_id={order.id}
                                                     closingCallback={() => {
                                                         closePanel(`${props.panelName}-dispatch`, props.origin);
                                                         refAgentCode.current.focus({ preventScroll: true });
                                                     }}
-
-                                                    componentId={moment().format('x')}
-
-                                                    order_id={order.id}
                                                 />
                                             }
 
@@ -6580,18 +6643,13 @@ const Agents = (props) => {
                                                 color: "#4682B4",
                                                 fontWeight: 'bold',
                                                 marginRight: 5
-                                            }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                ? order.routing[0].type === 'pickup'
-                                                    ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-
-                                                    : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                        ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                            ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                            (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                : ''}
+                                            }}>{order.order_number}</span>
+                                            {
+                                                `${(order?.from_pickup_city || '') || (order?.from_delivery_city || '')}, 
+                                                                                        ${(order?.from_pickup_state || '') || (order?.from_delivery_state || '')} - 
+                                                                                     ${(order?.to_pickup_city || '') || (order?.to_delivery_city || '')}, 
+                                                                                        ${(order?.to_pickup_state || '') || (order?.to_delivery_state || '')}`
+                                            }
                                         </div>
                                     )
                                 })
@@ -6635,6 +6693,53 @@ const Agents = (props) => {
                     </animated.div>
                 ))
             }
+
+            {achWiringInfoTransition(
+                (style, item) =>
+                    item && (
+                        <animated.div
+                            className="ach-wiring-info-main-container"
+                            style={{
+                                ...style,
+                                position: "absolute",
+                                width: "100%",
+                                height: "100%",
+                                top: 0,
+                                left: 0,
+                                backgroundColor: "rgba(0,0,0,0.3)",
+                            }}
+                        >
+                            <div
+                                className="ach-wiring-info-wrapper"
+                                style={{
+                                    position: "relative",
+                                    width: "100%",
+                                    height: "100%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <ACHWiringInfo
+                                    panelName={`${props.panelName}-agent-ach-wiring-info`}
+                                    tabTimes={props.tabTimes}
+                                    componentId={moment().format("x")}
+
+                                    origin={props.origin}
+                                    closeModal={() => {
+                                        setShowingACHWiringInfo(false);
+                                        refAgentCode.current.focus({ preventScroll: true });
+                                    }}
+                                    selectedOwner={selectedAgent}
+                                    setSelectedOwner={setSelectedAgent}
+                                    owner="agent"
+                                    savingUrl="/saveAgentAchWiringInfo"
+                                />
+                            </div>
+                        </animated.div>
+                    )
+            )}
+
 
         </div>
     )
@@ -6685,5 +6790,6 @@ export default connect(mapStateToProps, {
     setCompanyReportPanels,
 
     setSelectedCompany,
-    setSelectedDriver
+    setSelectedDriver,
+    setSelectedOrder
 })(Agents)

@@ -66,6 +66,7 @@ const Divisions = (props) => {
     const [selectedDivision, setSelectedDivision] = useState({});
     const [selectedContact, setSelectedContact] = useState({});
     const [selectedPrimaryContact, setSelectedPrimaryContact] = useState({});
+    const [divisionsList, setDivisionsList] = useState([])
 
     const [selectedNote, setSelectedNote] = useState({});
 
@@ -259,7 +260,24 @@ const Divisions = (props) => {
         refDivisionCode.current.focus({
             preventScroll: true
         });
+
+        getDivisionsList();
     }, []);
+
+    const getDivisionsList = () => {
+        setIsLoading(true);
+
+        axios.post(props.serverUrl + '/getDivisionsList').then(res => {
+            if (res.data.result === 'OK') {
+                setDivisionsList(res.data.divisions);
+            }
+
+            setIsLoading(false);
+        }).catch(e => {
+            console.log('error getting divisions', e);
+            setIsLoading(false);
+        });
+    }
 
     useEffect(() => {
         if ((selectedDivision?.contacts || []).length === 0) {
@@ -422,16 +440,22 @@ const Divisions = (props) => {
                         if ((selectedContact?.id || 0) === 0) {
                             setSelectedContact((division?.contacts || []).find(c => c.is_primary === 1) || {})
                         }
-                    }
 
-                    if ((selectedDivision?.id || 0) > 0) {
-                        setIsEditingDivision(true);
-                        setIsAddingDivision(false)
+                        setDivisionsList(divisionsList.map(item => {
+                            if (item.id === division.id) {
+                                item.code = division.code;
+                                item.code_number = division.code_number;
+                                item.name = division.name;
+                            }
+                            return item
+                        }))
                     }
-
-                    setIsSavingDivision(false);
                 }).catch(e => {
                     console.log('error saving division', e);
+                    setIsSavingDivision(false);
+                }).finally(() => {
+                    setIsEditingDivision(false);
+                    setIsAddingDivision(false);
                     setIsSavingDivision(false);
                 });
             } else {
@@ -470,7 +494,7 @@ const Divisions = (props) => {
                 selectedContact.zip_code = selectedDivision?.zip;
             }
 
-            axios.post(props.serverUrl + '/saveDivisionContact', selectedContact).then(res => {
+            axios.post(props.serverUrl + '/saveDivisionContact', { ...selectedContact, owner_id: selectedDivision.id }).then(res => {
                 if (res.data.result === 'OK') {
                     let mailing_contact = selectedDivision?.mailing_address?.mailing_contact || {};
 
@@ -620,6 +644,24 @@ const Divisions = (props) => {
                 setInitialValues(false);
             }
         }
+    }
+
+    const getDivisionById = (id) => {
+        setIsLoading(true);
+        axios.post(props.serverUrl + '/getDivisionById', { id }).then(res => {
+            if (res.data.result === 'OK') {
+                setSelectedDivision(res.data.division);
+                setSelectedContact((res.data.division.contacts || []).find(c => c.is_primary === 1) || {});
+
+                getDivisionOrders(res.data.division);
+            } else {
+                setInitialValues(true);
+            }
+        }).catch(e => {
+            console.log('error getting division by id', e);
+        }).finally(() => {
+            setIsLoading(false);
+        });
     }
 
     const getDivisionOrders = (division) => {
@@ -1296,11 +1338,11 @@ const Divisions = (props) => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refDivisionsContainer} onKeyDown={(e) => {
-            if (e.key === 'Escape'){
+            if (e.key === 'Escape') {
                 e.stopPropagation();
                 if ((selectedDivision?.id || 0) > 0) {
                     setInitialValues();
-                }else{
+                } else {
                     props.closingCallback();
                 }
             }
@@ -1750,7 +1792,7 @@ const Divisions = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="fields-container-row">
+                    <div className="fields-container-row" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {/*CONTACTS FORM*/}
                         <div className="form-bordered-box">
                             <div className="form-header">
@@ -1775,6 +1817,8 @@ const Divisions = (props) => {
                                                 title='Contacts'
                                                 tabTimes={22000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contacts`}
+                                                selectedOwner={selectedDivision}
+                                                getContactsUrl='/getContactsByDivisionId'
                                                 savingContactUrl='/saveDivisionContact'
                                                 deletingContactUrl='/deleteDivisionContact'
                                                 uploadAvatarUrl='/uploadDivisionContactAvatar'
@@ -1785,23 +1829,27 @@ const Divisions = (props) => {
                                                     closePanel(`${props.panelName}-contacts`, props.origin);
                                                     refDivisionCode.current.focus({ preventScroll: true });
                                                 }}
+                                                savingCallback={(contact, contacts) => {
+                                                    setSelectedDivision(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
 
-                                                componentId={moment().format('x')}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedDivision,
-                                                    selectedContact: {
-                                                        ...selectedContact,
-                                                        address1: (selectedDivision?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedDivision?.address1 || '') : (selectedContact?.address1 || ''),
-                                                        address2: (selectedDivision?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedDivision?.address2 || '') : (selectedContact?.address2 || ''),
-                                                        city: (selectedDivision?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedDivision?.city || '') : (selectedContact?.city || ''),
-                                                        state: (selectedDivision?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedDivision?.state || '') : (selectedContact?.state || ''),
-                                                        zip_code: (selectedDivision?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedDivision?.zip || '') : (selectedContact?.zip_code || ''),
+                                                    if ((selectedContact?.id || 0) === contact.id) {
+                                                        setSelectedContact(contact);
                                                     }
                                                 }}
-                                                selectedDivision={selectedDivision}
-                                                setSelectedDivision={setSelectedDivision}
-                                                setSelectedDivisionContact={setSelectedContact}
+                                                deletingCallback={(contactId, contacts) => {
+                                                    setSelectedDivision(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+
+                                                    if ((selectedContact?.id || 0) === contactId) {
+                                                        setSelectedContact({});
+                                                    }
+                                                }}
+
+                                                componentId={moment().format('x')}
+                                                selectedContactId={selectedContact.id}
                                             />
                                         }
 
@@ -1823,28 +1871,39 @@ const Divisions = (props) => {
                                                 title='Contacts'
                                                 tabTimes={22000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contacts`}
+                                                selectedOwner={selectedDivision}
+                                                getContactsUrl='/getContactsByDivisionId'
                                                 savingContactUrl='/saveDivisionContact'
                                                 deletingContactUrl='/deleteDivisionContact'
                                                 uploadAvatarUrl='/uploadDivisionContactAvatar'
                                                 removeAvatarUrl='/removeDivisioContactAvatar'
                                                 origin={props.origin}
                                                 owner='division'
+                                                isEditingContact={true}
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contacts`, props.origin);
                                                     refDivisionCode.current.focus({ preventScroll: true });
                                                 }}
+                                                savingCallback={(contact, contacts) => {
+                                                    setSelectedDivision(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
 
-                                                componentId={moment().format('x')}
-                                                isEditingContact={true}
+                                                    if ((selectedContact?.id || 0) === contact.id) {
+                                                        setSelectedContact(contact);
+                                                    }
+                                                }}
+                                                deletingCallback={(contactId, contacts) => {
+                                                    setSelectedDivision(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
 
-                                                contactSearchCustomer={{
-                                                    ...selectedDivision,
-                                                    selectedContact: { id: 0, division_id: selectedDivision?.id }
+                                                    if ((selectedContact?.id || 0) === contactId) {
+                                                        setSelectedContact({});
+                                                    }
                                                 }}
 
-                                                selectedDivision={selectedDivision}
-                                                setSelectedDivision={setSelectedDivision}
-                                                setSelectedDivisionContact={setSelectedContact}
+                                                componentId={moment().format('x')}
                                             />
                                         }
 
@@ -2816,23 +2875,39 @@ const Divisions = (props) => {
                                                                         title='Contacts'
                                                                         tabTimes={22000 + props.tabTimes}
                                                                         panelName={`${props.panelName}-contacts`}
-                                                                        savingContactUrl='/saveContact'
-                                                                        deletingContactUrl='/deleteContact'
-                                                                        uploadAvatarUrl='/uploadAvatar'
-                                                                        removeAvatarUrl='/removeAvatar'
+                                                                        selectedOwner={selectedDivision}
+                                                                        getContactsUrl='/getContactsByDivisionId'
+                                                                        savingContactUrl='/saveDivisionContact'
+                                                                        deletingContactUrl='/deleteDivisionContact'
+                                                                        uploadAvatarUrl='/uploadDivisionContactAvatar'
+                                                                        removeAvatarUrl='/removeDivisioContactAvatar'
                                                                         origin={props.origin}
                                                                         owner='division'
                                                                         closingCallback={() => {
                                                                             closePanel(`${props.panelName}-contacts`, props.origin);
                                                                             refDivisionCode.current.focus({ preventScroll: true });
                                                                         }}
+                                                                        savingCallback={(contact, contacts) => {
+                                                                            setSelectedDivision(prev => {
+                                                                                return { ...prev, contacts: contacts }
+                                                                            })
+
+                                                                            if ((selectedContact?.id || 0) === contact.id) {
+                                                                                setSelectedContact(contact);
+                                                                            }
+                                                                        }}
+                                                                        deletingCallback={(contactId, contacts) => {
+                                                                            setSelectedDivision(prev => {
+                                                                                return { ...prev, contacts: contacts }
+                                                                            })
+
+                                                                            if ((selectedContact?.id || 0) === contactId) {
+                                                                                setSelectedContact({});
+                                                                            }
+                                                                        }}
 
                                                                         componentId={moment().format('x')}
-
-                                                                        contactSearchCustomer={{
-                                                                            ...selectedDivision,
-                                                                            selectedContact: contact
-                                                                        }}
+                                                                        selectedContactId={contact.id}
                                                                     />
                                                                 }
 
@@ -4245,7 +4320,8 @@ const Divisions = (props) => {
                         }}>
                             <div className="form-bordered-box" style={{
                                 maxHeight: 'calc(50% - 5px)',
-                                minWidth: 'initial',
+                                maxWidth: 170,
+                                minWidth: 170,
                                 justifyContent: 'space-around'
                             }}>
                                 <div className="form-header">
@@ -4306,7 +4382,8 @@ const Divisions = (props) => {
 
                             <div className="form-bordered-box" style={{
                                 maxHeight: 'calc(50% - 5px)',
-                                minWidth: 'initial',
+                                maxWidth: 170,
+                                minWidth: 170,
                                 justifyContent: 'space-around'
                             }}>
                                 <div className="form-header">
@@ -4410,14 +4487,12 @@ const Divisions = (props) => {
                                                             origin={props.origin}
                                                             isOnPanel={true}
                                                             isAdmin={props.isAdmin}
+                                                            componentId={moment().format('x')}
+                                                            order_id={order.id}
                                                             closingCallback={() => {
                                                                 closePanel(`${props.panelName}-dispatch`, props.origin);
                                                                 refDivisionCode.current.focus({ preventScroll: true });
                                                             }}
-
-                                                            componentId={moment().format('x')}
-
-                                                            order_id={order.id}
                                                         />
                                                     }
 
@@ -4427,18 +4502,13 @@ const Divisions = (props) => {
                                                         color: "#4682B4",
                                                         fontWeight: 'bold',
                                                         marginRight: 5
-                                                    }}>{order.order_number}</span> {((order?.routing || []).length >= 2)
-                                                        ? order.routing[0].type === 'pickup'
-                                                            ? ((order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[0].pickup_id).customer?.state || '') +
-                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-
-                                                            : ((order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[0].delivery_id).customer?.state || '') +
-                                                                ' - ' + (order.routing[order.routing.length - 1].type === 'pickup'
-                                                                    ? (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.city || '') + ', ' + (order.pickups.find(p => p.id === order.routing[order.routing.length - 1].pickup_id).customer?.state || '') :
-                                                                    (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.city || '') + ', ' + (order.deliveries.find(d => d.id === order.routing[order.routing.length - 1].delivery_id).customer?.state || '')))
-                                                        : ''}
+                                                    }}>{order.order_number}</span>
+                                                    {
+                                                        `${(order?.from_pickup_city || '') || (order?.from_delivery_city || '')}, 
+                                                            ${(order?.from_pickup_state || '') || (order?.from_delivery_state || '')} - 
+                                                         ${(order?.to_pickup_city || '') || (order?.to_delivery_city || '')}, 
+                                                            ${(order?.to_pickup_state || '') || (order?.to_delivery_state || '')}`
+                                                    }
                                                 </div>
                                             )
                                         })
@@ -4458,6 +4528,47 @@ const Divisions = (props) => {
                             }
                         </div>
 
+                    </div>
+                </div>
+
+                <div className="fields-container-col grow">
+                    <div className="form-bordered-box" style={{ minWidth: 'unset' }}>
+                        <div className="form-header">
+                            <div className="top-border top-border-left"></div>
+                            <div className="form-title">Divisions</div>
+                            <div className="top-border top-border-middle"></div>
+                            <div className="top-border top-border-right"></div>
+                        </div>
+
+                        <div className="divisions-list-container">
+                            <div className="divisions-list-wrapper">
+                                {
+                                    (divisionsList || []).map((division, index) => {
+                                        return (
+                                            <div className={classnames({
+                                                'division-list-item': true,
+                                                'selected': (selectedDivision?.id || 0) === division.id
+                                            })} key={index} onClick={() => {
+                                                getDivisionById(division.id);
+                                            }}>
+                                                <div style={{
+                                                    color: "#4682B4",
+                                                    fontWeight: 'bold'
+                                                }}>{`${division?.code || ''}${(division?.code_number || 0) > 0 ? division.code_number : ''}`}</div>
+                                                <div>-</div>
+                                                <div style={{ flexGrow: 1 }}>{division.name}</div>
+                                                {
+                                                    (division.id === (selectedDivision?.id || 0)) &&
+                                                    <div className="division-selected">
+                                                        <FontAwesomeIcon icon={faPencilAlt} />
+                                                    </div>
+                                                }
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
 

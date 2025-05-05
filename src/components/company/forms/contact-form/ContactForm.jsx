@@ -159,7 +159,7 @@ function ContactForm(props) {
                         onChange={e => {
                             props.setSelectedContact({ ...props.selectedContact, first_name: e.target.value })
                         }}
-                        value={props.selectedContact.first_name || ''} />
+                        value={props.selectedContact?.first_name || ''} />
                 </div>
                 <div className="form-h-sep"></div>
                 <div className="input-box-container grow">
@@ -176,7 +176,7 @@ function ContactForm(props) {
                             ...props.selectedContact,
                             last_name: e.target.value
                         })}
-                        value={props.selectedContact.last_name || ''} />
+                        value={props.selectedContact?.last_name || ''} />
                 </div>
             </div>
             <div className="form-v-sep"></div>
@@ -626,7 +626,7 @@ function ContactForm(props) {
 
                                 props.validateContactForSaving({ keyCode: 9 });
                             }}
-                            checked={props.selectedContact.pivot
+                            checked={props.selectedContact?.pivot
                                 ? (props.selectedContact?.pivot?.is_primary || 0) === 1
                                 : (props.selectedContact?.is_primary || 0) === 1} />
                         <label htmlFor={props.panelName + '-cbox-customer-contacts-primary-btn'}>
@@ -1065,7 +1065,7 @@ function ContactForm(props) {
                             ...props.selectedContact,
                             notes: e.target.value
                         })}
-                        value={props.selectedContact.notes || ''}
+                        value={props.selectedContact?.notes || ''}
                     />
                 </div>
             </div>

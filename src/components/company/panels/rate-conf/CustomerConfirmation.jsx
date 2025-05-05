@@ -440,6 +440,17 @@ export default class CustomerConfirmation extends Component {
                             }}>Carrier Assigned:</span> <span style={{ ...this.styleFieldDataBold, fontSize: '1rem' }}>
                                 {this.props.selectedCarrierInfo?.name || ''}
                             </span>
+                            {
+                                (this.props.selectedCarrierInfo?.mc_number || '').trim() !== ''
+                                    ? <span style={{ ...this.styleFieldData, fontSize: '1rem', marginLeft: 10 }}>
+                                        MC# {this.props.selectedCarrierInfo?.mc_number || ''}
+                                    </span>
+                                    : (this.props.selectedCarrierInfo?.dot_number || '').trim() !== ''
+                                        ? <span style={{ ...this.styleFieldData, fontSize: '1rem', marginLeft: 10 }}>
+                                            DOT# {this.props.selectedCarrierInfo?.dot_number || ''}
+                                        </span>
+                                        : ''
+                            }
                         </div>
 
                         <div style={{

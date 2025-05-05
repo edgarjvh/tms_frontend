@@ -25,6 +25,7 @@ export const companyReducers = (state = {
     companyOpenedPanels: [],
     companyHomePanels: [],
     customersTPanels: [],
+    companySuperOrigin: ''
 }, action) => {
     switch (action.type) {
         case companyConstants.SET_PAGES:
@@ -155,7 +156,7 @@ export const companyReducers = (state = {
             state = {
                 ...state,
                 companyHomePanels: (action.payload || []).map(item => {
-                    if (!item?.right){
+                    if (!item?.right) {
                         item.right = 0
                     }
                     return item;
@@ -169,6 +170,14 @@ export const companyReducers = (state = {
                 customersTPanels: action.payload
             }
             break;
+
+        case companyConstants.SET_COMPANY_SUPER_ORIGIN:
+            state = {
+                ...state,
+                companySuperOrigin: action.payload
+            }
+            break;
+
         default:
             break;
     }

@@ -77,3 +77,10 @@ export const setAdminHomePanels = bool => {
         payload: bool
     }
 }
+
+export const setAdminSuperOrigin = adminSuperOrigin => {
+    return {
+        type: adminConstants.SET_ADMIN_SUPER_ORIGIN,
+        payload: adminSuperOrigin
+    }
+}

@@ -611,7 +611,7 @@ const Customers = (props) => {
                 selectedContact.zip_code = selectedCustomer?.zip;
             }
 
-            selectedContact.main_customer_id = selectedCustomer.id;
+            selectedContact.owner_id = selectedCustomer.id;
 
             axios.post(props.serverUrl + '/saveContact', selectedContact).then(res => {
                 if (res.data.result === 'OK') {
@@ -1230,7 +1230,15 @@ const Customers = (props) => {
                 origin={props.origin}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-customer-import`, props.origin);
-                    refCustomerCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
                 componentId={moment().format('x')}
             />
@@ -1288,7 +1296,15 @@ const Customers = (props) => {
                 origin={props.origin}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-customer-search`, props.origin);
-                    refCustomerCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
 
                 componentId={moment().format('x')}
@@ -1487,7 +1503,15 @@ const Customers = (props) => {
                 suborigin='customer'
                 closingCallback={() => {
                     closePanel(`${props.panelName}-contact-search`, props.origin);
-                    refCustomerName.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
 
                 componentId={moment().format('x')}
@@ -1545,7 +1569,15 @@ const Customers = (props) => {
                 suborigin={'customer'}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-revenue-information`, props.origin);
-                    refCustomerCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
 
                 componentId={moment().format('x')}
@@ -1568,7 +1600,15 @@ const Customers = (props) => {
                 suborigin={'customer'}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-order-history`, props.origin);
-                    refCustomerCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
 
                 componentId={moment().format('x')}
@@ -1608,7 +1648,15 @@ const Customers = (props) => {
                     }}
                     closingCallback={() => {
                         closePanel(`${props.panelName}-documents`, props.origin);
-                        refCustomerCode.current.focus({ preventScroll: true });
+                        if (props.isOnPanel) {
+                            if (refCustomerCode?.current) {
+                                refCustomerCode.current.focus({ preventScroll: true });
+                            }
+                        } else {
+                            if (props.refCustomerCode?.current) {
+                                props.refCustomerCode.current.focus({ preventScroll: true });
+                            }
+                        }
                     }}
                 />
             }
@@ -2034,6 +2082,8 @@ const Customers = (props) => {
                 title='Contacts'
                 tabTimes={22000 + props.tabTimes}
                 panelName={`${props.panelName}-contacts`}
+                selectedOwner={selectedCustomer}
+                getContactsUrl='/getContactsByCustomerId'
                 savingContactUrl='/saveContact'
                 deletingContactUrl='/deleteContact'
                 uploadAvatarUrl='/uploadAvatar'
@@ -2041,25 +2091,44 @@ const Customers = (props) => {
                 permissionName='customer contacts'
                 origin={props.origin}
                 owner='customer'
+                isEditingContact={true}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-contacts`, props.origin);
-                    refCustomerCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCustomerCode?.current) {
+                            refCustomerCode.current.focus({
+                                preventScroll: true,
+                            });
+                        }
+                    } else {
+                        if (props.refCustomerCode?.current) {
+                            props.refCustomerCode.current.focus({
+                                preventScroll: true,
+                            });
+                        }
+                    }
+                }}
+                savingCallback={(contact, contacts) => {
+                    setSelectedCustomer(prev => {
+                        return { ...prev, contacts: contacts }
+                    })
+
+                    if ((selectedContact?.id || 0) === contact.id) {
+                        setSelectedContact(contact);
+                    }
+                }}
+                deletingCallback={(contactId, contacts) => {
+                    setSelectedCustomer(prev => {
+                        return { ...prev, contacts: contacts }
+                    })
+
+                    if ((selectedContact?.id || 0) === contactId) {
+                        setSelectedContact({});
+                    }
                 }}
 
                 componentId={moment().format('x')}
-
-                contactSearchCustomer={{
-                    ...selectedCustomer,
-                    selectedContact: {
-                        ...contact,
-                        company: (contact?.company || '') === '' ? props.selectedParent?.name || '' : contact.company,
-                        address1: (props.selectedParent?.address1 || '').toLowerCase() === (contact?.address1 || '').toLowerCase() ? (props.selectedParent?.address1 || '') : (contact?.address1 || ''),
-                        address2: (props.selectedParent?.address2 || '').toLowerCase() === (contact?.address2 || '').toLowerCase() ? (props.selectedParent?.address2 || '') : (contact?.address2 || ''),
-                        city: (props.selectedParent?.city || '').toLowerCase() === (contact?.city || '').toLowerCase() ? (props.selectedParent?.city || '') : (contact?.city || ''),
-                        state: (props.selectedParent?.state || '').toLowerCase() === (contact?.state || '').toLowerCase() ? (props.selectedParent?.state || '') : (contact?.state || ''),
-                        zip_code: (props.selectedParent?.zip || '').toLowerCase() === (contact?.zip_code || '').toLowerCase() ? (props.selectedParent?.zip || '') : (contact?.zip_code || ''),
-                    }
-                }}
+                selectedContactId={contact?.id}
             />
         }
 
@@ -2236,7 +2305,7 @@ const Customers = (props) => {
                             }
                         }
                     } else {
-                        if (props.isOnPanel){
+                        if (props.isOnPanel) {
                             props.closingCallback();
                         }
                     }
@@ -3872,7 +3941,7 @@ const Customers = (props) => {
                             formButtons={[
                                 {
                                     title: 'More',
-                                    onClick: (async) => {
+                                    onClick: () => {
                                         if (selectedCustomer?.id === undefined) {
                                             window.alert('You must select a customer first!');
                                             return;
@@ -3889,6 +3958,8 @@ const Customers = (props) => {
                                                 title='Contacts'
                                                 tabTimes={22000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contacts`}
+                                                selectedOwner={selectedCustomer}
+                                                getContactsUrl='/getContactsByCustomerId'
                                                 savingContactUrl='/saveContact'
                                                 deletingContactUrl='/deleteContact'
                                                 uploadAvatarUrl='/uploadAvatar'
@@ -3898,23 +3969,41 @@ const Customers = (props) => {
                                                 owner='customer'
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contacts`, props.origin);
-                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
+                                                            refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
+                                                            props.refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }
+                                                }}
+                                                savingCallback={(contact, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contact.id) {
+                                                        setSelectedContact(contact);
+                                                    }
+                                                }}
+                                                deletingCallback={(contactId, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contactId) {
+                                                        setSelectedContact({});
+                                                    }
                                                 }}
 
                                                 componentId={moment().format('x')}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedCustomer,
-                                                    selectedContact: {
-                                                        ...selectedContact,
-                                                        company: (selectedContact?.company || '') === '' ? selectedCustomer?.name || '' : selectedContact.company,
-                                                        address1: (selectedCustomer?.address1 || '').toLowerCase() === (selectedContact?.address1 || '').toLowerCase() ? (selectedCustomer?.address1 || '') : (selectedContact?.address1 || ''),
-                                                        address2: (selectedCustomer?.address2 || '').toLowerCase() === (selectedContact?.address2 || '').toLowerCase() ? (selectedCustomer?.address2 || '') : (selectedContact?.address2 || ''),
-                                                        city: (selectedCustomer?.city || '').toLowerCase() === (selectedContact?.city || '').toLowerCase() ? (selectedCustomer?.city || '') : (selectedContact?.city || ''),
-                                                        state: (selectedCustomer?.state || '').toLowerCase() === (selectedContact?.state || '').toLowerCase() ? (selectedCustomer?.state || '') : (selectedContact?.state || ''),
-                                                        zip_code: (selectedCustomer?.zip || '').toLowerCase() === (selectedContact?.zip_code || '').toLowerCase() ? (selectedCustomer?.zip || '') : (selectedContact?.zip_code || ''),
-                                                    }
-                                                }}
+                                                selectedContactId={selectedContact.id}
                                             />
                                         }
 
@@ -3940,7 +4029,19 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
+                                                            refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
+                                                            props.refCustomerCode.current.focus({
+                                                                preventScroll: true,
+                                                            });
+                                                        }
+                                                    }
                                                 }}
 
                                                 componentId={moment().format('x')}
@@ -4010,6 +4111,8 @@ const Customers = (props) => {
                                                 title='Contacts'
                                                 tabTimes={22000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contacts`}
+                                                selectedOwner={selectedCustomer}
+                                                getContactsUrl='/getContactsByCustomerId'
                                                 savingContactUrl='/saveContact'
                                                 deletingContactUrl='/deleteContact'
                                                 uploadAvatarUrl='/uploadAvatar'
@@ -4020,24 +4123,36 @@ const Customers = (props) => {
                                                 isEditingContact={true}
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contacts`, props.origin);
-                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
+                                                            refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
+                                                            props.refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    }
+                                                }}
+                                                savingCallback={(contact, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contact.id) {
+                                                        setSelectedContact(contact);
+                                                    }
+                                                }}
+                                                deletingCallback={(contactId, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contactId) {
+                                                        setSelectedContact({});
+                                                    }
                                                 }}
 
                                                 componentId={moment().format('x')}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedCustomer,
-                                                    selectedContact: {
-                                                        id: 0,
-                                                        customer_id: selectedCustomer?.id,
-                                                        company: selectedCustomer?.name || '',
-                                                        address1: selectedCustomer?.address1 || '',
-                                                        address2: selectedCustomer?.address2 || '',
-                                                        city: selectedCustomer?.city || '',
-                                                        state: selectedCustomer?.state || '',
-                                                        zip_code: selectedCustomer?.zip || ''
-                                                    }
-                                                }}
                                             />
                                         }
 
@@ -5431,7 +5546,15 @@ const Customers = (props) => {
                                                 origin={props.origin}
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contact-list`, props.origin);
-                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
+                                                            refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
+                                                            props.refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    }
                                                 }}
 
                                                 componentId={moment().format('x')}
@@ -5501,6 +5624,8 @@ const Customers = (props) => {
                                                 title='Contacts'
                                                 tabTimes={22000 + props.tabTimes}
                                                 panelName={`${props.panelName}-contacts`}
+                                                selectedOwner={selectedCustomer}
+                                                getContactsUrl='/getContactsByCustomerId'
                                                 savingContactUrl='/saveContact'
                                                 deletingContactUrl='/deleteContact'
                                                 uploadAvatarUrl='/uploadAvatar'
@@ -5511,24 +5636,36 @@ const Customers = (props) => {
                                                 isEditingContact={true}
                                                 closingCallback={() => {
                                                     closePanel(`${props.panelName}-contacts`, props.origin);
-                                                    refCustomerCode.current.focus({ preventScroll: true });
+                                                    if (props.isOnPanel) {
+                                                        if (refCustomerCode?.current) {
+                                                            refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    } else {
+                                                        if (props.refCustomerCode?.current) {
+                                                            props.refCustomerCode.current.focus({ preventScroll: true });
+                                                        }
+                                                    }
+                                                }}
+                                                savingCallback={(contact, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contact.id) {
+                                                        setSelectedContact(contact);
+                                                    }
+                                                }}
+                                                deletingCallback={(contactId, contacts) => {
+                                                    setSelectedCustomer(prev => {
+                                                        return { ...prev, contacts: contacts }
+                                                    })
+                                
+                                                    if ((selectedContact?.id || 0) === contactId) {
+                                                        setSelectedContact({});
+                                                    }
                                                 }}
 
                                                 componentId={moment().format('x')}
-
-                                                contactSearchCustomer={{
-                                                    ...selectedCustomer,
-                                                    selectedContact: {
-                                                        id: 0,
-                                                        customer_id: selectedCustomer?.id,
-                                                        company: selectedCustomer?.name || '',
-                                                        address1: selectedCustomer?.address1 || '',
-                                                        address2: selectedCustomer?.address2 || '',
-                                                        city: selectedCustomer?.city || '',
-                                                        state: selectedCustomer?.state || '',
-                                                        zip_code: selectedCustomer?.zip || ''
-                                                    }
-                                                }}
                                             />
                                         }
 
@@ -6031,7 +6168,15 @@ const Customers = (props) => {
                                                             order_id={order.id}
                                                             closingCallback={() => {
                                                                 closePanel(`${props.panelName}-dispatch`, props.origin);
-                                                                refCustomerCode.current.focus({ preventScroll: true });
+                                                                if (props.isOnPanel) {
+                                                                    if (refCustomerCode?.current) {
+                                                                        refCustomerCode.current.focus({ preventScroll: true });
+                                                                    }
+                                                                } else {
+                                                                    if (props.refCustomerCode?.current) {
+                                                                        props.refCustomerCode.current.focus({ preventScroll: true });
+                                                                    }
+                                                                }
                                                             }}
                                                         />
                                                     }

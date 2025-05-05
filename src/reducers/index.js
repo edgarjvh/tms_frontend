@@ -8,3 +8,4 @@ export * from './dispatchReducers';
 export * from './loadBoardReducers';
 export * from './companySetupReducers';
 export * from './reportReducers';
+export * from './userReducers';

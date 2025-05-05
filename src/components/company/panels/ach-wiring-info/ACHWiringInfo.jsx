@@ -67,6 +67,7 @@ const ACHWiringInfo = (props) => {
             axios.post(props.serverUrl + props.savingUrl, {
                 factoring_company_id: selectedOwner.id,
                 carrier_id: selectedOwner.id,
+                agent_id: selectedOwner.id,
                 ach_banking_info: selectedOwner?.ach_banking_info || '',
                 ach_account_info: selectedOwner?.ach_account_info || '',
                 ach_aba_routing: selectedOwner?.ach_aba_routing || '',
@@ -83,7 +84,16 @@ const ACHWiringInfo = (props) => {
                         props.setSelectedOwner(selectedOwner => {
                             return {
                                 ...selectedOwner,
-                                ...res.data.carrier
+                                ach_aba_routing: res.data.carrier.ach_aba_routing,
+                                ach_account_info: res.data.carrier.ach_account_info,
+                                ach_banking_info: res.data.carrier.ach_banking_info,
+                                ach_remittence_email: res.data.carrier.ach_remittence_email,
+                                ach_type: res.data.carrier.ach_type,
+                                wiring_aba_routing: res.data.carrier.wiring_aba_routing,
+                                wiring_account_info: res.data.carrier.wiring_account_info,
+                                wiring_banking_info: res.data.carrier.wiring_banking_info,
+                                wiring_remittence_email: res.data.carrier.wiring_remittence_email,
+                                wiring_type: res.data.carrier.wiring_type
                             }
                         });
                     }
@@ -92,7 +102,34 @@ const ACHWiringInfo = (props) => {
                         props.setSelectedOwner(selectedOwner => {
                             return {
                                 ...selectedOwner,
-                                ...res.data.factoring_company
+                                ach_aba_routing: res.data.factoring_company.ach_aba_routing,
+                                ach_account_info: res.data.factoring_company.ach_account_info,
+                                ach_banking_info: res.data.factoring_company.ach_banking_info,
+                                ach_remittence_email: res.data.factoring_company.ach_remittence_email,
+                                ach_type: res.data.factoring_company.ach_type,
+                                wiring_aba_routing: res.data.factoring_company.wiring_aba_routing,
+                                wiring_account_info: res.data.factoring_company.wiring_account_info,
+                                wiring_banking_info: res.data.factoring_company.wiring_banking_info,
+                                wiring_remittence_email: res.data.factoring_company.wiring_remittence_email,
+                                wiring_type: res.data.factoring_company.wiring_type
+                            }
+                        });
+                    }
+
+                    if (props.owner === 'agent') {
+                        props.setSelectedOwner(selectedOwner => {
+                            return {
+                                ...selectedOwner,
+                                ach_aba_routing: res.data.agent.ach_aba_routing,
+                                ach_account_info: res.data.agent.ach_account_info,
+                                ach_banking_info: res.data.agent.ach_banking_info,
+                                ach_remittence_email: res.data.agent.ach_remittence_email,
+                                ach_type: res.data.agent.ach_type,
+                                wiring_aba_routing: res.data.agent.wiring_aba_routing,
+                                wiring_account_info: res.data.agent.wiring_account_info,
+                                wiring_banking_info: res.data.agent.wiring_banking_info,
+                                wiring_remittence_email: res.data.agent.wiring_remittence_email,
+                                wiring_type: res.data.agent.wiring_type
                             }
                         });
                     }

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import $, { merge } from 'jquery';
 import Draggable from 'react-draggable';
-import './RevenueInformation.css';
+import './ReportCustomerOpenInvoices.css';
 import MaskedInput from 'react-text-mask';
 import Loader from 'react-loader-spinner';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
@@ -43,11 +43,13 @@ import {
     Dispatch
 } from './../../../company';
 
-import ToPrint from './ToPrint';
+// import ToPrint from './ToPrint';
 import { useReactToPrint } from 'react-to-print';
+import { Agents } from '../../../admin/panels';
+import Highlighter from 'react-highlight-words';
 
-const RevenueInformation = (props) => {
-    const refRevenueInformationContainer = useRef();
+const ReportCustomerOpenInvoices = (props) => {
+    const refCustomerOpenInvoicesContainer = useRef();
     const [isDateStartCalendarShown, setIsDateStartCalendarShown] = useState(false);
     const [isDateEndCalendarShown, setIsDateEndCalendarShown] = useState(false);
 
@@ -78,6 +80,7 @@ const RevenueInformation = (props) => {
         leave: { opacity: 0, display: 'none' },
         reverse: isLoading,
     });
+
     const [noOrdersFound, setNoOrdersFound] = useState(false);
     const [orders, setOrders] = useState([]);
 
@@ -89,13 +92,12 @@ const RevenueInformation = (props) => {
     const [stateDestination, setStateDestination] = useState('');
     const [zipOrigin, setZipOrigin] = useState('');
     const [zipDestination, setZipDestination] = useState('');
-    const [billToCode, setBillToCode] = useState('');
     const [customerCode, setCustomerCode] = useState('');
     const [showCustomerTotals, setShowCustomerTotals] = useState(true);
     const [showYearTotals, setShowYearTotals] = useState(false);
     const [showMonthTotals, setShowMonthTotals] = useState(false);
 
-    const [url, setUrl] = useState('/getRevenueCustomer');
+    const [url, setUrl] = useState('/getCustomerOpenInvoicesReport');
 
     const getFormattedDates = (date) => {
         let formattedDate = date;
@@ -180,379 +182,9 @@ const RevenueInformation = (props) => {
     }
 
     useEffect(() => {
-        setUrl(props.suborigin === 'customer' ? '/getRevenueCustomer' : '/getRevenueCarrier');
-
-        if ((props.selectedCustomer?.id || 0) > 0) {
-            let customer_code = props.selectedCustomer.code + (props.selectedCustomer.code_number === 0 ? '' : props.selectedCustomer.code_number);
-
-            setCustomerCode(customer_code);
-
-            setIsLoading(true);
-
-            axios.post(props.serverUrl + (props.suborigin === 'customer' ? '/getRevenueCustomer' : '/getRevenueCarrier'), {
-                customer_id: props.selectedCustomer?.id || 0,
-                carrier_id: props.selectedCustomer?.id || 0,
-                bill_to_code: billToCode,
-                customer_code: customer_code,
-                carrier_code: customer_code,
-                date_start: dateStart,
-                date_end: dateEnd,
-                city_origin: (cityOrigin || '').trim(),
-                city_destination: (cityDestination || '').trim(),
-                state_origin: (stateOrigin || '').trim(),
-                state_destination: (stateDestination || '').trim(),
-                zip_origin: (zipOrigin || '').trim(),
-                zip_destination: (zipDestination || '').trim(),
-                origin: props.suborigin,
-                for_revenue: true
-            }).then(res => {
-                if (res.data.result === 'OK') {
-                    let newOrders = res.data.orders.map(order => order);
-
-                    let currentMonth = '';
-                    let currentYear = '';
-                    let lastMonth = '';
-                    let lastYear = '';
-                    let groupedOrders = [];
-                    let currentDateGroup = [];
-                    let currentYearGroup = [];
-                    let currentOrderGroup = [];
-                    let lastCustomer = { id: 0 };
-                    const orderLength = newOrders.length - 1;
-
-                    newOrders.map((order, index) => {
-                        let currentCustomer = {
-                            id: order?.bill_to_customer_id,
-                            code: order?.code,
-                            code_number: order?.code_number,
-                            name: order?.name,
-                            city: order?.city,
-                            state: order?.state
-                        };
-                        currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
-                        currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
-
-                        if (lastCustomer.id === 0) { // if is the first customer
-                            lastCustomer = currentCustomer;
-                            lastMonth = currentMonth;
-                            lastYear = currentYear;
-                            currentOrderGroup.push(order);
-
-                            if (index === orderLength) { // if is the only/last record of the array
-                                groupedOrders.push({
-                                    billToCustomer: lastCustomer,
-                                    dateGroup: [{
-                                        year: lastYear,
-                                        months: [{
-                                            month: lastMonth,
-                                            year: lastYear,
-                                            orders: currentOrderGroup,
-                                            showMonthGroup: true
-                                        }],
-                                        showYearGroup: true
-                                    }],
-                                    showCustomerGroup: true
-                                });
-                            }
-                        } else {
-                            if (currentCustomer.id === lastCustomer.id) { // if is the same customer than before
-                                if (lastYear !== currentYear) {
-                                    currentDateGroup.push({
-                                        month: lastMonth,
-                                        year: lastYear,
-                                        orders: currentOrderGroup,
-                                        showMonthGroup: true
-                                    })
-
-                                    currentYearGroup.push({
-                                        year: lastYear,
-                                        months: currentDateGroup,
-                                        showYearGroup: true
-                                    });
-
-                                    lastYear = currentYear;
-                                    lastMonth = currentMonth;
-                                    currentDateGroup = [];
-                                    currentOrderGroup = [];
-                                    currentOrderGroup.push(order);
-
-                                    if (index === newOrders.length - 1) {
-                                        currentYearGroup.push({
-                                            year: lastYear,
-                                            months: [{
-                                                month: lastMonth,
-                                                year: lastYear,
-                                                orders: currentOrderGroup,
-                                                showMonthGroup: true
-                                            }],
-                                            showYearGroup: true
-                                        });
-
-                                        groupedOrders.push({
-                                            billToCustomer: lastCustomer,
-                                            dateGroup: currentYearGroup,
-                                            showCustomerGroup: true
-                                        });
-                                    }
-                                } else {
-                                    if (lastMonth !== currentMonth) {
-                                        currentDateGroup.push({
-                                            month: lastMonth,
-                                            year: lastYear,
-                                            orders: currentOrderGroup,
-                                            showMonthGroup: true
-                                        });
-
-                                        lastMonth = currentMonth;
-                                        lastYear = currentYear;
-
-                                        currentOrderGroup = [];
-                                        currentOrderGroup.push(order);
-
-                                        if (index === newOrders.length - 1) {
-                                            currentDateGroup.push({
-                                                month: lastMonth,
-                                                year: lastYear,
-                                                orders: currentOrderGroup,
-                                                showMonthGroup: true
-                                            });
-
-                                            currentYearGroup.push({
-                                                year: lastYear,
-                                                months: currentDateGroup,
-                                                showYearGroup: true
-                                            })
-
-                                            groupedOrders.push({
-                                                billToCustomer: lastCustomer,
-                                                dateGroup: currentYearGroup,
-                                                showCustomerGroup: true
-                                            });
-                                        }
-                                    } else {
-                                        currentOrderGroup.push(order);
-
-                                        if (index === newOrders.length - 1) {
-                                            currentDateGroup.push({
-                                                month: lastMonth,
-                                                year: lastYear,
-                                                orders: currentOrderGroup,
-                                                showMonthGroup: true
-                                            });
-
-                                            currentYearGroup.push({
-                                                year: lastYear,
-                                                months: currentDateGroup,
-                                                showYearGroup: true
-                                            })
-
-                                            groupedOrders.push({
-                                                billToCustomer: lastCustomer,
-                                                dateGroup: currentYearGroup,
-                                                showCustomerGroup: true
-                                            });
-                                        }
-                                    }
-                                }
-                            } else {
-                                currentDateGroup.push({
-                                    month: lastMonth,
-                                    year: lastYear,
-                                    orders: currentOrderGroup,
-                                    showMonthGroup: true
-                                });
-
-                                currentYearGroup.push({
-                                    year: lastYear,
-                                    months: currentDateGroup,
-                                    showYearGroup: true
-                                })
-
-                                groupedOrders.push({
-                                    billToCustomer: lastCustomer,
-                                    dateGroup: currentYearGroup,
-                                    showCustomerGroup: true
-                                });
-
-                                lastMonth = currentMonth;
-                                lastYear = currentYear;
-                                currentYearGroup = [];
-                                currentDateGroup = [];
-                                currentOrderGroup = [];
-
-                                currentOrderGroup.push(order);
-                                lastCustomer = currentCustomer;
-
-                                if (index === newOrders.length - 1) {
-                                    groupedOrders.push({
-                                        billToCustomer: lastCustomer,
-                                        dateGroup: [
-                                            {
-                                                year: lastYear,
-                                                months: [
-                                                    {
-                                                        month: lastMonth,
-                                                        year: lastYear,
-                                                        orders: currentOrderGroup,
-                                                        showMonthGroup: true
-                                                    }
-                                                ],
-                                                showYearGroup: true
-                                            }
-                                        ],
-                                        showCustomerGroup: true
-                                    });
-                                }
-                            }
-                        }
-
-                        return false;
-                    })
-
-                    groupedOrders = groupedOrders.map((groupOrder) => {
-                        // YEAR AND MONTH TOTALS
-                        groupOrder.dateGroup.map((year) => {
-                            year.totals = {
-                                orderCount: year.months.reduce((a, b) => {
-                                    return a + b.orders.length;
-                                }, 0),
-                                customerCharges: year.months.reduce((a, b) => {
-                                    return a + b.orders.reduce((c, d) => {
-                                        return c + d.total_customer_rating;
-                                    }, 0);
-                                }, 0),
-                                carrierCosts: year.months.reduce((a, b) => {
-                                    return a + b.orders.reduce((c, d) => {
-                                        return c + d.total_customer_rating;
-                                    }, 0);
-                                }, 0),
-                                profit: ((year.months.reduce((a, b) => {
-                                    return a + b.orders.reduce((c, d) => {
-                                        return c + d.total_customer_rating;
-                                    }, 0);
-                                }, 0)) - (year.months.reduce((a, b) => {
-                                    return a + b.orders.reduce((c, d) => {
-                                        return c + d.total_customer_rating;
-                                    }, 0);
-                                }, 0)))
-                            }
-
-                            year.months.map((month) => {
-                                month.totals = {
-                                    orderCount: month.orders.length,
-                                    customerCharges: month.orders.reduce((a, b) => {
-                                        return a + b.total_customer_rating;
-                                    }, 0),
-                                    carrierCosts: month.orders.reduce((a, b) => {
-                                        return a + b.total_carrier_rating;
-                                    }, 0),
-                                    profit: ((month.orders.reduce((a, b) => {
-                                        return a + b.total_customer_rating;
-                                    }, 0)) - (month.orders.reduce((a, b) => {
-                                        return a + b.total_carrier_rating;
-                                    }, 0)))
-                                }
-
-                                return month;
-                            })
-
-                            return year;
-                        });
-
-                        // CUSTOMER TOTALS
-                        groupOrder.totals = {
-                            orderCount: groupOrder.dateGroup.reduce((a, b) => {
-                                return a + b.months.reduce((c, d) => {
-                                    return c + d.orders.length;
-                                }, 0);
-                            }, 0),
-                            customerCharges: groupOrder.dateGroup.reduce((a, b) => {
-                                return a + b.months.reduce((c, d) => {
-                                    return c + d.orders.reduce((e, f) => {
-                                        return e + f.total_customer_rating;
-                                    }, 0);
-                                }, 0);
-                            }, 0),
-                            carrierCosts: groupOrder.dateGroup.reduce((a, b) => {
-                                return a + b.months.reduce((c, d) => {
-                                    return c + d.orders.reduce((e, f) => {
-                                        return e + f.total_carrier_rating;
-                                    }, 0);
-                                }, 0);
-                            }, 0),
-                            profit: ((groupOrder.dateGroup.reduce((a, b) => {
-                                return a + b.months.reduce((c, d) => {
-                                    return c + d.orders.reduce((e, f) => {
-                                        return e + f.total_customer_rating;
-                                    }, 0);
-                                }, 0);
-                            }, 0)) - (groupOrder.dateGroup.reduce((a, b) => {
-                                return a + b.months.reduce((c, d) => {
-                                    return c + d.orders.reduce((e, f) => {
-                                        return e + f.total_carrier_rating;
-                                    }, 0);
-                                }, 0);
-                            }, 0)))
-                        }
-
-                        return groupOrder;
-                    });
-
-                    setOrders(groupedOrders)
-
-                    setNoOrdersFound(newOrders.length === 0);
-
-                    setIsLoading(false);
-                } else {
-                    setIsLoading(false);
-                }
-            }).catch(e => {
-                console.log('Error on getting orders by customer', e);
-                setIsLoading(false);
-            })
-        }
-
-        refDateStart.current.inputElement.focus({
-            preventScroll: true
-        });
-    }, [])
-
-    const dateStartTransition = useTransition(isDateStartCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
-        reverse: isDateStartCalendarShown,
-        config: { duration: 100 }
-    })
-
-    const dateEndTransition = useTransition(isDateEndCalendarShown, {
-        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
-        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
-        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
-        reverse: isDateEndCalendarShown,
-        config: { duration: 100 }
-    })
-
-    const doSearch = () => {
-        if (dateStart !== '' && dateEnd !== '') {
-            let dStart = moment(dateStart, 'MM/DD/YYYY');
-            let dEnd = moment(dateEnd, 'MM/DD/YYYY');
-
-            if (dStart > dEnd) {
-                window.alert('Date End must be greater than the Date Start!');
-                refDateStart.current.inputElement.focus();
-                return;
-            }
-        }
-
         setIsLoading(true);
 
         axios.post(props.serverUrl + url, {
-            customer_id: props.selectedCustomer?.id || 0,
-            carrier_id: props.selectedCustomer?.id || 0,
-            bill_to_code: billToCode,
-            customer_code: customerCode,
-            carrier_code: customerCode,
             date_start: dateStart,
             date_end: dateEnd,
             city_origin: (cityOrigin || '').trim(),
@@ -561,8 +193,6 @@ const RevenueInformation = (props) => {
             state_destination: (stateDestination || '').trim(),
             zip_origin: (zipOrigin || '').trim(),
             zip_destination: (zipDestination || '').trim(),
-            origin: props.suborigin,
-            for_revenue: true
         }).then(res => {
             if (res.data.result === 'OK') {
                 let newOrders = res.data.orders.map(order => order);
@@ -576,28 +206,26 @@ const RevenueInformation = (props) => {
                 let currentYearGroup = [];
                 let currentOrderGroup = [];
                 let lastCustomer = { id: 0 };
+                const orderLength = newOrders.length - 1;
 
                 newOrders.map((order, index) => {
                     let currentCustomer = {
                         id: order?.bill_to_customer_id,
-                        code: order?.code,
-                        code_number: order?.code_number,
-                        name: order?.name,
-                        city: order?.city,
-                        state: order?.state
+                        code: `${order?.code || ''}${(order?.code_number || 0) === 0 ? '' : order.code_number}`,
+                        name: order?.name
                     };
                     currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
                     currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
 
-                    if (lastCustomer.id === 0) {
+                    if (lastCustomer.id === 0) { // if is the first customer
                         lastCustomer = currentCustomer;
                         lastMonth = currentMonth;
                         lastYear = currentYear;
                         currentOrderGroup.push(order);
 
-                        if (index === newOrders.length - 1) {
+                        if (index === orderLength) { // if is the only/last record of the array
                             groupedOrders.push({
-                                billToCustomer: lastCustomer,
+                                customer: lastCustomer,
                                 dateGroup: [{
                                     year: lastYear,
                                     months: [{
@@ -612,8 +240,7 @@ const RevenueInformation = (props) => {
                             });
                         }
                     } else {
-                        if (currentCustomer.id === lastCustomer.id) {
-
+                        if (currentCustomer.id === lastCustomer.id) { // if is the same customer than before
                             if (lastYear !== currentYear) {
                                 currentDateGroup.push({
                                     month: lastMonth,
@@ -647,7 +274,7 @@ const RevenueInformation = (props) => {
                                     });
 
                                     groupedOrders.push({
-                                        billToCustomer: lastCustomer,
+                                        customer: lastCustomer,
                                         dateGroup: currentYearGroup,
                                         showCustomerGroup: true
                                     });
@@ -682,7 +309,7 @@ const RevenueInformation = (props) => {
                                         })
 
                                         groupedOrders.push({
-                                            billToCustomer: lastCustomer,
+                                            customer: lastCustomer,
                                             dateGroup: currentYearGroup,
                                             showCustomerGroup: true
                                         });
@@ -705,7 +332,7 @@ const RevenueInformation = (props) => {
                                         })
 
                                         groupedOrders.push({
-                                            billToCustomer: lastCustomer,
+                                            customer: lastCustomer,
                                             dateGroup: currentYearGroup,
                                             showCustomerGroup: true
                                         });
@@ -727,7 +354,7 @@ const RevenueInformation = (props) => {
                             })
 
                             groupedOrders.push({
-                                billToCustomer: lastCustomer,
+                                customer: lastCustomer,
                                 dateGroup: currentYearGroup,
                                 showCustomerGroup: true
                             });
@@ -743,7 +370,7 @@ const RevenueInformation = (props) => {
 
                             if (index === newOrders.length - 1) {
                                 groupedOrders.push({
-                                    billToCustomer: lastCustomer,
+                                    customer: lastCustomer,
                                     dateGroup: [
                                         {
                                             year: lastYear,
@@ -854,20 +481,365 @@ const RevenueInformation = (props) => {
                     }
 
                     return groupOrder;
-                })
+                });
 
-                setOrders(groupedOrders);
-
+                setOrders(groupedOrders)
 
                 setNoOrdersFound(newOrders.length === 0);
-
-                setIsLoading(false);
-            } else {
-                setIsLoading(false);
             }
         }).catch(e => {
-            console.log('Error on getting orders by customer', e);
+            console.log('Error on getting orders by customers', e);
+        }).finally(() => {
             setIsLoading(false);
+
+            refDateStart.current.inputElement.focus({
+                preventScroll: true
+            });
+        })
+    }, [])
+
+    const dateStartTransition = useTransition(isDateStartCalendarShown, {
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+        reverse: isDateStartCalendarShown,
+        config: { duration: 100 }
+    })
+
+    const dateEndTransition = useTransition(isDateEndCalendarShown, {
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+        reverse: isDateEndCalendarShown,
+        config: { duration: 100 }
+    })
+
+    const doSearch = () => {
+        if (dateStart !== '' && dateEnd !== '') {
+            let dStart = moment(dateStart, 'MM/DD/YYYY');
+            let dEnd = moment(dateEnd, 'MM/DD/YYYY');
+
+            if (dStart > dEnd) {
+                window.alert('Date End must be greater than the Date Start!');
+                refDateStart.current.inputElement.focus();
+                return;
+            }
+        }
+
+        setIsLoading(true);
+
+        axios.post(props.serverUrl + url, {
+            customer_code: (customerCode || '').trim(),
+            date_start: dateStart,
+            date_end: dateEnd,
+            city_origin: (cityOrigin || '').trim(),
+            city_destination: (cityDestination || '').trim(),
+            state_origin: (stateOrigin || '').trim(),
+            state_destination: (stateDestination || '').trim(),
+            zip_origin: (zipOrigin || '').trim(),
+            zip_destination: (zipDestination || '').trim(),
+        }).then(res => {
+            if (res.data.result === 'OK') {
+                let newOrders = res.data.orders.map(order => order);
+
+                let currentMonth = '';
+                let currentYear = '';
+                let lastMonth = '';
+                let lastYear = '';
+                let groupedOrders = [];
+                let currentDateGroup = [];
+                let currentYearGroup = [];
+                let currentOrderGroup = [];
+                let lastCustomer = { id: 0 };
+                const orderLength = newOrders.length - 1;
+
+                newOrders.map((order, index) => {
+                    let currentCustomer = {
+                        id: order?.bill_to_customer_id,
+                        code: `${order?.code || ''}${(order?.code_number || 0) === 0 ? '' : order.code_number}`,
+                        name: order?.name
+                    };
+                    currentMonth = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MMMM');
+                    currentYear = moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY');
+
+                    if (lastCustomer.id === 0) { // if is the first customer
+                        lastCustomer = currentCustomer;
+                        lastMonth = currentMonth;
+                        lastYear = currentYear;
+                        currentOrderGroup.push(order);
+
+                        if (index === orderLength) { // if is the only/last record of the array
+                            groupedOrders.push({
+                                customer: lastCustomer,
+                                dateGroup: [{
+                                    year: lastYear,
+                                    months: [{
+                                        month: lastMonth,
+                                        year: lastYear,
+                                        orders: currentOrderGroup,
+                                        showMonthGroup: true
+                                    }],
+                                    showYearGroup: true
+                                }],
+                                showCustomerGroup: true
+                            });
+                        }
+                    } else {
+                        if (currentCustomer.id === lastCustomer.id) { // if is the same customer than before
+                            if (lastYear !== currentYear) {
+                                currentDateGroup.push({
+                                    month: lastMonth,
+                                    year: lastYear,
+                                    orders: currentOrderGroup,
+                                    showMonthGroup: true
+                                })
+
+                                currentYearGroup.push({
+                                    year: lastYear,
+                                    months: currentDateGroup,
+                                    showYearGroup: true
+                                });
+
+                                lastYear = currentYear;
+                                lastMonth = currentMonth;
+                                currentDateGroup = [];
+                                currentOrderGroup = [];
+                                currentOrderGroup.push(order);
+
+                                if (index === newOrders.length - 1) {
+                                    currentYearGroup.push({
+                                        year: lastYear,
+                                        months: [{
+                                            month: lastMonth,
+                                            year: lastYear,
+                                            orders: currentOrderGroup,
+                                            showMonthGroup: true
+                                        }],
+                                        showYearGroup: true
+                                    });
+
+                                    groupedOrders.push({
+                                        customer: lastCustomer,
+                                        dateGroup: currentYearGroup,
+                                        showCustomerGroup: true
+                                    });
+                                }
+                            } else {
+                                if (lastMonth !== currentMonth) {
+                                    currentDateGroup.push({
+                                        month: lastMonth,
+                                        year: lastYear,
+                                        orders: currentOrderGroup,
+                                        showMonthGroup: true
+                                    });
+
+                                    lastMonth = currentMonth;
+                                    lastYear = currentYear;
+
+                                    currentOrderGroup = [];
+                                    currentOrderGroup.push(order);
+
+                                    if (index === newOrders.length - 1) {
+                                        currentDateGroup.push({
+                                            month: lastMonth,
+                                            year: lastYear,
+                                            orders: currentOrderGroup,
+                                            showMonthGroup: true
+                                        });
+
+                                        currentYearGroup.push({
+                                            year: lastYear,
+                                            months: currentDateGroup,
+                                            showYearGroup: true
+                                        })
+
+                                        groupedOrders.push({
+                                            customer: lastCustomer,
+                                            dateGroup: currentYearGroup,
+                                            showCustomerGroup: true
+                                        });
+                                    }
+                                } else {
+                                    currentOrderGroup.push(order);
+
+                                    if (index === newOrders.length - 1) {
+                                        currentDateGroup.push({
+                                            month: lastMonth,
+                                            year: lastYear,
+                                            orders: currentOrderGroup,
+                                            showMonthGroup: true
+                                        });
+
+                                        currentYearGroup.push({
+                                            year: lastYear,
+                                            months: currentDateGroup,
+                                            showYearGroup: true
+                                        })
+
+                                        groupedOrders.push({
+                                            customer: lastCustomer,
+                                            dateGroup: currentYearGroup,
+                                            showCustomerGroup: true
+                                        });
+                                    }
+                                }
+                            }
+                        } else {
+                            currentDateGroup.push({
+                                month: lastMonth,
+                                year: lastYear,
+                                orders: currentOrderGroup,
+                                showMonthGroup: true
+                            });
+
+                            currentYearGroup.push({
+                                year: lastYear,
+                                months: currentDateGroup,
+                                showYearGroup: true
+                            })
+
+                            groupedOrders.push({
+                                customer: lastCustomer,
+                                dateGroup: currentYearGroup,
+                                showCustomerGroup: true
+                            });
+
+                            lastMonth = currentMonth;
+                            lastYear = currentYear;
+                            currentYearGroup = [];
+                            currentDateGroup = [];
+                            currentOrderGroup = [];
+
+                            currentOrderGroup.push(order);
+                            lastCustomer = currentCustomer;
+
+                            if (index === newOrders.length - 1) {
+                                groupedOrders.push({
+                                    customer: lastCustomer,
+                                    dateGroup: [
+                                        {
+                                            year: lastYear,
+                                            months: [
+                                                {
+                                                    month: lastMonth,
+                                                    year: lastYear,
+                                                    orders: currentOrderGroup,
+                                                    showMonthGroup: true
+                                                }
+                                            ],
+                                            showYearGroup: true
+                                        }
+                                    ],
+                                    showCustomerGroup: true
+                                });
+                            }
+                        }
+                    }
+
+                    return false;
+                })
+
+                groupedOrders = groupedOrders.map((groupOrder) => {
+                    // YEAR AND MONTH TOTALS
+                    groupOrder.dateGroup.map((year) => {
+                        year.totals = {
+                            orderCount: year.months.reduce((a, b) => {
+                                return a + b.orders.length;
+                            }, 0),
+                            customerCharges: year.months.reduce((a, b) => {
+                                return a + b.orders.reduce((c, d) => {
+                                    return c + d.total_customer_rating;
+                                }, 0);
+                            }, 0),
+                            carrierCosts: year.months.reduce((a, b) => {
+                                return a + b.orders.reduce((c, d) => {
+                                    return c + d.total_carrier_rating;
+                                }, 0);
+                            }, 0),
+                            profit: ((year.months.reduce((a, b) => {
+                                return a + b.orders.reduce((c, d) => {
+                                    return c + d.total_customer_rating;
+                                }, 0);
+                            }, 0)) - (year.months.reduce((a, b) => {
+                                return a + b.orders.reduce((c, d) => {
+                                    return c + d.total_carrier_rating;
+                                }, 0);
+                            }, 0)))
+                        }
+
+                        year.months.map((month) => {
+                            month.totals = {
+                                orderCount: month.orders.length,
+                                customerCharges: month.orders.reduce((a, b) => {
+                                    return a + b.total_customer_rating;
+                                }, 0),
+                                carrierCosts: month.orders.reduce((a, b) => {
+                                    return a + b.total_carrier_rating;
+                                }, 0),
+                                profit: ((month.orders.reduce((a, b) => {
+                                    return a + b.total_customer_rating;
+                                }, 0)) - (month.orders.reduce((a, b) => {
+                                    return a + b.total_carrier_rating;
+                                }, 0)))
+                            }
+
+                            return month;
+                        })
+
+                        return year;
+                    });
+
+                    // CUSTOMER TOTALS
+                    groupOrder.totals = {
+                        orderCount: groupOrder.dateGroup.reduce((a, b) => {
+                            return a + b.months.reduce((c, d) => {
+                                return c + d.orders.length;
+                            }, 0);
+                        }, 0),
+                        customerCharges: groupOrder.dateGroup.reduce((a, b) => {
+                            return a + b.months.reduce((c, d) => {
+                                return c + d.orders.reduce((e, f) => {
+                                    return e + f.total_customer_rating;
+                                }, 0);
+                            }, 0);
+                        }, 0),
+                        carrierCosts: groupOrder.dateGroup.reduce((a, b) => {
+                            return a + b.months.reduce((c, d) => {
+                                return c + d.orders.reduce((e, f) => {
+                                    return e + f.total_carrier_rating;
+                                }, 0);
+                            }, 0);
+                        }, 0),
+                        profit: ((groupOrder.dateGroup.reduce((a, b) => {
+                            return a + b.months.reduce((c, d) => {
+                                return c + d.orders.reduce((e, f) => {
+                                    return e + f.total_customer_rating;
+                                }, 0);
+                            }, 0);
+                        }, 0)) - (groupOrder.dateGroup.reduce((a, b) => {
+                            return a + b.months.reduce((c, d) => {
+                                return c + d.orders.reduce((e, f) => {
+                                    return e + f.total_carrier_rating;
+                                }, 0);
+                            }, 0);
+                        }, 0)))
+                    }
+
+                    return groupOrder;
+                });
+
+                setOrders(groupedOrders)
+
+                setNoOrdersFound(newOrders.length === 0);
+            }
+        }).catch(e => {
+            console.log('Error on getting orders by customers', e);
+        }).finally(() => {
+            setIsLoading(false);
+
+            refDateStart.current.inputElement.focus({
+                preventScroll: true
+            });
         })
     }
 
@@ -878,7 +850,7 @@ const RevenueInformation = (props) => {
             }
         }
 
-        if (origin === 'admin-carrier') {
+        if (origin === 'admin-customer') {
             if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
                 props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
             }
@@ -920,7 +892,7 @@ const RevenueInformation = (props) => {
             }
         }
 
-        if (origin === 'company-carrier') {
+        if (origin === 'company-customer') {
             if (props.companyCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
                 props.setCompanyCarrierPanels([...props.companyCarrierPanels, panel]);
             }
@@ -962,7 +934,7 @@ const RevenueInformation = (props) => {
             props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'admin-carrier') {
+        if (origin === 'admin-customer') {
             props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
 
@@ -990,7 +962,7 @@ const RevenueInformation = (props) => {
             props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
         }
 
-        if (origin === 'company-carrier') {
+        if (origin === 'company-customer') {
             props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
 
@@ -1068,7 +1040,7 @@ const RevenueInformation = (props) => {
             merges.push(XLSX.utils.decode_range('A2:F2'));
 
             orders.map((item1, index1) => {
-                const { id, code, code_number, name, city, state } = item1.billToCustomer;
+                const { id, code, code_number, name, city, state } = item1.customer;
                 const { dateGroup } = item1;
                 rowCount++;
 
@@ -1231,7 +1203,7 @@ const RevenueInformation = (props) => {
     }
 
     return (
-        <div className="panel-content" tabIndex={0} ref={refRevenueInformationContainer} onKeyDown={e => {
+        <div className="panel-content" tabIndex={0} ref={refCustomerOpenInvoicesContainer} onKeyDown={e => {
             if (e.key === 'Escape') {
                 e.stopPropagation();
                 if ((dateStart || '') !== '' ||
@@ -1240,7 +1212,7 @@ const RevenueInformation = (props) => {
                     (cityDestination || '') !== '' ||
                     (stateOrigin || '') !== '' ||
                     (stateDestination || '') !== '' ||
-                    (billToCode || '') !== '') {
+                    (customerCode || '') !== '') {
                     setDateStart('');
                     setDateEnd('');
                     setCityOrigin('');
@@ -1249,15 +1221,12 @@ const RevenueInformation = (props) => {
                     setStateDestination('');
                     setZipOrigin('');
                     setZipDestination('');
-                    setBillToCode('');
-                    if ((props.selectedCustomer?.id || 0) === 0) {
-                        setCustomerCode('');
-                    }
-
+                    setCustomerCode('');
+                    
                     setOrders([]);
 
                     refDateStart.current.inputElement.focus();
-                }else{
+                } else {
                     props.closingCallback();
                 }
             }
@@ -1272,10 +1241,10 @@ const RevenueInformation = (props) => {
             {
                 (orders || []).length > 0 &&
                 <div style={{ display: 'none' }}>
-                    <ToPrint
-                        ref={refPrint}
-                        orders={orders}
-                    />
+                    {/* <ToPrint
+            ref={refPrint}
+            orders={orders}
+          /> */}
                 </div>
 
             }
@@ -1290,7 +1259,7 @@ const RevenueInformation = (props) => {
                 )
             }
 
-            <div className="order-fields-container customer-carrier">
+            <div className="order-fields-container report-customer-open-invoices">
 
                 <div className="search-fields">
                     <div className="select-box-container date" style={{ position: 'relative', marginRight: 2 }}>
@@ -1493,19 +1462,27 @@ const RevenueInformation = (props) => {
                         />
                     </div>
                     <div className="input-box-container">
-                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Bill-To Code
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>Customer Code
                         </div>
                         <input type="text"
                             tabIndex={9 + props.tabTimes}
                             maxLength={10}
                             style={{ textTransform: 'uppercase' }}
+                            onKeyDown={(e) => {
+                                const key = e.key.toLowerCase();
+
+                                if (key === 'tab') {
+                                    e.preventDefault();
+                                    doSearch();
+                                }
+                            }}
                             onInput={(e) => {
-                                setBillToCode(e.target.value)
+                                setCustomerCode(e.target.value)
                             }}
                             onChange={(e) => {
-                                setBillToCode(e.target.value)
+                                setCustomerCode(e.target.value)
                             }}
-                            value={billToCode || ''}
+                            value={customerCode || ''}
                         />
                     </div>
                     <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
@@ -1531,10 +1508,7 @@ const RevenueInformation = (props) => {
                             setStateDestination('');
                             setZipOrigin('');
                             setZipDestination('');
-                            setBillToCode('');
-                            if ((props.selectedCustomer?.id || 0) === 0) {
-                                setCustomerCode('');
-                            }
+                            setCustomerCode('');                            
 
                             setOrders([]);
 
@@ -1751,33 +1725,8 @@ const RevenueInformation = (props) => {
                             value={zipDestination || ''}
                         />
                     </div>
-                    <div className="input-box-container">
-                        <div style={{ fontSize: '0.7rem', color: 'rgba(0,0,0,0.7)', whiteSpace: 'nowrap' }}>
-                            {props.suborigin === 'customer' ? 'Customer Code' : 'Carrier Code'}
-                        </div>
-                        <input type="text"
-                            readOnly={(props.selectedCustomer?.id || 0) > 0}
-                            tabIndex={10 + props.tabTimes}
-                            maxLength={10}
-                            onKeyDown={e => {
-                                let key = e.keyCode || e.which;
-
-                                if (key === 9) {
-                                    e.preventDefault();
-                                    refDateStart.current.inputElement.focus();
-
-                                    doSearch();
-                                }
-                            }}
-                            style={{ textTransform: 'uppercase' }}
-                            onInput={(e) => {
-                                setCustomerCode(e.target.value)
-                            }}
-                            onChange={(e) => {
-                                setCustomerCode(e.target.value)
-                            }}
-                            value={customerCode || ''}
-                        />
+                    <div className="select-box-container" style={{ flexGrow: 1 }}>
+                        
                     </div>
                     <div className="input-toggle-container" style={{ minWidth: '7.5rem', maxWidth: '7.5rem' }}>
                         <input type="checkbox"
@@ -1794,7 +1743,7 @@ const RevenueInformation = (props) => {
                     </div>
                     <div className="button-container">
                         <div>
-                            <div className="mochi-button" onClick={doSearch}>
+                            <div className="mochi-button" onClick={() => { doSearch() }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Find</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
@@ -1804,7 +1753,7 @@ const RevenueInformation = (props) => {
                 </div>
 
             </div>
-            <div className="order-info-container customer-carrier">
+            <div className="order-info-container report-customer-open-invoices">
                 <div className="form-bordered-box" style={{
                     backgroundColor: (orders || []).length > 0 ? 'rgba(0,0,0,0.1)' : 'transparent'
                 }}>
@@ -1813,7 +1762,7 @@ const RevenueInformation = (props) => {
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
                             <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
-                                handleExport();
+                                // handleExport();
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Export</div>
@@ -1821,7 +1770,7 @@ const RevenueInformation = (props) => {
                             </div>
 
                             <div className={`mochi-button ${(orders || []).length > 0} ? '' : 'disabled'`} onClick={() => {
-                                handlePrint();
+                                // handlePrint();
                             }}>
                                 <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                                 <div className="mochi-button-base">Print</div>
@@ -1843,10 +1792,9 @@ const RevenueInformation = (props) => {
                                 <div className="order-info-col order-date">Order Date</div>
                                 <div className="order-info-col order-number">Order Number</div>
                                 <div className="order-info-col customer-charges">Customer Charges</div>
-                                <div className="order-info-col carrier-costs">Carrier Costs</div>
+                                <div className="order-info-col customer-costs">Carrier Costs</div>
                                 <div className="order-info-col profit">Profit</div>
                                 <div className="order-info-col percentage">Percentage</div>
-                                <div className="order-info-col paid">Paid</div>
                             </div>
                         </div>
                     }
@@ -1856,7 +1804,7 @@ const RevenueInformation = (props) => {
                         <div className="order-info-wrapper">
                             {
                                 (orders || []).map((groupOrder, index1) => {
-                                    const { id, code, code_number, name, city, state } = groupOrder.billToCustomer;
+                                    const { id, code, name } = groupOrder.customer;
                                     const { dateGroup } = groupOrder;
                                     const customerOrdersClasses = classnames({
                                         'customer-orders': true,
@@ -1866,34 +1814,11 @@ const RevenueInformation = (props) => {
                                     return (
                                         <div className="customer-container" key={index1}>
                                             <div className="customer-info">
-                                                <span>Bill To</span>
-                                                <span className="customer-bill-to-code" onClick={() => {
-                                                    let panel = {
-                                                        panelName: `${props.panelName}-customer`,
-                                                        component: (
-                                                            <Customers
-                                                                pageName={"Customer"}
-                                                                title={"Bill-To Company"}
-                                                                panelName={`${props.panelName}-customer`}
-                                                                tabTimes={200025 + props.tabTimes}
-                                                                componentId={moment().format("x")}
-                                                                isOnPanel={true}
-                                                                isAdmin={props.isAdmin}
-                                                                origin={props.origin}
-                                                                closingCallback={() => {
-                                                                    closePanel(`${props.panelName}-customer`, props.origin);
-                                                                    refDateStart.current.inputElement.focus({ preventScroll: true });
-                                                                }}
+                                                <span>Customer</span>
+                                                <span className="customer-code" onClick={() => {
 
-                                                                customer_id={id}
-                                                            />
-                                                        ),
-                                                    };
-
-                                                    openPanel(panel, props.origin);
-                                                }}>{code}{code_number > 0 ? code_number : ''}</span>-
-                                                <span>{name}</span>-
-                                                <span>{city}, {state}</span>
+                                                }}>{code}</span>-
+                                                <span>{name}</span>
 
                                                 <FontAwesomeIcon
                                                     icon={groupOrder.showCustomerGroup ? faCaretDown : faCaretUp}
@@ -1999,6 +1924,11 @@ const RevenueInformation = (props) => {
                                                                                     <div className={monthOrdersClasses}>
                                                                                         {
                                                                                             orders.map((order, index4) => {
+                                                                                                const itemClasses = classnames({
+                                                                                                    'date-group-order-item': true,
+                                                                                                    'cancelled': (order?.is_cancelled || 0) === 1
+                                                                                                })
+
                                                                                                 return (
                                                                                                     <div
                                                                                                         className="date-group-order-item"
@@ -2027,18 +1957,19 @@ const RevenueInformation = (props) => {
 
                                                                                                             openPanel(panel, props.origin);
                                                                                                         }}>
-                                                                                                        <div
-                                                                                                            className="order-info-col order-date">
+
+                                                                                                        <div className="order-info-col order-date">
                                                                                                             {
                                                                                                                 moment(order.order_date_time, 'YYYY-MM-DD HH:mm:ss').format('MM/DD/YYYY')
                                                                                                             }
                                                                                                         </div>
-                                                                                                        <div
-                                                                                                            className="order-info-col order-number">
+
+                                                                                                        <div className="order-info-col order-number">
                                                                                                             {
                                                                                                                 order.order_number
                                                                                                             }
                                                                                                         </div>
+
                                                                                                         <div
                                                                                                             className="order-info-col customer-charges">
                                                                                                             <NumberFormat
@@ -2057,7 +1988,7 @@ const RevenueInformation = (props) => {
                                                                                                             />
                                                                                                         </div>
                                                                                                         <div
-                                                                                                            className="order-info-col carrier-costs">
+                                                                                                            className="order-info-col customer-costs">
                                                                                                             <NumberFormat
                                                                                                                 className={classnames({
                                                                                                                     'negative-number': order.total_carrier_rating < 0
@@ -2129,10 +2060,7 @@ const RevenueInformation = (props) => {
                                                                                                                 displayType={'text'}
                                                                                                                 readOnly={true}
                                                                                                             />
-                                                                                                        </div>
-                                                                                                        <div className='order-info-col paid'>
-                                                                                                            <input type="checkbox" name='' checked={(order?.customer_check_number || '') !== ''} />
-                                                                                                        </div>
+                                                                                                        </div>                                                                                                        
                                                                                                     </div>
                                                                                                 )
                                                                                             })
@@ -2177,7 +2105,7 @@ const RevenueInformation = (props) => {
                                                                                                 />
                                                                                             </div>
                                                                                             <div
-                                                                                                className="order-info-col carrier-costs">
+                                                                                                className="order-info-col customer-costs">
                                                                                                 <NumberFormat
                                                                                                     className={classnames({
                                                                                                         'negative-number': (group.totals.carrierCosts) < 0
@@ -2255,7 +2183,6 @@ const RevenueInformation = (props) => {
                                                                                                     readOnly={true}
                                                                                                 />
                                                                                             </div>
-                                                                                            <div className='order-info-col paid'></div>
                                                                                         </div>
                                                                                     }
                                                                                 </div>
@@ -2299,7 +2226,7 @@ const RevenueInformation = (props) => {
                                                                                 readOnly={true}
                                                                             />
                                                                         </div>
-                                                                        <div className="order-info-col carrier-costs">
+                                                                        <div className="order-info-col customer-costs">
                                                                             <NumberFormat
                                                                                 className={classnames({
                                                                                     'negative-number': (yearGroup.totals.carrierCosts) < 0
@@ -2388,7 +2315,7 @@ const RevenueInformation = (props) => {
                                                 <div className="customer-totals">
                                                     <div className="order-info-col order-number">Total <span
                                                         style={{ fontWeight: 'bold' }}>
-                                                        {code}{code_number > 0 ? code_number : ''}</span></div>
+                                                        {code}</span></div>
                                                     <div className="order-info-col order-totals">
                                                         <span style={{
                                                             fontWeight: 'bold',
@@ -2415,7 +2342,7 @@ const RevenueInformation = (props) => {
                                                             readOnly={true}
                                                         />
                                                     </div>
-                                                    <div className="order-info-col carrier-costs">
+                                                    <div className="order-info-col customer-costs">
                                                         <NumberFormat
                                                             className={classnames({
                                                                 'negative-number': (groupOrder.totals.carrierCosts) < 0
@@ -2491,7 +2418,6 @@ const RevenueInformation = (props) => {
                                                             readOnly={true}
                                                         />
                                                     </div>
-                                                    <div></div>
                                                 </div>
                                             }
                                         </div>
@@ -2550,7 +2476,7 @@ const RevenueInformation = (props) => {
                                         readOnly={true}
                                     />
                                 </div>
-                                <div className="order-info-col carrier-costs">
+                                <div className="order-info-col customer-costs">
                                     <NumberFormat
                                         className={classnames({
                                             'negative-number': (orders.reduce((a, b) => {
@@ -2680,7 +2606,6 @@ const RevenueInformation = (props) => {
                                         readOnly={true}
                                     />
                                 </div>
-                                <div></div>
                             </div>
                         </div>
                     }
@@ -2732,4 +2657,4 @@ export default connect(mapStateToProps, {
     setAdminReportPanels,
     setCompanyReportPanels,
 
-})(RevenueInformation)
+})(ReportCustomerOpenInvoices)

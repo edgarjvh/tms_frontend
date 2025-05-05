@@ -39,6 +39,9 @@ import {
 import ReportCustomer from '../panels/report-customer/ReportCustomer';
 import ReportCarrier from '../panels/report-carrier/ReportCarrier';
 import ReportAgent from '../panels/report-agent/ReportAgent';
+import ReportCustomerOpenInvoices from '../panels/report-customer-open-invoices/ReportCustomerOpenInvoices';
+import ReportCarrierOpenInvoices from '../panels/report-carrier-open-invoices/ReportCarrierOpenInvoices';
+import ReportAgentRevenue from '../panels/report-agent-revenue/ReportAgentRevenue';
 
 const Reports = (props) => {
     const refReportsMainContainer = useRef();
@@ -231,6 +234,9 @@ const Reports = (props) => {
                                 title="Customer Report"
                                 tabTimes={39050 + props.tabTimes}
                                 origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-customers`, props.origin);
+                                }}
                             />
                         ),
                     };
@@ -251,6 +257,9 @@ const Reports = (props) => {
                                 title="Carrier Report"
                                 tabTimes={39060 + props.tabTimes}
                                 origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-carriers`, props.origin);
+                                }}
                             />
                         ),
                     };
@@ -271,6 +280,9 @@ const Reports = (props) => {
                                 title="Agent Report"
                                 tabTimes={39070 + props.tabTimes}
                                 origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-agents`, props.origin);
+                                }}
                             />
                         ),
                     };
@@ -279,6 +291,75 @@ const Reports = (props) => {
                 }}>
                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
                     <div className="mochi-button-base">Agents</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-customer-open-invoices`,
+                        component: (
+                            <ReportCustomerOpenInvoices
+                                panelName={`${props.panelName}-customer-open-invoices`}
+                                title="Customer Open Invoices Report"
+                                tabTimes={3934050 + props.tabTimes}
+                                origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-customer-open-invoices`, props.origin);
+                                }}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Customer Open Invoices</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-carrier-open-invoices`,
+                        component: (
+                            <ReportCarrierOpenInvoices
+                                panelName={`${props.panelName}-carrier-open-invoices`}
+                                title="Carrier Open Invoices Report"
+                                tabTimes={39340360 + props.tabTimes}
+                                origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-carrier-open-invoices`, props.origin);
+                                }}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Carrier Open Invoices</div>
+                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                </div>
+
+                <div className="mochi-button" onClick={() => {
+                    let panel = {
+                        panelName: `${props.panelName}-agent-revenue`,
+                        component: (
+                            <ReportAgentRevenue
+                                panelName={`${props.panelName}-agent-revenue`}
+                                title="Agent Revenues Report"
+                                tabTimes={49340360 + props.tabTimes}
+                                origin={props.origin}
+                                closingCallback={() => {
+                                    closePanel(`${props.panelName}-agent-revenue`, props.origin);
+                                }}
+                            />
+                        ),
+                    };
+
+                    openPanel(panel, props.origin);
+                }}>
+                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                    <div className="mochi-button-base">Agent Revenues</div>
                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                 </div>
             </div>

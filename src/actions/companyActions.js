@@ -85,10 +85,10 @@ export const setReportsScreenFocused = bool => {
     }
 }
 
-export const setCompanyHomePanels = bool => {
+export const setCompanyHomePanels = panels => {
     return {
         type: companyConstants.SET_COMPANY_HOME_PANELS,
-        payload: bool
+        payload: panels
     }
 }
 
@@ -96,5 +96,12 @@ export const setCustomersTPanels = bool => {
     return {
         type: companyConstants.SET_CUSTOMERS_T_PANELS,
         payload: bool
+    }
+}
+
+export const setCompanySuperOrigin = companySuperOrigin => {
+    return {
+        type: companyConstants.SET_COMPANY_SUPER_ORIGIN,
+        payload: companySuperOrigin
     }
 }

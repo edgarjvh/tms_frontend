@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Company.css';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
-// import { Transition, Spring, animated, config } from 'react-spring';
 import { useTransition, animated, config } from 'react-spring';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretRight, faCalendarAlt, faPencilAlt, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { useDetectClickOutside } from "react-detect-click-outside";
+import moment from 'moment';
 import Draggable from 'react-draggable';
 import axios from 'axios';
+
+import { useHotkeys, useHotkeysContext } from 'react-hotkeys-hook';
 
 import {
     setMainScreen,
@@ -29,7 +28,6 @@ import {
     setLoadBoardScreenFocused,
     setInvoiceScreenFocused,
     setReportsScreenFocused,
-    setCompanyHomePanels,
     setCustomersTPanels,
 } from '../../actions/companyActions';
 
@@ -77,8 +75,7 @@ import {
     setCustomerTripNumber,
     setCustomerDivision,
     setCustomerLoadType,
-    setCustomerTemplate,
-    setCompanyDispatchPanels
+    setCustomerTemplate
 } from '../../actions/dispatchActions';
 
 import {
@@ -146,7 +143,6 @@ import {
     setCustomerSelectedConsigneeCompanyInfo,
     setCustomerConsigneeCompanySearch,
     setCustomerSelectedConsigneeCompanyContact,
-    setCompanyCustomerPanels
 } from '../../actions/customersActions';
 
 import {
@@ -206,12 +202,10 @@ import {
     setSelectedCustomerCarrierInfoDocument,
     setCustomerCarrierInfoDocumentTags as setSelectedCustomerCarrierInfoDocumentTags,
     setSelectedCustomerCarrierInfoDocumentNote,
-    setCompanyCarrierPanels
 } from '../../actions/carriersActions';
 
 import {
-    setLoadBoardOpenedPanels,
-    setCompanyLoadBoardPanels
+    setLoadBoardOpenedPanels
 } from '../../actions/loadBoardActions';
 
 import {
@@ -233,15 +227,29 @@ import {
     setSelectedOrderInvoiceCarrierDocumentTags,
     setSelectedOrderInvoiceInternalNote,
     setSelectedOrderInvoiceBillingNote,
-    setCompanyInvoicePanels
 } from '../../actions/invoiceActions';
 
 import {
-    setCompanyReportPanels
-} from '../../actions/reportsActions';
-
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+    setCompanySuperOrigin
+} from './../../actions';
 import { CompanyHome, Dispatch, Customers, Carriers, LoadBoard, Invoice, Reports, CustomersT } from './../company';
-import moment from 'moment';
+import PersonalContacts from './panels/personal-contacts/PersonalContacts';
 
 function Company(props) {
     const baseWidth = 95;
@@ -275,8 +283,12 @@ function Company(props) {
         'is-showing': props.mainScreen === 'company'
     });
 
+    const { enableScope, disableScope  } = useHotkeysContext();
+
     const userClick = () => {
         props.setMainScreen('admin');
+        enableScope('admin');
+        disableScope('company');
     }
 
     useEffect(() => {
@@ -285,7 +297,72 @@ function Company(props) {
         } else if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_PRO_SERVER_URL !== 'https://tms.et3.dev/api') {
             setTCount(1);
         }
+
+        props.setCompanySuperOrigin('company-home');
     }, []);
+
+    useHotkeys('alt+u', () => {
+        userClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+h', () => {
+        homeBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })    
+
+    useHotkeys('alt+c', () => {
+        customersBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+a', () => {
+        carriersBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+d', () => {
+        dispatchBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+l', () => {
+        loadBoardBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+i', () => {
+        invoiceBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+r', () => {
+        reportsBtnClick();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
+
+    useHotkeys('alt+o', () => {
+        openPersonalContactsPanel();
+    }, {
+        enableOnFormTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+        scopes: ['company']
+    })
 
     const homeBtnClick = async () => {
         let curPages = props.pages;
@@ -299,20 +376,7 @@ function Company(props) {
         }
 
         props.setMainCompanyScreenFocused(true);
-    }
-
-    const testBtnClick = async () => {
-        let curPages = props.pages;
-
-        if (curPages.indexOf('customers-t') === -1) {
-            await props.setPages([...curPages, 'customers-t']);
-            await props.setSelectedPageIndex(curPages.length);
-
-        } else {
-            await props.setSelectedPageIndex(props.pages.indexOf('customers-t'));
-        }
-
-        props.setCustomerTScreenFocused(true);
+        props.setCompanySuperOrigin('company-home');
     }
 
     const dispatchBtnClick = async () => {
@@ -327,6 +391,7 @@ function Company(props) {
         }
 
         props.setDispatchScreenFocused(true);
+        props.setCompanySuperOrigin('company-dispatch');
     }
 
     const customersBtnClick = async () => {
@@ -341,6 +406,7 @@ function Company(props) {
         }
 
         props.setCustomerScreenFocused(true);
+        props.setCompanySuperOrigin('company-customer');
     }
 
     const carriersBtnClick = async () => {
@@ -355,6 +421,7 @@ function Company(props) {
         }
 
         props.setCarrierScreenFocused(true);
+        props.setCompanySuperOrigin('company-carrier');
     }
 
     const loadBoardBtnClick = async () => {
@@ -369,6 +436,7 @@ function Company(props) {
         }
 
         props.setLoadBoardScreenFocused(true);
+        props.setCompanySuperOrigin('company-load-board');
     }
 
     const invoiceBtnClick = async () => {
@@ -383,6 +451,7 @@ function Company(props) {
         }
 
         props.setInvoiceScreenFocused(true);
+        props.setCompanySuperOrigin('company-invoice');
     }
 
     const reportsBtnClick = async () => {
@@ -397,6 +466,7 @@ function Company(props) {
         }
 
         props.setReportsScreenFocused(true);
+        props.setCompanySuperOrigin('company-report');
     }
 
     const homePanelTransition = useTransition(props.companyHomePanels, {
@@ -696,6 +766,48 @@ function Company(props) {
     }
 
     const openPanel = (panel, origin) => {
+        if (origin === 'admin-home') {
+            if (props.adminHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminHomePanels([...props.adminHomePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-carrier') {
+            if (props.adminCarrierPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCarrierPanels([...props.adminCarrierPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-company-setup') {
+            if (props.adminCompanySetupPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCompanySetupPanels([...props.adminCompanySetupPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-customer') {
+            if (props.adminCustomerPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminCustomerPanels([...props.adminCustomerPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-dispatch') {
+            if (props.adminDispatchPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminDispatchPanels([...props.adminDispatchPanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-invoice') {
+            if (props.adminInvoicePanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminInvoicePanels([...props.adminInvoicePanels, panel]);
+            }
+        }
+
+        if (origin === 'admin-report') {
+            if (props.adminReportPanels.find(p => p.panelName === panel.panelName) === undefined) {
+                props.setAdminReportPanels([...props.adminReportPanels, panel]);
+            }
+        }
+
         if (origin === 'company-home') {
             if (props.companyHomePanels.find(p => p.panelName === panel.panelName) === undefined) {
                 props.setCompanyHomePanels([...props.companyHomePanels, panel]);
@@ -740,138 +852,60 @@ function Company(props) {
     }
 
     const closePanel = (panelName, origin) => {
+        if (origin === 'admin-home') {
+            props.setAdminHomePanels(props.adminHomePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-carrier') {
+            props.setAdminCarrierPanels(props.adminCarrierPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-company-setup') {
+            props.setAdminCompanySetupPanels(props.adminCompanySetupPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-customer') {
+            props.setAdminCustomerPanels(props.adminCustomerPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-dispatch') {
+            props.setAdminDispatchPanels(props.adminDispatchPanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-invoice') {
+            props.setAdminInvoicePanels(props.adminInvoicePanels.filter(panel => panel.panelName !== panelName));
+        }
+
+        if (origin === 'admin-report') {
+            props.setAdminReportPanels(props.adminReportPanels.filter(panel => panel.panelName !== panelName));
+        }
+
         if (origin === 'company-home') {
-            let currentCompanyHomePanels = [...props.companyHomePanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyHomePanels(props.companyHomePanels.filter(panel => panel.panelName !== panelName));
-
-            let companyHomePanelsLength = currentCompanyHomePanels.length;
-
-            if (companyHomePanelsLength > 0) {
-                let lastPanelName = currentCompanyHomePanels[companyHomePanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyHomePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
         }
 
         if (origin === 'company-carrier') {
-            let currentCompanyCarrierPanels = [...props.companyCarrierPanels.filter(panel => panel.panelName !== panelName)];
-            props.setCompanyCarrierPanels(currentCompanyCarrierPanels);
-
-            let companyCarrierPanelsLength = currentCompanyCarrierPanels.length;
-
-            if (companyCarrierPanelsLength > 0) {
-                let lastPanelName = currentCompanyCarrierPanels[companyCarrierPanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyCarrierPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refCompanyCarrierCode?.current) {
-                    refCompanyCarrierCode.current.focus();
-                }
-            }
+            props.setCompanyCarrierPanels(props.companyCarrierPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'company-customer') {
-            let currentCompanyCustomerPanels = [...props.companyCustomerPanels.filter(panel => panel.panelName !== panelName)];
-            props.setCompanyCustomerPanels(currentCompanyCustomerPanels);
-
-            let companyCustomerPanelsLength = currentCompanyCustomerPanels.length;
-
-            if (companyCustomerPanelsLength > 0) {
-                let lastPanelName = currentCompanyCustomerPanels[companyCustomerPanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyCustomerPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refCompanyCustomerCode?.current) {
-                    refCompanyCustomerCode.current.focus();
-                }
-            }
+            props.setCompanyCustomerPanels(props.companyCustomerPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'company-dispatch') {
-            let currentCompanyDispatchPanels = [...props.companyDispatchPanels.filter(panel => panel.panelName !== panelName)];
-            props.setCompanyDispatchPanels(currentCompanyDispatchPanels);
-
-            let companyDispatchPanelsLength = currentCompanyDispatchPanels.length;
-
-            if (companyDispatchPanelsLength > 0) {
-                let lastPanelName = currentCompanyDispatchPanels[companyDispatchPanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyDispatchPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refCompanyDispatchOrderNumber?.current) {
-                    refCompanyDispatchOrderNumber.current.focus();
-                }
-            }
+            props.setCompanyDispatchPanels(props.companyDispatchPanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'company-invoice') {
-            let currentCompanyInvoicePanels = [...props.companyInvoicePanels.filter(panel => panel.panelName !== panelName)];
-            props.setCompanyInvoicePanels(currentCompanyInvoicePanels);
-
-            let companyInvoicePanelsLength = currentCompanyInvoicePanels.length;
-
-            if (companyInvoicePanelsLength > 0) {
-                let lastPanelName = currentCompanyInvoicePanels[companyInvoicePanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyInvoicePanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                if (refCompanyInvoiceOrderNumber?.current) {
-                    refCompanyInvoiceOrderNumber.current.focus();
-                }
-            }
+            props.setCompanyInvoicePanels(props.companyInvoicePanels.filter(panel => panel.panelName !== panelName));
         }
 
         if (origin === 'company-load-board') {
-            let currentCompanyLoadBoardPanels = [...props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyLoadBoardPanels(props.companyLoadBoardPanels.filter(panel => panel.panelName !== panelName));
-
-            let companyLoadBoardPanelsLength = currentCompanyLoadBoardPanels.length;
-
-            if (companyLoadBoardPanelsLength > 0) {
-                let lastPanelName = currentCompanyLoadBoardPanels[companyLoadBoardPanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyLoadBoardPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
         }
 
         if (origin === 'company-report') {
-            let currentCompanyReportPanels = [...props.companyReportPanels.filter(panel => panel.panelName !== panelName)];
             props.setCompanyReportPanels(props.companyReportPanels.filter(panel => panel.panelName !== panelName));
-
-            let companyReportPanelsLength = currentCompanyReportPanels.length;
-
-            if (companyReportPanelsLength > 0) {
-                let lastPanelName = currentCompanyReportPanels[companyReportPanelsLength - 1]?.panelName || '';
-                let refEl = (refCompanyReportsPanels.current || []).find(x => x?.id === `${origin}-panel-${lastPanelName}`);
-
-                if (refEl) {
-                    refEl.focus();
-                }
-            } else {
-                // Focus the main input when is available
-            }
         }
     }
 
@@ -884,6 +918,25 @@ function Company(props) {
         'screen-content': true,
         'pro': true
     })
+
+    const openPersonalContactsPanel = () => {
+        let panel = {
+            panelName: `${props.panelName}-personal-contacts`,
+            component: <PersonalContacts
+                title='Personal Contacts'
+                tabTimes={moment().unix() + props.tabTimes}
+                panelName={`${props.panelName}-personal-contacts`}
+                origin={props.companySuperOrigin}
+                owner='user'
+                closingCallback={() => {
+                    closePanel(`${props.panelName}-personal-contacts`, props.companySuperOrigin);
+                }}
+                componentId={moment().format('x')}
+            />
+        }
+
+        openPanel(panel, props.companySuperOrigin);
+    }
 
     return (
         <div className={containerCls}>
@@ -962,9 +1015,17 @@ function Company(props) {
                                 <div className="mochi-button-base">Video</div>
                                 <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                             </div>
+
+                            <div className="mochi-button" onClick={() => {
+                                openPersonalContactsPanel();
+                            }}>
+                                <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                <div className="mochi-button-base">Contacts</div>
+                                <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                            </div>
                         </div>
                         <div className="section">
-                            <div className="mochi-input-decorator">
+                            <div className="mochi-input-decorator" style={{ padding: 2 }}>
                                 <input type="search" placeholder="just type" id="txt-main-search" />
                             </div>
                         </div>
@@ -1362,7 +1423,7 @@ function Company(props) {
                                                         ?
                                                         <div className="panel-content">
                                                             <div className="drag-handler" onClick={e => e.stopPropagation()}></div>
-                                                            <div className="title">{panel?.component?.props?.title}</div>                                                            
+                                                            <div className="title">{panel?.component?.props?.title}</div>
                                                             <div className="side-title"><div>{panel?.component?.props?.title}</div></div>
                                                             {panel?.component}
                                                         </div>
@@ -1812,6 +1873,7 @@ const mapStateToProps = state => {
         selectedInvoiceCarrierInfoDocumentTags: state.carrierReducers.invoiceCarrierInfoDocumentTags,
         selectedInvoiceCarrierInfoDocumentNote: state.carrierReducers.selectedInvoiceCarrierInfoDocumentNote,
 
+        companySuperOrigin: state.companyReducers.companySuperOrigin,
         companyHomePanels: state.companyReducers.companyHomePanels,
         customersTPanels: state.companyReducers.customersTPanels,
         companyCarrierPanels: state.carrierReducers.companyCarrierPanels,
@@ -2032,5 +2094,23 @@ export default connect(mapStateToProps, {
     setCompanyDispatchPanels,
     setCompanyInvoicePanels,
     setCompanyLoadBoardPanels,
-    setCompanyReportPanels
+    setCompanyReportPanels,
+
+    setAdminHomePanels,
+    setCompanyHomePanels,
+    setAdminCarrierPanels,
+    setCompanyCarrierPanels,
+    setAdminCompanySetupPanels,
+    setCompanyCompanySetupPanels,
+    setAdminCustomerPanels,
+    setCompanyCustomerPanels,
+    setAdminDispatchPanels,
+    setCompanyDispatchPanels,
+    setAdminInvoicePanels,
+    setCompanyInvoicePanels,
+    setAdminLoadBoardPanels,
+    setCompanyLoadBoardPanels,
+    setAdminReportPanels,
+    setCompanyReportPanels,
+    setCompanySuperOrigin
 })(Company)

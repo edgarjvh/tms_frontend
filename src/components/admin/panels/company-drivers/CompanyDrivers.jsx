@@ -590,7 +590,7 @@ const CompanyDrivers = props => {
                     contact.first_name = first;
                     contact.last_name = last;
 
-                    axios.post(props.serverUrl + `/saveDriverEmergencyContact`, contact).then(res => {
+                    axios.post(props.serverUrl + `/saveDriverEmergencyContact`, { ...contact, owner_id: selectedDriver.id }).then(res => {
                         if (res.data.result === 'OK') {
 
                             if (res.data.contact) {
@@ -701,6 +701,8 @@ const CompanyDrivers = props => {
                 title='Contacts'
                 tabTimes={2258000 + props.tabTimes}
                 panelName={`${props.panelName}-contacts`}
+                selectedOwner={selectedDriver}
+                getContactsUrl='/getContactsByDriverId'
                 savingContactUrl={`/saveDriverEmergencyContact`}
                 deletingContactUrl={`/deleteDriverEmergencyContact`}
                 uploadAvatarUrl={`/uploadDriverEmergencyContactAvatar`}
@@ -708,18 +710,32 @@ const CompanyDrivers = props => {
                 permissionName='customer contacts'
                 origin={props.origin}
                 owner={props.subOrigin}
+                isEditingContact={true}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-contacts`, props.origin);
                     refDriverInfoCode.current.focus({ preventScroll: true });
                 }}
-                
-                
-                componentId={moment().format('x')}
+                savingCallback={(contact, contacts) => {
+                    setSelectedDriver(prev => {
+                        return { ...prev, contacts: contacts }
+                    })
 
-                contactSearchCustomer={{
-                    ...selectedDriver,
-                    selectedContact: { ...contact }
+                    if ((selectedContact?.id || 0) === contact.id) {
+                        setSelectedContact(contact);
+                    }
                 }}
+                deletingCallback={(contactId, contacts) => {
+                    setSelectedDriver(prev => {
+                        return { ...prev, contacts: contacts }
+                    })
+
+                    if ((selectedContact?.id || 0) === contactId) {
+                        setSelectedContact({});
+                    }
+                }}
+
+                componentId={moment().format('x')}
+                selectedContactId={contact?.id}
             />
         }
 
@@ -1074,7 +1090,7 @@ const CompanyDrivers = props => {
                         closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-license`, props.origin);
                         refDriverInfoCode.current.focus({ preventScroll: true });
                     }}
-                    
+
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedLicense }}
                     selectedOwnerDocument={{
@@ -1109,7 +1125,7 @@ const CompanyDrivers = props => {
                         closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-medical-card`, props.origin);
                         refDriverInfoCode.current.focus({ preventScroll: true });
                     }}
-                    
+
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedMedicalCard }}
                     selectedOwnerDocument={{
@@ -1144,7 +1160,7 @@ const CompanyDrivers = props => {
                         closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-tractor`, props.origin);
                         refDriverInfoCode.current.focus({ preventScroll: true });
                     }}
-                    
+
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedTractor }}
                     selectedOwnerDocument={{
@@ -1179,7 +1195,7 @@ const CompanyDrivers = props => {
                         closePanel(`${props.panelName}-documents-company-${(props.subOrigin || 'driver') === 'operator' ? 'operator' : 'driver'}-trailer`, props.origin);
                         refDriverInfoCode.current.focus({ preventScroll: true });
                     }}
-                    
+
                     componentId={moment().format("x")}
                     selectedOwner={{ ...selectedTrailer }}
                     selectedOwnerDocument={{
@@ -1366,12 +1382,12 @@ const CompanyDrivers = props => {
 
     return (
         <div className="panel-content" tabIndex={0} ref={refCompanyDriversContainer} onKeyDown={(e) => {
-            if (e.key === 'Escape'){
+            if (e.key === 'Escape') {
                 e.stopPropagation();
-                if ((selectedDriver?.id || 0) > 0){
+                if ((selectedDriver?.id || 0) > 0) {
                     setInitialValues();
                     refDriverInfoCode.current.focus()
-                }else{
+                } else {
                     props.closingCallback();
                 }
             }
@@ -2562,6 +2578,8 @@ const CompanyDrivers = props => {
                                         title='Contacts'
                                         tabTimes={2258000 + props.tabTimes}
                                         panelName={`${props.panelName}-contacts`}
+                                        selectedOwner={selectedDriver}
+                                        getContactsUrl='/getContactsByDriverId'
                                         savingContactUrl={`/saveDriverEmergencyContact`}
                                         deletingContactUrl={`/deleteDriverEmergencyContact`}
                                         uploadAvatarUrl={`/uploadDriverEmergencyContactAvatar`}
@@ -2573,14 +2591,27 @@ const CompanyDrivers = props => {
                                             closePanel(`${props.panelName}-contacts`, props.origin);
                                             refDriverInfoCode.current.focus({ preventScroll: true });
                                         }}
-                                        
-                                        
-                                        componentId={moment().format('x')}
+                                        savingCallback={(contact, contacts) => {
+                                            setSelectedDriver(prev => {
+                                                return { ...prev, contacts: contacts }
+                                            })
 
-                                        contactSearchCustomer={{
-                                            ...selectedDriver,
-                                            selectedContact: { ...selectedContact }
+                                            if ((selectedContact?.id || 0) === contact.id) {
+                                                setSelectedContact(contact);
+                                            }
                                         }}
+                                        deletingCallback={(contactId, contacts) => {
+                                            setSelectedDriver(prev => {
+                                                return { ...prev, contacts: contacts }
+                                            })
+
+                                            if ((selectedContact?.id || 0) === contactId) {
+                                                setSelectedContact({});
+                                            }
+                                        }}
+
+                                        componentId={moment().format('x')}
+                                        selectedContactId={selectedContact.id}
                                     />
                                 }
 
@@ -2602,6 +2633,8 @@ const CompanyDrivers = props => {
                                         title='Contacts'
                                         tabTimes={2258000 + props.tabTimes}
                                         panelName={`${props.panelName}-contacts`}
+                                        selectedOwner={selectedDriver}
+                                        getContactsUrl='/getContactsByDriverId'
                                         savingContactUrl={`/saveDriverEmergencyContact`}
                                         deletingContactUrl={`/deleteDriverEmergencyContact`}
                                         uploadAvatarUrl={`/uploadDriverEmergencyContactAvatar`}
@@ -2614,16 +2647,26 @@ const CompanyDrivers = props => {
                                             closePanel(`${props.panelName}-contacts`, props.origin);
                                             refDriverInfoCode.current.focus({ preventScroll: true });
                                         }}
-                                        
-                                        componentId={moment().format('x')}
+                                        savingCallback={(contact, contacts) => {
+                                            setSelectedDriver(prev => {
+                                                return { ...prev, contacts: contacts }
+                                            })
 
-                                        contactSearchCustomer={{
-                                            ...selectedDriver,
-                                            selectedContact: {
-                                                id: 0,
-                                                driver_id: selectedDriver?.id
+                                            if ((selectedContact?.id || 0) === contact.id) {
+                                                setSelectedContact(contact);
                                             }
                                         }}
+                                        deletingCallback={(contactId, contacts) => {
+                                            setSelectedDriver(prev => {
+                                                return { ...prev, contacts: contacts }
+                                            })
+
+                                            if ((selectedContact?.id || 0) === contactId) {
+                                                setSelectedContact({});
+                                            }
+                                        }}
+
+                                        componentId={moment().format('x')}
                                     />
                                 }
 

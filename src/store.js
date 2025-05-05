@@ -9,7 +9,8 @@ import {
     dispatchReducers, 
     loadBoardReducers,
     companySetupReducers,
-    reportReducers
+    reportReducers,
+    userReducers
 } from './reducers';
 import thunk from 'redux-thunk';
 
@@ -24,7 +25,8 @@ export const store = createStore(
         dispatchReducers,
         loadBoardReducers,
         companySetupReducers,
-        reportReducers
+        reportReducers,
+        userReducers
     })
     // applyMiddleware(thunk)
 );

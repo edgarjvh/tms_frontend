@@ -307,6 +307,46 @@ const Dispatch = (props) => {
                         ...props.selectedOrder,
                     };
                 });
+            } else {
+                if ((selectedOrder?.id || 0) > 0 &&
+                    (selectedOrder?.is_cancelled || 0) === 0 &&
+                    (selectedOrder?.order_invoiced || 0) === 0) {
+                    if ((props.selectedOrder?.agent_code || '') !== '') {
+                        if ((selectedOrder?.bill_to_company?.agent?.code || '') === props.selectedOrder.agent_code) {
+                            let currentAgentCommission = selectedOrder?.agent_commission;
+
+                            setSelectedOrder(prev => {
+                                return {
+                                    ...prev,
+                                    bill_to_company: {
+                                        ...prev.bill_to_company,
+                                        agent: {
+                                            ...prev.bill_to_company.agent,
+                                            agent_pay_brokerage: props.selectedOrder.agent_pay_brokerage,
+                                            agent_pay_et3: props.selectedOrder.agent_pay_et3
+                                        }
+                                    },
+                                    agent_commission: (selectedOrder?.agent_code || '') === (props.selectedOrder.agent_code)
+                                        ? (selectedOrder?.user_code?.code || '') === (props.selectedOrder.agent_code)
+                                            ? props.selectedOrder?.agent_pay_brokerage || 0
+                                            : (props.selectedOrder?.agent_pay_et3 || 0) > 0
+                                                ? 100 - props.selectedOrder?.agent_pay_et3
+                                                : 0
+                                        : currentAgentCommission
+                                }
+                            })
+                        }
+
+                        window.setTimeout(() => {
+                            validateOrderForSaving({ keyCode: 9 });
+                        }, 10);
+                    }
+
+                }
+
+
+
+
             }
         }
     }, [props.selectedOrder]);
@@ -591,6 +631,7 @@ const Dispatch = (props) => {
 
     const refDivision = useRef();
     const refLoadType = useRef();
+    const refAgentCode = useRef();
     const refTemplate = useRef();
     const refCarrierCode = useRef();
     const refEquipment = useRef();
@@ -614,6 +655,23 @@ const Dispatch = (props) => {
         },
     });
     const refLoadTypePopupItems = useRef([]);
+
+    const refProfits = useRef()
+    const [showProfitItems, setShowProfitItems] = useState(false)
+    const refProfitDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setShowProfitItems(false);
+        },
+    });
+    const refProfitPopupItems = useRef([]);
+
+    const [agentCodeItems, setAgentCodeItems] = useState([])
+    const refAgentCodeDropDown = useDetectClickOutside({
+        onTriggered: async () => {
+            await setAgentCodeItems([]);
+        },
+    });
+    const refAgentCodePopupItems = useRef([]);
 
     const [templateItems, setTemplateItems] = useState([]);
     const refTemplateDropDown = useDetectClickOutside({
@@ -717,6 +775,22 @@ const Dispatch = (props) => {
         leave: { opacity: 0, top: "calc(100% + 7px)" },
         config: { duration: 100 },
         reverse: loadTypeItems.length > 0,
+    });
+
+    const profitTransition = useTransition(showProfitItems, {
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
+        reverse: showProfitItems,
+    });
+
+    const agentCodeTransition = useTransition(agentCodeItems.length > 0, {
+        from: { opacity: 0, top: "calc(100% + 7px)" },
+        enter: { opacity: 1, top: "calc(100% + 12px)" },
+        leave: { opacity: 0, top: "calc(100% + 7px)" },
+        config: { duration: 100 },
+        reverse: agentCodeItems.length > 0,
     });
 
     const templateTransition = useTransition(templateItems.length > 0, {
@@ -1936,10 +2010,12 @@ const Dispatch = (props) => {
                                 }
 
                                 if ((carrier?.drivers || []).length > 0) {
-                                    if ((res.data?.driver_code || '') !== '') {
-                                        driver = carrier.drivers.find(x => (x.code || '').toUpperCase() === (res.data.driver_code).toUpperCase());
-                                    } else {
+                                    if (carrier.drivers.length === 1) {
                                         driver = { ...carrier.drivers[0] };
+                                    } else {
+                                        if ((res.data?.driver_code || '') !== '') {
+                                            driver = carrier.drivers.find(x => (x.code || '').toUpperCase() === (res.data.driver_code).toUpperCase());
+                                        }
                                     }
                                 }
                             }
@@ -2632,16 +2708,32 @@ const Dispatch = (props) => {
             if (!isCreatingTemplate && !isEditingTemplate) {
                 axios.post(props.serverUrl + "/saveOrder", selected_order).then((res) => {
                     if (res.data.result === "OK") {
+                        let newOrder = res.data.order;
+
+                        if (newOrder?.bill_to_company?.agent) {
+                            if ((newOrder?.agent_code || '') === '') {
+                                newOrder.agent_code = newOrder.bill_to_company.agent.code;
+                                newOrder.agent_commission = (newOrder?.user_code?.code || '') === newOrder.bill_to_company.agent.code
+                                    ? newOrder?.bill_to_company.agent.agent_pay_brokerage || 0
+                                    : (newOrder?.bill_to_company?.agent?.agent_pay_et3 || 0) > 0
+                                        ? 100 - newOrder.bill_to_company.agent.agent_pay_et3
+                                        : 0;
+                            }
+                        } else {
+                            newOrder.agent_code = '';
+                            newOrder.agent_commission = '';
+                        }
+
                         setSelectedOrder(prev => {
                             return {
                                 ...prev,
-                                ...res.data.order
+                                ...newOrder
                             }
                         });
 
                         if (!isEditingTemplate && !isCreatingTemplate) {
                             props.setSelectedOrder({
-                                ...res.data.order,
+                                ...newOrder,
                                 component_id: props.componentId,
                             });
                         }
@@ -2650,12 +2742,12 @@ const Dispatch = (props) => {
                             setSelectedShipperCustomer((selectedShipperCustomer) => {
                                 return {
                                     ...selectedShipperCustomer,
-                                    pickup_id: res.data.order.pickups[0].id,
+                                    pickup_id: newOrder.pickups[0].id,
                                 };
                             });
                         }
 
-                        if ((selected_order?.id || 0) === 0 && res.data.order.id > 0) {
+                        if ((selected_order?.id || 0) === 0 && newOrder.id > 0) {
                             if (!isAddingNewShipper && !isAddingNewConsignee) {
                                 refShipperCompanyCode.current.focus();
                             }
@@ -4255,7 +4347,7 @@ const Dispatch = (props) => {
                     if ((selectedOrder?.id || 0) > 0) {
                         dispatchClearBtnClick();
                     } else {
-                        if (props.isOnPanel){
+                        if (props.isOnPanel) {
                             props.closingCallback();
                         }
                     }
@@ -8174,7 +8266,7 @@ const Dispatch = (props) => {
                                                 ((selectedOrder?.is_cancelled || 0) === 1) ||
                                                 !((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent')
                                             }
-                                            onKeyDown={async (e) => {
+                                            onKeyDown={(e) => {
                                                 if ((selectedOrder?.is_cancelled || 0) === 0) {
                                                     let key = e.keyCode || e.which;
 
@@ -8189,14 +8281,14 @@ const Dispatch = (props) => {
                                                                     );
 
                                                                     if (selectedIndex === -1) {
-                                                                        await setDriverItems(
+                                                                        setDriverItems(
                                                                             driverItems.map((item, index) => {
                                                                                 item.selected = index === 0;
                                                                                 return item;
                                                                             })
                                                                         );
                                                                     } else {
-                                                                        await setDriverItems(
+                                                                        setDriverItems(
                                                                             driverItems.map((item, index) => {
                                                                                 if (selectedIndex === 0) {
                                                                                     item.selected = index === driverItems.length - 1;
@@ -8225,12 +8317,12 @@ const Dispatch = (props) => {
                                                                                 carrier_id: selectedCarrier.id,
                                                                                 agent_id: selectedCarrier.id,
                                                                                 owner_type: selectedOrder?.carrier_owner_type,
-                                                                                name: selectedCarrierDriver?.name
+                                                                                // name: selectedCarrierDriver?.name
                                                                             }
-                                                                        ).then(async (res) => {
+                                                                        ).then((res) => {
                                                                             if (res.data.result === "OK") {
                                                                                 if (res.data.count > 0) {
-                                                                                    await setDriverItems([
+                                                                                    setDriverItems([
                                                                                         ...[{
                                                                                             name: "Clear",
                                                                                             id: null,
@@ -8243,7 +8335,7 @@ const Dispatch = (props) => {
                                                                                         }),
                                                                                     ]);
                                                                                 } else {
-                                                                                    await setDriverItems([
+                                                                                    setDriverItems([
                                                                                         ...[{
                                                                                             name: "Clear",
                                                                                             id: null,
@@ -8264,10 +8356,9 @@ const Dispatch = (props) => {
                                                                                     }
                                                                                 );
                                                                             }
-                                                                        })
-                                                                            .catch(async (e) => {
-                                                                                console.log("error getting carrier drivers", e);
-                                                                            });
+                                                                        }).catch(async (e) => {
+                                                                            console.log("error getting carrier drivers", e);
+                                                                        });
                                                                     }
                                                                 }
                                                                 break;
@@ -8281,14 +8372,14 @@ const Dispatch = (props) => {
                                                                     );
 
                                                                     if (selectedIndex === -1) {
-                                                                        await setDriverItems(
+                                                                        setDriverItems(
                                                                             driverItems.map((item, index) => {
                                                                                 item.selected = index === 0;
                                                                                 return item;
                                                                             })
                                                                         );
                                                                     } else {
-                                                                        await setDriverItems(
+                                                                        setDriverItems(
                                                                             driverItems.map((item, index) => {
                                                                                 if (selectedIndex === driverItems.length - 1) {
                                                                                     item.selected = index === 0;
@@ -8317,12 +8408,12 @@ const Dispatch = (props) => {
                                                                                 carrier_id: selectedCarrier.id,
                                                                                 agent_id: selectedCarrier.id,
                                                                                 owner_type: selectedOrder?.carrier_owner_type,
-                                                                                name: selectedCarrierDriver?.name
+                                                                                // name: selectedCarrierDriver?.name
                                                                             }
-                                                                        ).then(async (res) => {
+                                                                        ).then((res) => {
                                                                             if (res.data.result === "OK") {
                                                                                 if (res.data.count > 0) {
-                                                                                    await setDriverItems([
+                                                                                    setDriverItems([
                                                                                         ...[{
                                                                                             name: "Clear",
                                                                                             id: null,
@@ -8337,7 +8428,7 @@ const Dispatch = (props) => {
                                                                                         ),
                                                                                     ]);
                                                                                 } else {
-                                                                                    await setDriverItems([
+                                                                                    setDriverItems([
                                                                                         ...[{
                                                                                             name: "Clear",
                                                                                             id: null,
@@ -8372,18 +8463,18 @@ const Dispatch = (props) => {
                                                             case 13: // enter
                                                                 if (driverItems.length > 0 && driverItems.findIndex((item) => item.selected) > -1) {
                                                                     if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                        await setSelectedCarrierDriver({ name: "" });
+                                                                        setSelectedCarrierDriver({ name: "" });
 
                                                                         if (!isCreatingTemplate && !isEditingTemplate) {
                                                                             axios.post(props.serverUrl + "/saveOrder", {
                                                                                 ...selectedOrder,
                                                                                 carrier_driver_id: null,
-                                                                            }).then(async (res) => {
+                                                                            }).then((res) => {
                                                                                 if (res.data.result === "OK") {
-                                                                                    await setSelectedOrder({
+                                                                                    setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                     });
-                                                                                    await props.setSelectedOrder({
+                                                                                    props.setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                         component_id: props.componentId,
                                                                                     });
@@ -8400,8 +8491,8 @@ const Dispatch = (props) => {
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     } else {
-                                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
-                                                                        await setSelectedOrder({
+                                                                        setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
+                                                                        setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
                                                                             equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
@@ -8414,9 +8505,9 @@ const Dispatch = (props) => {
                                                                                 carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
                                                                                 equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
                                                                                 equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
-                                                                            }).then(async (res) => {
+                                                                            }).then((res) => {
                                                                                 if (res.data.result === "OK") {
-                                                                                    await props.setSelectedOrder({
+                                                                                    props.setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                         component_id: props.componentId,
                                                                                     });
@@ -8442,19 +8533,19 @@ const Dispatch = (props) => {
                                                                 if (driverItems.length > 0) {
                                                                     e.preventDefault();
                                                                     if (driverItems[driverItems.findIndex((item) => item.selected)].id === null) {
-                                                                        await setSelectedCarrierDriver({ name: "" });
+                                                                        setSelectedCarrierDriver({ name: "" });
 
                                                                         if (!isCreatingTemplate && !isEditingTemplate) {
                                                                             axios.post(props.serverUrl + "/saveOrder", {
                                                                                 ...selectedOrder,
                                                                                 carrier_driver_id: null,
-                                                                            }).then(async (res) => {
+                                                                            }).then((res) => {
                                                                                 if (res.data.result === "OK") {
-                                                                                    await setSelectedOrder({
+                                                                                    setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                     });
 
-                                                                                    await props.setSelectedOrder({
+                                                                                    props.setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                         component_id: props.componentId,
                                                                                     });
@@ -8471,9 +8562,9 @@ const Dispatch = (props) => {
 
                                                                         refDriverPhone.current.inputElement.focus();
                                                                     } else {
-                                                                        await setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
+                                                                        setSelectedCarrierDriver(driverItems[driverItems.findIndex((item) => item.selected)]);
 
-                                                                        await setSelectedOrder({
+                                                                        setSelectedOrder({
                                                                             ...selectedOrder,
                                                                             carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
                                                                             equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
@@ -8486,9 +8577,9 @@ const Dispatch = (props) => {
                                                                                 carrier_driver_id: driverItems[driverItems.findIndex((item) => item.selected)].id,
                                                                                 equipment: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type,
                                                                                 equipment_id: driverItems[driverItems.findIndex((item) => item.selected)]?.tractor?.type_id
-                                                                            }).then(async (res) => {
+                                                                            }).then((res) => {
                                                                                 if (res.data.result === "OK") {
-                                                                                    await props.setSelectedOrder({
+                                                                                    props.setSelectedOrder({
                                                                                         ...res.data.order,
                                                                                         component_id: props.componentId,
                                                                                     });
@@ -8546,12 +8637,12 @@ const Dispatch = (props) => {
                                                             carrier_id: selectedCarrier.id,
                                                             agent_id: selectedCarrier.id,
                                                             owner_type: selectedOrder?.carrier_owner_type,
-                                                            name: selectedCarrierDriver?.name
+                                                            // name: selectedCarrierDriver?.name
                                                         }
-                                                    ).then(async (res) => {
+                                                    ).then((res) => {
                                                         if (res.data.result === "OK") {
                                                             if (res.data.count > 0) {
-                                                                await setDriverItems([
+                                                                setDriverItems([
                                                                     ...[{
                                                                         name: "Clear",
                                                                         id: null,
@@ -8566,7 +8657,7 @@ const Dispatch = (props) => {
                                                                     ),
                                                                 ]);
                                                             } else {
-                                                                await setDriverItems([
+                                                                setDriverItems([
                                                                     ...[{
                                                                         name: "Clear",
                                                                         id: null,
@@ -8605,7 +8696,7 @@ const Dispatch = (props) => {
                                         {
                                             ((selectedOrder?.is_cancelled || 0) === 0 &&
                                                 ((selectedOrder?.carrier_owner_type || '') === 'carrier' || (selectedOrder?.carrier_owner_type || '') === 'agent') &&
-                                                ((selectedCarrier?.drivers || []).length > 0)) && (
+                                                ((selectedCarrier?.drivers || []).length > 1)) && (
                                                 <FontAwesomeIcon
                                                     className="dropdown-button"
                                                     icon={faCaretDown}
@@ -8620,12 +8711,12 @@ const Dispatch = (props) => {
                                                                             carrier_id: selectedCarrier.id,
                                                                             agent_id: selectedCarrier.id,
                                                                             owner_type: selectedOrder?.carrier_owner_type,
-                                                                            name: selectedCarrierDriver?.name
+                                                                            // name: selectedCarrierDriver?.name
                                                                         }
-                                                                    ).then(async (res) => {
+                                                                    ).then((res) => {
                                                                         if (res.data.result === "OK") {
                                                                             if (res.data.count > 0) {
-                                                                                await setDriverItems([
+                                                                                setDriverItems([
                                                                                     ...[{
                                                                                         name: "Clear",
                                                                                         id: null,
@@ -8638,7 +8729,7 @@ const Dispatch = (props) => {
                                                                                     }),
                                                                                 ]);
                                                                             } else {
-                                                                                await setDriverItems([
+                                                                                setDriverItems([
                                                                                     ...[{
                                                                                         name: "Clear",
                                                                                         id: null,
@@ -8751,9 +8842,9 @@ const Dispatch = (props) => {
                                                                                             carrier_driver_id: item.id,
                                                                                             equipment: item?.tractor?.type,
                                                                                             equipment_id: item?.tractor?.type_id
-                                                                                        }).then(async (res) => {
+                                                                                        }).then((res) => {
                                                                                             if (res.data.result === "OK") {
-                                                                                                await props.setSelectedOrder({
+                                                                                                props.setSelectedOrder({
                                                                                                     ...res.data.order,
                                                                                                     component_id: props.componentId,
                                                                                                 });
@@ -9498,7 +9589,7 @@ const Dispatch = (props) => {
                                                 refShipperCompanyCode.current.focus();
                                             }}
                                         >
-                                            <div>PU {index + 1}</div>
+                                            <div>Pick-Up {index + 1}</div>
                                             {
                                                 (selectedOrder?.is_cancelled || 0) === 0 &&
                                                 <div
@@ -9953,6 +10044,15 @@ const Dispatch = (props) => {
                                                     <span className="fas fa-times"></span>
                                                 </div>
                                             }
+                                            <div style={{ fontWeight: "bold" }}>
+                                                {
+                                                    (pickup?.customer?.id || 0) > 0
+                                                        ? (pickup?.customer?.code_number || 0) === 0
+                                                            ? (pickup?.customer?.code || '')
+                                                            : (pickup?.customer?.code || '') + pickup?.customer?.code_number
+                                                        : ''
+                                                }
+                                            </div>
                                         </SwiperSlide>
                                     );
                                 }
@@ -10599,6 +10699,15 @@ const Dispatch = (props) => {
                                                     <span className="fas fa-times"></span>
                                                 </div>
                                             }
+                                            <div style={{ fontWeight: "bold" }}>
+                                                {
+                                                    (delivery?.customer?.id || 0) > 0
+                                                        ? (delivery?.customer?.code_number || 0) === 0
+                                                            ? (delivery?.customer?.code || '')
+                                                            : (delivery?.customer?.code || '') + delivery?.customer?.code_number
+                                                        : ''
+                                                }
+                                            </div>
                                         </SwiperSlide>
                                     );
                                 }
@@ -14530,7 +14639,163 @@ const Dispatch = (props) => {
                         >
                             <div className="form-header">
                                 <div className="top-border top-border-left"></div>
-                                <div className="form-title">Consignee</div>
+                                <div className="form-title" style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    gap: 10,
+                                    alignItems: 'center'
+                                }}>
+                                    <span>Consignee</span>
+                                    <FontAwesomeIcon icon={faPlus} style={{ cursor: 'pointer' }} onClick={() => {
+                                        if ((selectedOrder?.deliveries || []).find(x => x.id === 0)) {
+                                            const newDeliveries = (selectedOrder?.deliveries || []).filter(x => x.id !== 0);
+
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    deliveries: newDeliveries
+                                                }
+                                            })
+
+                                            if (newDeliveries.length > 0) {
+                                                setSelectedConsigneeCustomer({
+                                                    ...newDeliveries[0].customer,
+                                                    delivery_id: newDeliveries[0].id
+                                                })
+
+                                                setSelectedConsigneeCustomerContact((newDeliveries[0].customer?.contacts || []).find(c => c.is_primary === 1) || {})
+                                            }
+                                        }
+
+                                        let panel = {
+                                            panelName: `${props.panelName}-customer`,
+                                            component: (
+                                                <Customers
+                                                    pageName={"Customer"}
+                                                    title={"Consignee Company"}
+                                                    panelName={`${props.panelName}-customer`}
+                                                    tabTimes={300043 + props.tabTimes}
+                                                    componentId={moment().format("x")}
+                                                    isOnPanel={true}
+                                                    isAdmin={props.isAdmin}
+                                                    origin={props.origin}
+                                                    suborigin='dispatch consignee'
+                                                    onCustomerChangeCallback={(customer) => {
+                                                        // checking if the order is already created
+                                                        if ((selectedOrder?.id || 0) > 0) {
+                                                            // checking if the customer is already selected as consignee
+                                                            if ((selectedConsigneeCustomer?.id || 0) === customer.id) {
+                                                                setSelectedOrder(prev => {
+                                                                    return {
+                                                                        ...prev,
+                                                                        deliveries: (prev?.deliveries || []).map((p, i) => {
+                                                                            if (p.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
+                                                                                p.customer = customer;
+                                                                                p.customer_id = customer.id;
+
+                                                                                setSelectedConsigneeCustomer(prev => {
+                                                                                    return {
+                                                                                        ...prev,
+                                                                                        ...customer,
+                                                                                        customer: {}
+                                                                                    }
+                                                                                })
+
+                                                                                setSelectedConsigneeCustomerContact((customer.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                                            }
+                                                                            return p;
+                                                                        })
+                                                                    }
+                                                                })
+
+                                                                setIsShowingConsigneeSecondPage(true);
+                                                            } else { // if the customer is not selected as shipper, is added as new delivery and selected as consignee
+                                                                setSelectedOrder((prev) => {
+                                                                    return {
+                                                                        ...prev,
+                                                                        deliveries: [
+                                                                            ...(prev?.deliveries || []),
+                                                                            {
+                                                                                id: 0,
+                                                                                order_id: prev.id,
+                                                                                customer: { ...customer },
+                                                                                customer_id: customer.id
+                                                                            }
+                                                                        ]
+                                                                    };
+                                                                });
+
+                                                                setSelectedConsigneeCustomer({
+                                                                    ...customer,
+                                                                    customer: {},
+                                                                    delivery_id: 0
+                                                                })
+
+                                                                setSelectedConsigneeCustomerContact((customer?.contacts || []).find((c) => c.is_primary === 1) || {})
+                                                                setIsShowingConsigneeSecondPage(true)
+                                                                setIsSavingDeliveryId(0)
+                                                            }
+                                                        } else {
+                                                            // if the order is not created yet, check if the customer has the Bill To Code filled
+                                                            // and proceed to create the order with the selected customer as bill to customer and consignee
+                                                            if ((customer?.bill_to_code || '') !== '') {
+                                                                setIsLoading(true);
+                                                                const billToCode = (customer?.bill_to_code || '') + ((customer?.bill_to_code_number || 0) === 0 ? '' : customer.bill_to_code_number)
+
+                                                                axios.post(props.serverUrl + "/getCustomerByCode", {
+                                                                    code: billToCode,
+                                                                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : ''
+                                                                }).then((res) => {
+                                                                    if (res.data.result === "OK") {
+                                                                        setSelectedBillToCustomer(res.data.customer);
+                                                                        setSelectedBillToCustomerContact((res.data.customer.contacts || []).find((c) => c.is_primary === 1) || {});
+
+                                                                        setSelectedConsigneeCustomer({
+                                                                            ...customer,
+                                                                            customer: {},
+                                                                            pickup_id: 0
+                                                                        })
+
+                                                                        setSelectedConsigneeCustomerContact((customer?.contacts || []).find((c) => c.is_primary === 1) || {})
+
+                                                                        setSelectedOrder((selectedOrder) => {
+                                                                            return {
+                                                                                ...selectedOrder,
+                                                                                bill_to_customer_id: res.data.customer.id,
+                                                                                deliveries: [
+                                                                                    {
+                                                                                        toSave: true,
+                                                                                        id: 0,
+                                                                                        customer: { ...customer },
+                                                                                        customer_id: customer.id
+                                                                                    }
+                                                                                ]
+                                                                            };
+                                                                        });
+
+                                                                        validateOrderForSaving({ keyCode: 9 });
+
+                                                                        setIsShowingConsigneeSecondPage(true);
+                                                                    }
+                                                                    setIsLoading(false);
+                                                                }).catch((e) => {
+                                                                    console.log("error getting customers", e);
+                                                                    setIsLoading(false);
+                                                                });
+                                                            }
+                                                        }
+                                                    }}
+                                                    closingCallback={() => {
+                                                        closePanel(`${props.panelName}-customer`, props.origin);
+                                                        (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                                    }}
+                                                />
+                                            ),
+                                        };
+
+                                        openPanel(panel, props.origin);
+                                    }} />
+                                </div>
                                 <div className="top-border top-border-middle"></div>
                                 <div className="form-buttons">
                                     <div className="mochi-button" onClick={() => {
@@ -18179,7 +18444,7 @@ const Dispatch = (props) => {
                                                                         goToTabindex(
                                                                             (54 + props.tabTimes).toString()
                                                                         );
-                                                                        
+
                                                                         if ((selectedOrder?.load_type_id || 0) === 2) {
                                                                             let panel = {
                                                                                 panelName: `${props.panelName}-carrier-list`,
@@ -18216,7 +18481,7 @@ const Dispatch = (props) => {
                                                                         if (delivery.id === (selectedConsigneeCustomer?.delivery_id || 0)) {
                                                                             delivery.special_instructions = e.target.value;
                                                                         }
-                                                                        return delivery;                                                                        
+                                                                        return delivery;
                                                                     })
                                                                 });
 
@@ -18326,11 +18591,417 @@ const Dispatch = (props) => {
                             <div className="top-border top-border-right"></div>
                         </div>
 
-                        <div className="input-box-container grow">
-                            <input type="text" placeholder="Agent Code" readOnly={true} />
+                        <div className="select-box-container">
+                            <div className="select-box-wrapper">
+                                <input
+                                    type="text"
+                                    // tabIndex={4 + props.tabTimes}
+                                    placeholder="Agent Code"
+                                    ref={refAgentCode}
+                                    readOnly={(selectedOrder?.is_cancelled || 0) === 1 ||
+                                        (selectedOrder?.id || 0) === 0 ||
+                                        (selectedOrder?.order_invoiced || 0) === 1 ||
+                                        !(selectedOrder?.bill_to_company?.agent)
+                                    }
+                                    onKeyDown={(e) => {
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
+
+                                            switch (key) {
+                                                case 37:
+                                                case 38: // arrow left | arrow up
+                                                    e.preventDefault();
+                                                    if (!((selectedOrder?.is_cancelled || 0) === 1 ||
+                                                        (selectedOrder?.id || 0) === 0 ||
+                                                        (selectedOrder?.order_invoiced || 0) === 1 ||
+                                                        !(selectedOrder?.bill_to_company?.agent))) {
+                                                        if (agentCodeItems.length > 0) {
+                                                            let selectedIndex = agentCodeItems.findIndex(
+                                                                (item) => item.selected
+                                                            );
+
+                                                            if (selectedIndex === -1) {
+                                                                setAgentCodeItems(agentCodeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }));
+                                                            } else {
+                                                                setAgentCodeItems(agentCodeItems.map((item, index) => {
+                                                                    if (selectedIndex === 0) {
+                                                                        item.selected = index === agentCodeItems.length - 1;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex - 1;
+                                                                    }
+                                                                    return item;
+                                                                }));
+                                                            }
+
+                                                            refAgentCodePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            setAgentCodeItems([
+                                                                {
+                                                                    id: 1,
+                                                                    name: 'Not Assigned',
+                                                                    selected: (selectedOrder?.agent_code || '') === '' || (selectedOrder?.agent_code || '') === 'Not Assigned'
+                                                                },
+                                                                {
+                                                                    id: 2,
+                                                                    name: (selectedOrder?.bill_to_company?.agent?.code || '') !== ''
+                                                                        ? selectedOrder.bill_to_company.agent.code
+                                                                        : '',
+                                                                    selected: (selectedOrder?.agent_code || '') !== '' &&
+                                                                        (selectedOrder?.agent_code || '') === (selectedOrder?.bill_to_company?.agent?.code || '')
+                                                                }
+                                                            ])
+
+                                                            refAgentCodePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+
+                                                    break;
+
+                                                case 39:
+                                                case 40: // arrow right | arrow down
+                                                    e.preventDefault();
+                                                    if (!((selectedOrder?.is_cancelled || 0) === 1 ||
+                                                        (selectedOrder?.id || 0) === 0 ||
+                                                        (selectedOrder?.order_invoiced || 0) === 1 ||
+                                                        !(selectedOrder?.bill_to_company?.agent))) {
+                                                        if (agentCodeItems.length > 0) {
+                                                            let selectedIndex = agentCodeItems.findIndex(
+                                                                (item) => item.selected
+                                                            );
+
+                                                            if (selectedIndex === -1) {
+                                                                setAgentCodeItems(agentCodeItems.map((item, index) => {
+                                                                    item.selected = index === 0;
+                                                                    return item;
+                                                                }));
+                                                            } else {
+                                                                setAgentCodeItems(agentCodeItems.map((item, index) => {
+                                                                    if (selectedIndex === agentCodeItems.length - 1) {
+                                                                        item.selected = index === 0;
+                                                                    } else {
+                                                                        item.selected = index === selectedIndex + 1;
+                                                                    }
+                                                                    return item;
+                                                                }));
+                                                            }
+
+                                                            refAgentCodePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        } else {
+                                                            setAgentCodeItems([
+                                                                {
+                                                                    id: 1,
+                                                                    name: 'Not Assigned',
+                                                                    selected: (selectedOrder?.agent_code || '') === '' || (selectedOrder?.agent_code || '') === 'Not Assigned'
+                                                                },
+                                                                {
+                                                                    id: 2,
+                                                                    name: (selectedOrder?.bill_to_company?.agent?.code || '') !== ''
+                                                                        ? selectedOrder.bill_to_company.agent.code
+                                                                        : '',
+                                                                    selected: (selectedOrder?.agent_code || '') !== '' &&
+                                                                        (selectedOrder?.agent_code || '') === (selectedOrder?.bill_to_company?.agent?.code || '')
+                                                                }
+                                                            ])
+
+                                                            refAgentCodePopupItems.current.map((r, i) => {
+                                                                if (r && r.classList.contains("selected")) {
+                                                                    r.scrollIntoView({
+                                                                        behavior: "auto",
+                                                                        block: "center",
+                                                                        inline: "nearest",
+                                                                    });
+                                                                }
+                                                                return true;
+                                                            });
+                                                        }
+                                                    }
+
+                                                    break;
+
+                                                case 27: // escape
+                                                    e.preventDefault();
+                                                    setAgentCodeItems([]);
+                                                    break;
+
+                                                case 13: // enter
+                                                    if (agentCodeItems.length > 0 && agentCodeItems.findIndex((item) => item.selected) > -1) {
+                                                        setSelectedOrder(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                agent_code: agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name,
+                                                                agent_commission: (agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name === 'Not Assigned'
+                                                                    ? 0
+                                                                    : (selectedOrder?.user_code?.code || '') === agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name
+                                                                        ? (selectedOrder?.bill_to_company?.agent?.agent_pay_brokerage || 0)
+                                                                        : (selectedOrder?.bill_to_company?.agent?.agent_pay_et3 || 0) > 0
+                                                                            ? 100 - selectedOrder?.bill_to_company?.agent?.agent_pay_et3
+                                                                            : 0)
+                                                            }
+                                                        })
+
+                                                        validateOrderForSaving({ keyCode: 9 });
+                                                        setAgentCodeItems([]);
+                                                        refAgentCode.current.focus();
+                                                    }
+                                                    break;
+
+                                                case 9: // tab
+                                                    if (agentCodeItems.length > 0) {
+                                                        e.preventDefault();
+                                                        setSelectedOrder(prev => {
+                                                            return {
+                                                                ...prev,
+                                                                agent_code: agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name,
+                                                                agent_commission: (agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name === 'Not Assigned'
+                                                                    ? 0
+                                                                    : (selectedOrder?.user_code?.code || '') === agentCodeItems[agentCodeItems.findIndex((item) => item.selected)].name
+                                                                        ? (selectedOrder?.bill_to_company?.agent?.agent_pay_brokerage || 0)
+                                                                        : (selectedOrder?.bill_to_company?.agent?.agent_pay_et3 || 0) > 0
+                                                                            ? 100 - selectedOrder?.bill_to_company?.agent?.agent_pay_et3
+                                                                            : 0)
+                                                            }
+                                                        })
+                                                        validateOrderForSaving({ keyCode: 9 });
+                                                        setAgentCodeItems([]);
+                                                        refAgentCode.current.focus();
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }}
+
+                                    onChange={(e) => { }}
+                                    value={selectedOrder?.agent_code || ""}
+                                />
+                                {
+                                    ((selectedOrder?.is_cancelled || 0) === 0 &&
+                                        (selectedOrder?.order_invoiced || 0) === 0 &&
+                                        (selectedOrder?.id || 0) > 0 &&
+                                        (selectedOrder?.bill_to_company?.agent?.code || '') !== '') &&
+                                    <FontAwesomeIcon
+                                        className="dropdown-button"
+                                        icon={faCaretDown}
+                                        onClick={() => {
+                                            if (agentCodeItems.length > 0) {
+                                                setAgentCodeItems([]);
+                                            } else {
+                                                window.setTimeout(() => {
+                                                    setAgentCodeItems([
+                                                        {
+                                                            id: 1,
+                                                            name: 'Not Assigned',
+                                                            selected: (selectedOrder?.agent_code || '') === '' || (selectedOrder?.agent_code || '') === 'Not Assigned'
+                                                        },
+                                                        {
+                                                            id: 2,
+                                                            name: (selectedOrder?.bill_to_company?.agent?.code || '') !== ''
+                                                                ? selectedOrder.bill_to_company.agent.code
+                                                                : '',
+                                                            selected: (selectedOrder?.agent_code || '') !== '' &&
+                                                                (selectedOrder?.agent_code || '') === (selectedOrder?.bill_to_company?.agent?.code || '')
+                                                        }
+                                                    ])
+
+                                                    refAgentCodePopupItems.current.map((r, i) => {
+                                                        if (r && r.classList.contains("selected")) {
+                                                            r.scrollIntoView({
+                                                                behavior: "auto",
+                                                                block: "center",
+                                                                inline: "nearest",
+                                                            });
+                                                        }
+                                                        return true;
+                                                    });
+                                                }, 10)
+                                            }
+
+                                            refAgentCode.current.focus();
+                                        }}
+                                    />
+                                }
+                            </div>
+
+                            {agentCodeTransition(
+                                (style, item) =>
+                                    item && (
+                                        <animated.div
+                                            className="mochi-contextual-container"
+                                            id="mochi-contextual-container-agent-code"
+                                            style={{
+                                                ...style,
+                                                left: "calc(0% - 250px)",
+                                                display: "block",
+                                            }}
+                                            ref={refAgentCodeDropDown}
+                                        >
+                                            <div
+                                                className="mochi-contextual-popup vertical left below corner"
+                                                style={{ height: 150 }}
+                                            >
+                                                <div className="mochi-contextual-popup-content">
+                                                    <div className="mochi-contextual-popup-wrapper">
+                                                        {agentCodeItems.map((item, index) => {
+                                                            const mochiItemClasses = classnames({
+                                                                "mochi-item": true,
+                                                                selected: item.selected,
+                                                            });
+
+                                                            const searchValue = undefined;
+
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className={mochiItemClasses}
+                                                                    id={item.id}
+                                                                    onClick={() => {
+                                                                        setSelectedOrder(prev => {
+                                                                            return {
+                                                                                ...prev,
+                                                                                agent_code: item.name,
+                                                                                agent_commission: (item.name === 'Not Assigned'
+                                                                                    ? 0
+                                                                                    : (selectedOrder?.user_code?.code || '') === item.name
+                                                                                        ? (selectedOrder?.bill_to_company?.agent?.agent_pay_brokerage || 0)
+                                                                                        : (selectedOrder?.bill_to_company?.agent?.agent_pay_et3 || 0) > 0
+                                                                                            ? 100 - selectedOrder?.bill_to_company?.agent?.agent_pay_et3
+                                                                                            : 0)
+                                                                            }
+                                                                        })
+
+                                                                        window.setTimeout(() => {
+                                                                            validateOrderForSaving({ keyCode: 9 });
+                                                                            setAgentCodeItems([]);
+                                                                            refAgentCode.current.focus();
+                                                                        }, 0);
+                                                                    }}
+                                                                    ref={(ref) => refAgentCodePopupItems.current.push(ref)}
+                                                                >
+                                                                    {searchValue === undefined ? (
+                                                                        item.name
+                                                                    ) : (
+                                                                        <Highlighter
+                                                                            highlightClassName="mochi-item-highlight-text"
+                                                                            searchWords={[searchValue]}
+                                                                            autoEscape={true}
+                                                                            textToHighlight={item.name}
+                                                                        />
+                                                                    )}
+                                                                    {item.selected && (
+                                                                        <FontAwesomeIcon
+                                                                            className="dropdown-selected"
+                                                                            icon={faCaretRight}
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </animated.div>
+                                    )
+                            )}
                         </div>
                         <div className="input-box-container grow">
-                            <input type="text" placeholder="Agent Commision" readOnly={true} />
+                            <NumberFormat
+                                style={{ fontSize: "0.7rem", textAlign: "left" }}
+                                value={
+                                    selectedOrder?.bill_to_company?.agent
+                                        ? new Intl.NumberFormat("en-US", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        }).format(
+                                            (Number((
+                                                (selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                                    return {
+                                                        total_charges:
+                                                            Number((a.total_charges || "").toString().replace(",", "")) +
+                                                            Number((b.total_charges || "").toString().replace(",", "")),
+                                                    };
+                                                }, { total_charges: "" })?.total_charges || "").toString().replace(",", "")) -
+                                                Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                    return {
+                                                        total_charges:
+                                                            Number((a.total_charges || "").toString().replace(",", "")) +
+                                                            Number((b.total_charges || "").toString().replace(",", "")),
+                                                    };
+                                                }, { total_charges: "" })?.total_charges || "").toString().replace(",", ""))) *
+                                            ((selectedOrder?.agent_commission || 0) > 0 ? selectedOrder.agent_commission / 100 : 0)
+                                        )
+                                        : '' // not agent owner
+                                }
+                                thousandsGroupStyle="thousand"
+                                thousandSeparator={true}
+                                decimalScale={2}
+                                fixedDecimalScale={true}
+                                prefix={"$ "}
+                                type="text"
+                                onValueChange={(values) => {
+                                }}
+                                displayType={"input"}
+                                placeholder="Agent Commission"
+                                readOnly={true}
+                            />
+
+                            {
+                                (selectedOrder?.agent_date_paid || '') !== '' &&
+                                <div className="agent-paid-btn" onClick={() => {
+                                    let panel = {
+                                        panelName: `${props.panelName}-invoice`,
+                                        component: <Invoice
+                                            pageName={'Invoice'}
+                                            title={'Invoice'}
+                                            panelName={`${props.panelName}-invoice`}
+                                            tabTimes={500560 + props.tabTimes}
+                                            screenFocused={props.invoiceScreenFocused}
+                                            componentId={moment().format('x')}
+                                            isOnPanel={true}
+                                            origin={props.origin}
+                                            closingCallback={() => {
+                                                closePanel(`${props.panelName}-invoice`, props.origin);
+                                                (props.isOnPanel ? refOrderNumber : props.refOrderNumber).current.focus({ preventScroll: true });
+                                            }}
+
+                                            order_id={(selectedOrder?.id || 0)}
+                                        />
+                                    }
+
+                                    openPanel(panel, props.origin);
+                                }}>Paid</div>
+                            }
                         </div>
                         <div className="input-box-container grow">
                             <input type="text" placeholder="Salesman Code" readOnly={true} />
@@ -20495,18 +21166,244 @@ const Dispatch = (props) => {
                         |
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                        <div
-                            style={{
-                                fontSize: "0.7rem",
-                                textDecoration: "underline",
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                whiteSpace: "nowrap",
-                                marginBottom: 1,
-                            }}
-                        >
-                            Profit
+                    <div style={{ display: "flex", flexDirection: "column", position: 'relative' }}>
+                        <div>
+                            <div
+                                style={{
+                                    fontSize: "0.7rem",
+                                    textDecoration: "underline",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                    whiteSpace: "nowrap",
+                                    marginBottom: 1,
+                                    pointerEvents: (selectedOrder?.agent_code || '') === '' ? 'none' : 'all',
+                                    cursor: (selectedOrder?.agent_code || '') === '' ? 'default' : 'pointer'
+                                }}
+                                ref={refProfits}
+                                tabIndex={76 + props.tabTimes}
+                                onKeyDown={(e) => {
+                                    const key = e.keyCode || e.which;
+
+                                    if (key === 27) { // escape
+                                        e.stopPropagation()
+                                        setShowProfitItems(false);
+                                        refDispatchEvents.current.focus();
+                                    }
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if ((selectedOrder?.agent_code || '') !== '') {
+                                        window.setTimeout(() => {
+                                            setShowProfitItems(true);
+                                            refProfitDropDown.current.focus();
+                                        }, 10)
+                                    }
+                                }}
+                            >
+                                Profit
+                            </div>
+                            {profitTransition(
+                                (style, item) =>
+                                    item && (
+                                        <animated.div
+                                            className="mochi-contextual-container"
+                                            id="mochi-contextual-container-profits"
+                                            style={{
+                                                ...style,
+                                                left: "-195px",
+                                                display: "block",
+                                            }}
+                                            ref={refProfitDropDown}
+                                        >
+                                            <div
+                                                className="mochi-contextual-popup vertical below left"
+                                                style={{ height: 150 }}
+                                            >
+                                                <div className="mochi-contextual-popup-content">
+                                                    <div className="mochi-contextual-popup-wrapper" style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: 15
+                                                    }}>
+                                                        <div className='mochi-item profit' style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'space-between'
+                                                        }}>
+                                                            <div className="mochi-item-title" style={{ fontWeight: 'bold' }}>Agent Commission</div>
+                                                            <div className="mochi-item-value">
+                                                                {`$ ${selectedOrder?.bill_to_company?.agent
+                                                                    ? new Intl.NumberFormat("en-US", {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }).format(
+                                                                        (Number((
+                                                                            (selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                                                                return {
+                                                                                    total_charges:
+                                                                                        Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                                        Number((b.total_charges || "").toString().replace(",", "")),
+                                                                                };
+                                                                            }, { total_charges: "" })?.total_charges || "").toString().replace(",", "")) -
+                                                                            Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                                                return {
+                                                                                    total_charges:
+                                                                                        Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                                        Number((b.total_charges || "").toString().replace(",", "")),
+                                                                                };
+                                                                            }, { total_charges: "" })?.total_charges || "").toString().replace(",", ""))) *
+                                                                        ((selectedOrder?.agent_commission || 0) > 0 ? selectedOrder.agent_commission / 100 : 0)
+                                                                    )
+                                                                    : ''}`}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className='mochi-item profit' style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'space-between'
+                                                        }}>
+                                                            <div className="mochi-item-title" style={{ fontWeight: 'bold' }}>Company Profit</div>
+                                                            <div className="mochi-item-value">
+                                                                {
+                                                                    `$ ${new Intl.NumberFormat("en-US", {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }).format((Number(
+                                                                        (
+                                                                            (selectedOrder?.order_customer_ratings || []).reduce(
+                                                                                (a, b) => {
+                                                                                    return {
+                                                                                        total_charges:
+                                                                                            Number(
+                                                                                                (a.total_charges || "")
+                                                                                                    .toString()
+                                                                                                    .replace(",", "")
+                                                                                            ) +
+                                                                                            Number(
+                                                                                                (b.total_charges || "")
+                                                                                                    .toString()
+                                                                                                    .replace(",", "")
+                                                                                            ),
+                                                                                    };
+                                                                                },
+                                                                                { total_charges: "" }
+                                                                            )?.total_charges || ""
+                                                                        )
+                                                                            .toString()
+                                                                            .replace(",", "")
+                                                                    ) -
+                                                                        Number(
+                                                                            (
+                                                                                (selectedOrder?.order_carrier_ratings || []).reduce(
+                                                                                    (a, b) => {
+                                                                                        return {
+                                                                                            total_charges:
+                                                                                                Number(
+                                                                                                    (a.total_charges || "")
+                                                                                                        .toString()
+                                                                                                        .replace(",", "")
+                                                                                                ) +
+                                                                                                Number(
+                                                                                                    (b.total_charges || "")
+                                                                                                        .toString()
+                                                                                                        .replace(",", "")
+                                                                                                ),
+                                                                                        };
+                                                                                    },
+                                                                                    { total_charges: "" }
+                                                                                )?.total_charges || ""
+                                                                            )
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        )) - ((Number((
+                                                                            (selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                                                                return {
+                                                                                    total_charges:
+                                                                                        Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                                        Number((b.total_charges || "").toString().replace(",", "")),
+                                                                                };
+                                                                            }, { total_charges: "" })?.total_charges || "").toString().replace(",", "")) -
+                                                                            Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                                                return {
+                                                                                    total_charges:
+                                                                                        Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                                        Number((b.total_charges || "").toString().replace(",", "")),
+                                                                                };
+                                                                            }, { total_charges: "" })?.total_charges || "").toString().replace(",", ""))) *
+                                                                            ((selectedOrder?.agent_commission || 0) > 0 ? selectedOrder.agent_commission / 100 : 0)))}`
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        <div className='mochi-item profit' style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'space-between'
+                                                        }}>
+                                                            <div className="mochi-item-title" style={{ fontWeight: 'bold' }}>Total Profit</div>
+                                                            <div className="mochi-item-value">
+                                                                {
+                                                                    `$ ${new Intl.NumberFormat("en-US", {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }).format(Number(
+                                                                        (
+                                                                            (selectedOrder?.order_customer_ratings || []).reduce(
+                                                                                (a, b) => {
+                                                                                    return {
+                                                                                        total_charges:
+                                                                                            Number(
+                                                                                                (a.total_charges || "")
+                                                                                                    .toString()
+                                                                                                    .replace(",", "")
+                                                                                            ) +
+                                                                                            Number(
+                                                                                                (b.total_charges || "")
+                                                                                                    .toString()
+                                                                                                    .replace(",", "")
+                                                                                            ),
+                                                                                    };
+                                                                                },
+                                                                                { total_charges: "" }
+                                                                            )?.total_charges || ""
+                                                                        )
+                                                                            .toString()
+                                                                            .replace(",", "")
+                                                                    ) -
+                                                                        Number(
+                                                                            (
+                                                                                (selectedOrder?.order_carrier_ratings || []).reduce(
+                                                                                    (a, b) => {
+                                                                                        return {
+                                                                                            total_charges:
+                                                                                                Number(
+                                                                                                    (a.total_charges || "")
+                                                                                                        .toString()
+                                                                                                        .replace(",", "")
+                                                                                                ) +
+                                                                                                Number(
+                                                                                                    (b.total_charges || "")
+                                                                                                        .toString()
+                                                                                                        .replace(",", "")
+                                                                                                ),
+                                                                                        };
+                                                                                    },
+                                                                                    { total_charges: "" }
+                                                                                )?.total_charges || ""
+                                                                            )
+                                                                                .toString()
+                                                                                .replace(",", "")
+                                                                        ))}`
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </animated.div>
+                                    )
+                            )}
                         </div>
                         <div
                             style={{
@@ -21056,20 +21953,15 @@ const Dispatch = (props) => {
                         <div className="form-title">Events</div>
                         <div className="top-border top-border-middle"></div>
                         <div className="form-buttons">
-                            <div
-                                className="mochi-button"
-                                onClick={() => {
-                                    if (
-                                        (selectedOrder?.id || 0) === 0 ||
-                                        selectedOrder.events.length === 0
-                                    ) {
-                                        window.alert("There is nothing to print!");
-                                        return;
-                                    }
+                            <div className="mochi-button" onClick={() => {
+                                if ((selectedOrder?.id || 0) === 0 || selectedOrder.events.length === 0) {
+                                    window.alert("There is nothing to print!");
+                                    return;
+                                }
 
-                                    let html = `<h2>Order Number: ${selectedOrder.order_number} - Events</h2></br></br>`;
+                                let html = `<h2>Order Number: ${selectedOrder.order_number} - Events</h2></br></br>`;
 
-                                    html += `
+                                html += `
                                     <div style="display:flex;align-items:center;font-size: 0.9rem;font-weight:bold;margin-bottom:10px;color: rgba(0,0,0,0.8)">
                                         <div style="min-width:15%;max-width:15%;text-decoration:underline">Date & Time</div>
                                         <div style="min-width:10%;max-width:10%;text-decoration:underline">User ID</div>
@@ -21080,25 +21972,25 @@ const Dispatch = (props) => {
                                     </div>
                                     `;
 
-                                    selectedOrder.events.map((item, index) => {
-                                        html += `
+                                selectedOrder.events.map((item, index) => {
+                                    html += `
                                     <div style="padding: 5px 0;display:flex;align-items:center;font-size: 0.7rem;font-weight:normal;margin-bottom:15px;color: rgba(0,0,0,1); borderTop:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1)">
                                         <div style="min-width:15%;max-width:15%;">${item.event_date
-                                            }@${item.event_time}</div>
+                                        }@${item.event_time}</div>
                                         <div style="min-width:10%;max-width:10%;">${item?.user_code?.code || ''}</div>
                                         <div style="min-width:15%;max-width:15%;">${item.event_type.name.toUpperCase()}</div>
                                         <div style="min-width:20%;max-width:20%;">${item.event_location || ""
-                                            }</div>
+                                        }</div>
                                         <div style="min-width:40%;max-width:40%;">${item.event_notes || ""
-                                            }</div> 
+                                        }</div> 
                                     </div>
                                     `;
 
-                                        return true;
-                                    });
+                                    return true;
+                                });
 
-                                    printWindow(html);
-                                }}
+                                printWindow(html);
+                            }}
                             >
                                 <div className="mochi-button-decorator mochi-button-decorator-left">
                                     (
@@ -21125,6 +22017,11 @@ const Dispatch = (props) => {
                                 <div className="event-time">Event Time</div>
                             </div>
                         )}
+
+                        {
+                            (selectedOrder?.is_cancelled || 0) === 1 &&
+                            <div className="order-cancelled-tag">CANCELLED</div>
+                        }
 
                         <div className="order-events-wrapper" tabIndex={-1}>
                             {(selectedOrder?.events || []).map((item, index) => (

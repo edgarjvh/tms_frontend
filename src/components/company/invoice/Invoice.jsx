@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux';
 import './Invoice.css';
@@ -338,6 +340,29 @@ const Invoice = (props) => {
         }
     });
 
+    const refAgentDatePaid = useRef();
+    const [preSelectedAgentDatePaid, setPreSelectedAgentDatePaid] = useState(moment());
+    const [isAgentDatePaidCalendarShown, setIsAgentDatePaidCalendarShown] = useState(false);
+    const refAgentDatePaidCalendarDropDown = useDetectClickOutside({
+        onTriggered: (e) => {
+            let sameTarget = false;
+
+            (e.path || []).map(el => {
+                try {
+                    if (el.matches('.agent-date-paid-calendar')) {
+                        sameTarget = true;
+                    }
+                } catch (e) {
+
+                }
+            })
+
+            if (!sameTarget) {
+                setIsAgentDatePaidCalendarShown(false)
+            }
+        }
+    });
+
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingOrder, setIsSavingOrder] = useState(false);
 
@@ -451,6 +476,14 @@ const Invoice = (props) => {
         enter: { opacity: 1, display: 'block', top: 'calc(100% - 305px)' },
         leave: { opacity: 0, display: 'none', top: 'calc(100% - 300px)' },
         reverse: isDatePaidCalendarShown,
+        config: { duration: 100 }
+    });
+
+    const agentDatePaidTransition = useTransition(isAgentDatePaidCalendarShown, {
+        from: { opacity: 0, display: 'block', top: 'calc(100% + 7px)' },
+        enter: { opacity: 1, display: 'block', top: 'calc(100% + 12px)' },
+        leave: { opacity: 0, display: 'none', top: 'calc(100% + 7px)' },
+        reverse: isAgentDatePaidCalendarShown,
         config: { duration: 100 }
     });
 
@@ -857,7 +890,11 @@ const Invoice = (props) => {
         if (key === 9) {
             if ((selectedOrder.order_number || '') !== '') {
                 setIsLoading(true);
-                axios.post(props.serverUrl + '/getOrderByOrderNumber', { order_number: selectedOrder.order_number, action: action }).then(res => {
+                axios.post(props.serverUrl + '/getOrderByOrderNumber', { 
+                    order_number: selectedOrder.order_number,
+                    user_code: (props.user?.user_code?.type || 'employee') === 'agent' ? props.user.user_code.code : '',
+                    action: action 
+                }).then(res => {
                     if (res.data.result === 'OK') {
                         if (res.data.order) {
                             setSelectedOrder({ ...res.data.order });
@@ -2172,7 +2209,7 @@ const Invoice = (props) => {
                             }
                         }
                     } else {
-                        if (props.isOnPanel){
+                        if (props.isOnPanel) {
                             props.closingCallback();
                         }
                     }
@@ -11787,7 +11824,7 @@ const Invoice = (props) => {
                                             phone: e.target.value
                                         })
                                     }}
-                                    value={selectedCarrierDriver.phone || ''}
+                                    value={selectedCarrierDriver.contact_phone || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
@@ -11800,7 +11837,7 @@ const Invoice = (props) => {
                                     onChange={(e) => {
                                         setSelectedCarrierDriver({ ...selectedCarrierDriver, truck: e.target.value })
                                     }}
-                                    value={selectedCarrierDriver.truck || ''}
+                                    value={selectedCarrierDriver.tractor?.number || ''}
                                 />
                             </div>
                             <div className="form-h-sep"></div>
@@ -11813,7 +11850,7 @@ const Invoice = (props) => {
                                     onChange={(e) => {
                                         setSelectedCarrierDriver({ ...selectedCarrierDriver, trailer: e.target.value })
                                     }}
-                                    value={selectedCarrierDriver.trailer || ''}
+                                    value={selectedCarrierDriver?.trailer?.number || ''}
                                 />
                             </div>
                         </div>
@@ -12252,15 +12289,441 @@ const Invoice = (props) => {
                         </div>
                     </div>
 
+                    {
+                        (selectedOrder?.agent_code || '') !== '' &&
+                        <div className='fixed' style={{
+                            minWidth: '10rem',
+                            display: 'grid',
+                            gridTemplateColumns: '1fr',
+                            gridGap: 2
+                        }}>
+                            <div style={{
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: '0.9rem',
+                                marginBottom: 3,
+                            }}>Agent Pay</div>
+                            <div className="input-box-container grow">
+                                <NumberFormat
+                                    style={{ fontSize: "0.7rem", textAlign: "left" }}
+                                    value={
+                                        selectedOrder?.bill_to_company?.agent
+                                            ? new Intl.NumberFormat("en-US", {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            }).format(
+                                                (Number((
+                                                    (selectedOrder?.order_customer_ratings || []).reduce((a, b) => {
+                                                        return {
+                                                            total_charges:
+                                                                Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                Number((b.total_charges || "").toString().replace(",", "")),
+                                                        };
+                                                    }, { total_charges: "" })?.total_charges || "").toString().replace(",", "")) -
+                                                    Number(((selectedOrder?.order_carrier_ratings || []).reduce((a, b) => {
+                                                        return {
+                                                            total_charges:
+                                                                Number((a.total_charges || "").toString().replace(",", "")) +
+                                                                Number((b.total_charges || "").toString().replace(",", "")),
+                                                        };
+                                                    }, { total_charges: "" })?.total_charges || "").toString().replace(",", ""))) *
+                                                ((selectedOrder?.agent_commission || 0) > 0 ? selectedOrder.agent_commission / 100 : 0)
+                                            )
+                                            : '' // not agent owner
+                                    }
+                                    thousandsGroupStyle="thousand"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    fixedDecimalScale={true}
+                                    prefix={"$ "}
+                                    type="text"
+                                    onValueChange={(values) => {
+                                    }}
+                                    displayType={"input"}
+                                    placeholder="Agent Commission"
+                                    readOnly={true}
+                                />
+                            </div>
+
+                            <div className="input-box-container">
+                                <input
+                                    type="text"
+                                    placeholder="Pay By Date"
+                                    readOnly={true}
+                                    value={
+                                        (selectedOrder?.routing || []).filter(x => x.type === 'delivery').length > 0 &&
+                                            ((selectedOrder?.events || []).filter(x => x.event_type_id === 6).length >=
+                                                (selectedOrder?.routing || []).filter(x => x.type === 'delivery').length)
+                                            ? moment(
+                                                Math.max(
+                                                    ...selectedOrder.events
+                                                        .filter(x => x.event_type_id === 6)
+                                                        .map(x => new Date(x.event_date))
+                                                )
+                                            ).add(1, 'week').day(5).format('MM/DD/YYYY')
+                                            : ""
+                                    }
+                                />
+                            </div>
+
+                            <div className="select-box-container" style={{ flexGrow: 1 }}>
+                                <div className="select-box-wrapper">
+                                    <MaskedInput tabIndex={75 + props.tabTimes}
+                                        mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+                                        guide={false}
+                                        type="text" placeholder="Agent Date Paid"
+                                        readOnly={
+                                            (selectedOrder?.is_cancelled || 0) === 1 ||
+                                            ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                        }
+                                        onKeyDown={async (e) => {
+                                            if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                                let key = e.keyCode || e.which;
+
+                                                if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                    ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                    if (key >= 37 && key <= 40) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.agent_date_paid || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedAgentDatePaid(event_date);
+
+                                                        if (isAgentDatePaidCalendarShown) {
+                                                            e.preventDefault();
+
+                                                            if (key === 37) { // left - minus 1
+                                                                setPreSelectedAgentDatePaid(preSelectedAgentDatePaid.clone().subtract(1, 'day'));
+                                                            }
+
+                                                            if (key === 38) { // up - minus 7
+                                                                setPreSelectedAgentDatePaid(preSelectedAgentDatePaid.clone().subtract(7, 'day'));
+                                                            }
+
+                                                            if (key === 39) { // right - plus 1
+                                                                setPreSelectedAgentDatePaid(preSelectedAgentDatePaid.clone().add(1, 'day'));
+                                                            }
+
+                                                            if (key === 40) { // down - plus 7
+                                                                setPreSelectedAgentDatePaid(preSelectedAgentDatePaid.clone().add(7, 'day'));
+                                                            }
+                                                        } else {
+                                                            await setIsAgentDatePaidCalendarShown(true);
+                                                        }
+                                                    }
+
+                                                    if (key === 13) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.agent_date_paid || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedAgentDatePaid(event_date);
+
+                                                        if (isAgentDatePaidCalendarShown) {
+                                                            event_date = preSelectedAgentDatePaid.clone().format('MM/DD/YYYY');
+
+                                                            await setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    agent_date_paid: event_date
+                                                                }
+                                                            })
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceAgentDatePaid', {
+                                                                    id: selectedOrder.id,
+                                                                    agent_date_paid: event_date
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsAgentDatePaidCalendarShown(false);
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (key === 9) {
+                                                        let event_date = e.target.value.trim() === '' ? moment() : moment(getFormattedDates(selectedOrder?.agent_date_paid || ''), 'MM/DD/YYYY');
+                                                        await setPreSelectedAgentDatePaid(event_date);
+
+                                                        if (isAgentDatePaidCalendarShown) {
+                                                            event_date = preSelectedAgentDatePaid.clone().format('MM/DD/YYYY');
+
+                                                            await setSelectedOrder(selectedOrder => {
+                                                                return {
+                                                                    ...selectedOrder,
+                                                                    agent_date_paid: event_date
+                                                                }
+                                                            })
+
+                                                            if ((selectedOrder?.id || 0) > 0) {
+                                                                axios.post(props.serverUrl + '/saveInvoiceAgentDatePaid', {
+                                                                    id: selectedOrder.id,
+                                                                    agent_date_paid: event_date
+                                                                }).then(res => {
+
+                                                                }).catch(e => {
+                                                                    console.log(e);
+                                                                }).finally(() => {
+                                                                    setIsAgentDatePaidCalendarShown(false);
+                                                                });
+                                                            }
+                                                        } else {
+                                                            if (e.target.value.trim() === '') {
+                                                                await setSelectedOrder(selectedOrder => {
+                                                                    return {
+                                                                        ...selectedOrder,
+                                                                        agent_date_paid: null
+                                                                    }
+                                                                })
+
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceAgentDatePaid', {
+                                                                        id: selectedOrder.id,
+                                                                        agent_date_paid: null
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceAgentDatePaid', {
+                                                                        id: selectedOrder.id,
+                                                                        agent_date_paid: event_date.clone().format('MM/DD/YYYY')
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    }).finally(() => {
+                                                                        setIsAgentDatePaidCalendarShown(false);
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        onBlur={e => {
+                                            if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                                setSelectedOrder(prev => {
+                                                    return {
+                                                        ...prev,
+                                                        agent_date_paid: getFormattedDates(prev?.agent_date_paid)
+                                                    }
+                                                })
+                                            }
+                                        }}
+                                        onInput={e => {
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    agent_date_paid: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        onChange={e => {
+                                            setSelectedOrder(prev => {
+                                                return {
+                                                    ...prev,
+                                                    agent_date_paid: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        value={selectedOrder?.agent_date_paid || ''}
+                                        ref={refAgentDatePaid}
+                                    />
+                                    {
+                                        (selectedOrder?.is_cancelled || 0) === 0 &&
+                                        ((props.user?.user_code?.is_admin || 0) === 1 ||
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1) &&
+                                        <FontAwesomeIcon className="dropdown-button calendar agent-date-paid-calendar"
+                                            icon={faCalendarAlt} onClick={(e) => {
+                                                if (isAgentDatePaidCalendarShown) {
+                                                    setIsAgentDatePaidCalendarShown(false);
+                                                } else {
+                                                    e.stopPropagation();
+
+                                                    setIsDatePaidCalendarShown(false);
+                                                    setIsDateReceivedCalendarShown(false);
+                                                    setIsInvoiceReceivedDateCalendarShown(false);
+                                                    setTermsItems([]);
+
+                                                    new Promise((resolve, reject) => {
+                                                        if (moment((selectedOrder?.agent_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.agent_date_paid || '').trim()) {
+                                                            setPreSelectedAgentDatePaid(moment(selectedOrder?.agent_date_paid, 'MM/DD/YYYY'));
+                                                        } else {
+                                                            setPreSelectedAgentDatePaid(moment());
+                                                        }
+
+                                                        resolve('OK');
+                                                    }).then(res => {
+                                                        setIsAgentDatePaidCalendarShown(true);
+                                                        refAgentDatePaid.current.inputElement.focus();
+                                                    }).catch(e => {
+
+                                                    });
+                                                }
+                                            }} />
+                                    }
+                                </div>
+                                {
+                                    agentDatePaidTransition((style, item) => item && (
+                                        <animated.div
+                                            className="mochi-contextual-container"
+                                            id="mochi-contextual-container-agent-date-paid"
+                                            style={{
+                                                ...style,
+                                                left: '-150px',
+                                                display: 'block'
+                                            }}
+                                            ref={refAgentDatePaidCalendarDropDown}
+                                        >
+                                            <div className="mochi-contextual-popup vertical below left"
+                                                style={{ height: 275 }}>
+                                                <div className="mochi-contextual-popup-content">
+                                                    <div className="mochi-contextual-popup-wrapper">
+                                                        <Calendar
+                                                            value={moment((selectedOrder?.agent_date_paid || '').trim(), 'MM/DD/YYYY').format('MM/DD/YYYY') === (selectedOrder?.agent_date_paid || '').trim()
+                                                                ? moment(selectedOrder?.agent_date_paid, 'MM/DD/YYYY')
+                                                                : moment()}
+                                                            onChange={(day) => {
+                                                                setSelectedOrder(prev => {
+                                                                    return {
+                                                                        ...prev,
+                                                                        agent_date_paid: day.format('MM/DD/YYYY')
+                                                                    }
+                                                                });
+
+                                                                if ((selectedOrder?.id || 0) > 0) {
+                                                                    axios.post(props.serverUrl + '/saveInvoiceAgentDatePaid', {
+                                                                        id: selectedOrder.id,
+                                                                        agent_date_paid: day.format('MM/DD/YYYY')
+                                                                    }).then(res => {
+
+                                                                    }).catch(e => {
+                                                                        console.log(e);
+                                                                    }).finally(() => {
+                                                                        setIsAgentDatePaidCalendarShown(false);
+                                                                    });
+                                                                }
+                                                            }}
+                                                            closeCalendar={() => {
+                                                                setIsAgentDatePaidCalendarShown(false);
+                                                            }}
+                                                            preDay={preSelectedAgentDatePaid}
+                                                            onChangePreDay={(preDay) => {
+                                                                setPreSelectedAgentDatePaid(preDay);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </animated.div>
+                                    ))
+                                }
+                            </div>
+
+                            <div className="input-box-container">
+                                <input type="text" placeholder="Agent Check Number"
+                                    tabIndex={76 + props.tabTimes}
+                                    readOnly={
+                                        (selectedOrder?.is_cancelled || 0) === 1 ||
+                                        ((props.user?.user_code?.is_admin || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 0 &&
+                                            ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 0)
+                                    }
+                                    onKeyDown={(e) => {
+                                        if ((selectedOrder?.is_cancelled || 0) === 0) {
+                                            let key = e.keyCode || e.which;
+
+                                            if (((props.user?.user_code?.is_admin || 0) === 1 ||
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.save || 0) === 1 &&
+                                                ((props.user?.user_code?.permissions || []).find(x => x.name === 'invoice')?.pivot?.edit || 0) === 1)) {
+                                                if (key === 9) {
+                                                    e.preventDefault();
+
+                                                    if ((selectedOrder?.id || 0) > 0) {
+                                                        axios.post(props.serverUrl + '/saveInvoiceAgentCheckNumber', {
+                                                            id: selectedOrder.id,
+                                                            agent_check_number: e.target.value.trim()
+                                                        }).then(res => {
+
+                                                        }).catch(e => {
+                                                            console.log(e);
+                                                        }).finally(() => {
+                                                            if (props.isOnPanel) {
+                                                                if (refOrderNumber?.current) {
+                                                                    refOrderNumber.current.focus({
+                                                                        preventScroll: true,
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                if (props.refOrderNumber?.current) {
+                                                                    props.refOrderNumber.current.focus({
+                                                                        preventScroll: true,
+                                                                    });
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
+                                                        if (props.isOnPanel) {
+                                                            if (refOrderNumber?.current) {
+                                                                refOrderNumber.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        } else {
+                                                            if (props.refOrderNumber?.current) {
+                                                                props.refOrderNumber.current.focus({
+                                                                    preventScroll: true,
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    onInput={(e) => {
+                                        setSelectedOrder(selectedOrder => {
+                                            return {
+                                                ...selectedOrder,
+                                                agent_check_number: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    onChange={(e) => {
+                                        setSelectedOrder(selectedOrder => {
+                                            return {
+                                                ...selectedOrder,
+                                                agent_check_number: e.target.value
+                                            }
+                                        })
+                                    }}
+                                    value={selectedOrder?.agent_check_number || ''}
+                                />
+                            </div>
+                        </div>
+                    }
+
                     <div className='fixed' style={{
                         minWidth: '10rem',
                         display: 'grid',
                         gridTemplateColumns: '1fr',
                         gridGap: 2
                     }}>
+                        <div style={{
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: '0.9rem',
+                                marginBottom: 3,
+                            }}>Carrier Pay</div>
                         <div className="select-box-container" style={{ flexGrow: 1 }}>
                             <div className="select-box-wrapper">
-                                <MaskedInput tabIndex={75 + props.tabTimes}
+                                <MaskedInput tabIndex={77 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                     guide={false}
                                     type="text" placeholder="Invoice Rec'd Date"
@@ -12522,7 +12985,7 @@ const Invoice = (props) => {
                         </div>
                         <div className="input-box-container">
                             <input type="text" placeholder="Invoice Number"
-                                tabIndex={76 + props.tabTimes}
+                                tabIndex={78 + props.tabTimes}
                                 readOnly={
                                     (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&
@@ -12573,7 +13036,7 @@ const Invoice = (props) => {
                         <div className="select-box-container" style={{ position: 'relative' }}>
                             <div className="select-box-wrapper">
                                 <input type="text" placeholder="Terms"
-                                    tabIndex={77 + props.tabTimes}
+                                    tabIndex={79 + props.tabTimes}
                                     readOnly={
                                         (selectedOrder?.is_cancelled || 0) === 1 ||
                                         ((props.user?.user_code?.is_admin || 0) === 0 &&
@@ -12985,7 +13448,7 @@ const Invoice = (props) => {
                         </div>
                         <div className="select-box-container" style={{ flexGrow: 1 }}>
                             <div className="select-box-wrapper">
-                                <MaskedInput tabIndex={78 + props.tabTimes}
+                                <MaskedInput tabIndex={80 + props.tabTimes}
                                     mask={[/[0-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
                                     guide={false}
                                     type="text" placeholder="Date Paid"
@@ -13243,7 +13706,7 @@ const Invoice = (props) => {
                         </div>
                         <div className="input-box-container">
                             <input type="text" placeholder="Check Number"
-                                tabIndex={79 + props.tabTimes}
+                                tabIndex={81 + props.tabTimes}
                                 readOnly={
                                     (selectedOrder?.is_cancelled || 0) === 1 ||
                                     ((props.user?.user_code?.is_admin || 0) === 0 &&

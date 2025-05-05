@@ -20,7 +20,9 @@ import {
   setAdminLoadBoardPanels,
   setCompanyLoadBoardPanels,
   setAdminReportPanels,
-  setCompanyReportPanels
+  setCompanyReportPanels,
+  setSelectedPageIndex,
+  setLoadBoardScreenFocused
 } from "./../../../../../actions";
 
 import LoadBoard from '../../../load-board/LoadBoard';
@@ -343,7 +345,8 @@ const mapStateToProps = (state) => {
     companyLoadBoardPanels: state.loadBoardReducers.companyLoadBoardPanels,
     isLoadingWidget: state.loadBoardReducers.isLoadingWidget,
     adminReportPanels: state.reportReducers.adminReportPanels,
-    companyReportPanels: state.reportReducers.companyReportPanels
+    companyReportPanels: state.reportReducers.companyReportPanels,
+    pages: state.companyReducers.pages,
   }
 }
 
@@ -363,5 +366,7 @@ export default connect(mapStateToProps, {
   setAdminLoadBoardPanels,
   setCompanyLoadBoardPanels,
   setAdminReportPanels,
-  setCompanyReportPanels
+  setCompanyReportPanels,
+  setSelectedPageIndex,
+  setLoadBoardScreenFocused
 })(LoadInformation)

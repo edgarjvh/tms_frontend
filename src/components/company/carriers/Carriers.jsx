@@ -512,52 +512,49 @@ const Carriers = props => {
 
             let contacts = [];
 
-            axios
-                .post(props.serverUrl + "/saveCarrierContact", contact)
-                .then(res => {
-                    if (res.data.result === "OK") {
-                        let mailing_contact = selectedCarrier?.mailing_address?.mailing_contact || {};
+            axios.post(props.serverUrl + "/saveCarrierContact", { ...contact, owner_id: selectedCarrier.id }).then(res => {
+                if (res.data.result === "OK") {
+                    let mailing_contact = selectedCarrier?.mailing_address?.mailing_contact || {};
 
-                        if ((mailing_contact?.id || 0) === res.data.contact.id) {
-                            mailing_contact = res.data.contact;
-                        }
+                    if ((mailing_contact?.id || 0) === res.data.contact.id) {
+                        mailing_contact = res.data.contact;
+                    }
 
-                        setSelectedCarrier(selectedCarrier => {
-                            return {
-                                ...selectedCarrier,
-                                contacts: res.data.contacts,
-                                mailing_address: {
-                                    ...selectedCarrier.mailing_address,
-                                    mailing_contact: mailing_contact,
-                                },
-                            };
-                        });
-                        setSelectedContact({ ...res.data.contact });
-
-                        contacts = res.data.contacts;
-
-                        props.setSelectedCarrier({
-                            id: selectedCarrier.id,
+                    setSelectedCarrier(selectedCarrier => {
+                        return {
+                            ...selectedCarrier,
                             contacts: res.data.contacts,
                             mailing_address: {
                                 ...selectedCarrier.mailing_address,
                                 mailing_contact: mailing_contact,
                             },
-                            component_id: props.componentId,
-                        });
+                        };
+                    });
+                    setSelectedContact({ ...res.data.contact });
 
-                        props.setSelectedCarrierContact({
-                            ...res.data.contact,
-                            component_id: props.componentId,
-                        });
-                    }
+                    contacts = res.data.contacts;
 
-                    setIsSavingContact(false);
-                })
-                .catch(e => {
-                    console.log("error on saving carrier contact", e);
-                    setIsSavingContact(false);
-                });
+                    props.setSelectedCarrier({
+                        id: selectedCarrier.id,
+                        contacts: res.data.contacts,
+                        mailing_address: {
+                            ...selectedCarrier.mailing_address,
+                            mailing_contact: mailing_contact,
+                        },
+                        component_id: props.componentId,
+                    });
+
+                    props.setSelectedCarrierContact({
+                        ...res.data.contact,
+                        component_id: props.componentId,
+                    });
+                }
+
+                setIsSavingContact(false);
+            }).catch(e => {
+                console.log("error on saving carrier contact", e);
+                setIsSavingContact(false);
+            });
         }
     }, [isSavingContact]);
 
@@ -1187,7 +1184,15 @@ const Carriers = props => {
                     origin={props.origin}
                     closingCallback={() => {
                         closePanel(`${props.panelName}-carrier-search`, props.origin);
-                        refCarrierName.current.focus({ preventScroll: true });
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        }
                     }}
 
                     suborigin={"carrier"}
@@ -1600,7 +1605,15 @@ const Carriers = props => {
                     suborigin="carrier"
                     closingCallback={() => {
                         closePanel(`${props.panelName}-contact-search`, props.origin);
-                        refCarrierCode.current.focus({ preventScroll: true });
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        }
                     }}
 
                     componentId={moment().format("x")}
@@ -1844,7 +1857,15 @@ const Carriers = props => {
                 selectedCarrier={{}}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-factoring-company`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -1899,7 +1920,15 @@ const Carriers = props => {
                     origin={props.origin}
                     closingCallback={() => {
                         closePanel(`${props.panelName}-factoring-company-search`, props.origin);
-                        refCarrierCode.current.focus({ preventScroll: true });
+                        if (props.isOnPanel) {
+                            if (refCarrierCode?.current) {
+                                refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        } else {
+                            if (props.refCarrierCode?.current) {
+                                props.refCarrierCode.current.focus({ preventScroll: true });
+                            }
+                        }
                     }}
 
                     suborigin={"factoring-company"}
@@ -1909,23 +1938,20 @@ const Carriers = props => {
                         new Promise((resolve, reject) => {
                             if (factoringCompanyId) {
                                 if ((selectedCarrier?.id || 0) > 0) {
-                                    axios
-                                        .post(props.serverUrl + "/getFactoringCompanyById", { id: factoringCompanyId })
-                                        .then(res => {
-                                            setSelectedCarrier(selectedCarrier => {
-                                                return {
-                                                    ...selectedCarrier,
-                                                    factoring_company: res.data.factoring_company,
-                                                    factoring_company_id: res.data.factoring_company.id,
-                                                };
-                                            });
-
-                                            validateCarrierForSaving({ keyCode: 9 });
-
-                                            resolve("OK");
-                                        })
-                                        .catch(e => {
+                                    axios.post(props.serverUrl + "/getFactoringCompanyById", { id: factoringCompanyId }).then(res => {
+                                        setSelectedCarrier(selectedCarrier => {
+                                            return {
+                                                ...selectedCarrier,
+                                                factoring_company: res.data.factoring_company,
+                                                factoring_company_id: res.data.factoring_company.id,
+                                            };
                                         });
+
+                                        validateCarrierForSaving({ keyCode: 9 });
+
+                                        resolve("OK");
+                                    }).catch(e => {
+                                    });
                                 } else {
                                     let panel = {
                                         panelName: `${props.panelName}-factoring-company`,
@@ -1939,7 +1965,15 @@ const Carriers = props => {
                                             selectedCarrier={selectedCarrier}
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-factoring-company`, props.origin);
-                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                if (props.isOnPanel) {
+                                                    if (refCarrierCode?.current) {
+                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                } else {
+                                                    if (props.refCarrierCode?.current) {
+                                                        props.refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                }
                                             }}
                                         />,
                                     };
@@ -1987,7 +2021,15 @@ const Carriers = props => {
                 selectedCarrier={selectedCarrier}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-factoring-company`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -2361,7 +2403,15 @@ const Carriers = props => {
                         suborigin={"carrier"}
                         closingCallback={() => {
                             closePanel(`${props.panelName}-documents`, props.origin);
-                            refCarrierCode.current.focus({ preventScroll: true });
+                            if (props.isOnPanel) {
+                                if (refCarrierCode?.current) {
+                                    refCarrierCode.current.focus({ preventScroll: true });
+                                }
+                            } else {
+                                if (props.refCarrierCode?.current) {
+                                    props.refCarrierCode.current.focus({ preventScroll: true });
+                                }
+                            }
                         }}
 
                         componentId={moment().format("x")}
@@ -2396,7 +2446,15 @@ const Carriers = props => {
                 selectedCustomer={selectedCarrier} isAdmin={props.isAdmin}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-revenue-information`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -2414,7 +2472,15 @@ const Carriers = props => {
                 carrier={selectedCarrier}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-equipment-information`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -2431,7 +2497,15 @@ const Carriers = props => {
                 selectedCustomer={selectedCarrier} isAdmin={props.isAdmin}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-order-history`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -2529,7 +2603,15 @@ const Carriers = props => {
                 componentId={moment().format("x")}
                 closingCallback={() => {
                     closePanel(`${props.panelName}-carrier-import`, props.origin);
-                    refCarrierCode.current.focus({ preventScroll: true });
+                    if (props.isOnPanel) {
+                        if (refCarrierCode?.current) {
+                            refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    } else {
+                        if (props.refCarrierCode?.current) {
+                            props.refCarrierCode.current.focus({ preventScroll: true });
+                        }
+                    }
                 }}
             />,
         };
@@ -2716,6 +2798,30 @@ const Carriers = props => {
         }
     }
 
+    const deleteInsurance = () => {
+        if (window.confirm("Are you sure you want to delete this insurance?")) {
+            setIsLoading(true);
+            axios.post(props.serverUrl + "/deleteInsurance", {
+                id: selectedInsurance.id,
+                carrier_id: selectedCarrier.id,
+            }).then(res => {
+                if (res.data.result === "OK") {
+                    setSelectedCarrier(selectedCarrier => {
+                        return {
+                            ...selectedCarrier,
+                            insurances: res.data.insurances,
+                        };
+                    })
+                    setSelectedInsurance({});
+
+                }
+            }).finally(() => {
+                setIsLoading(false);
+                refInsuranceType.current.focus();
+            })
+        }
+    }
+
     return (
         <div className="carriers-main-container" style={{
             borderRadius: props.scale === 1 ? 0 : "20px",
@@ -2742,7 +2848,7 @@ const Carriers = props => {
                             }
                         }
                     } else {
-                        if (props.isOnPanel){
+                        if (props.isOnPanel) {
                             props.closingCallback();
                         }
                     }
@@ -3377,7 +3483,16 @@ const Carriers = props => {
                                     }}
                                 >
                                     <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
-                                    <div className="mochi-button-base">ACH/Wiring Info</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: ((selectedCarrier?.ach_aba_routing || '') === '' &&
+                                        (selectedCarrier?.ach_account_info || '') === '' &&
+                                        (selectedCarrier?.ach_banking_info || '') === '' &&
+                                        (selectedCarrier?.ach_remittence_email || '') === '' &&
+                                        (selectedCarrier?.wiring_aba_routing || '') === '' &&
+                                        (selectedCarrier?.wiring_account_info || '') === '' &&
+                                        (selectedCarrier?.wiring_banking_info || '') === '' &&
+                                        (selectedCarrier?.wiring_remittence_email || '') === '') ? "black" : "green",
+                                    }}>ACH/Wiring Info</div>
                                     <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
                                 </div>
                                 <div
@@ -5353,6 +5468,8 @@ const Carriers = props => {
                                                     title="Contacts"
                                                     tabTimes={22000 + props.tabTimes}
                                                     panelName={`${props.panelName}-contacts`}
+                                                    selectedOwner={selectedCarrier}
+                                                    getContactsUrl="/getContactsByCarrierId"
                                                     savingContactUrl="/saveCarrierContact"
                                                     deletingContactUrl="/deleteCarrierContact"
                                                     uploadAvatarUrl="/uploadCarrierAvatar"
@@ -5362,22 +5479,37 @@ const Carriers = props => {
                                                     owner="carrier"
                                                     closingCallback={() => {
                                                         closePanel(`${props.panelName}-contacts`, props.origin);
-                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                        if (props.isOnPanel) {
+                                                            if (refCarrierCode?.current) {
+                                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                            }
+                                                        } else {
+                                                            if (props.refCarrierCode?.current) {
+                                                                props.refCarrierCode.current.focus({ preventScroll: true });
+                                                            }
+                                                        }
+                                                    }}
+                                                    savingCallback={(contact, contacts) => {
+                                                        setSelectedCarrier(prev => {
+                                                            return { ...prev, contacts: contacts }
+                                                        })
+
+                                                        if ((selectedContact?.id || 0) === contact.id) {
+                                                            setSelectedContact(contact);
+                                                        }
+                                                    }}
+                                                    deletingCallback={(contactId, contacts) => {
+                                                        setSelectedCarrier(prev => {
+                                                            return { ...prev, contacts: contacts }
+                                                        })
+
+                                                        if ((selectedContact?.id || 0) === contactId) {
+                                                            setSelectedContact({});
+                                                        }
                                                     }}
 
-                                                    componentId={moment().format("x")}
-                                                    contactSearchCustomer={{
-                                                        ...selectedCarrier,
-                                                        selectedContact: {
-                                                            ...selectedContact,
-                                                            company: (selectedContact?.company || "") === "" ? selectedCarrier?.name || "" : selectedContact.company,
-                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (selectedContact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : selectedContact?.address1 || "",
-                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (selectedContact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : selectedContact?.address2 || "",
-                                                            city: (selectedCarrier?.city || "").toLowerCase() === (selectedContact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : selectedContact?.city || "",
-                                                            state: (selectedCarrier?.state || "").toLowerCase() === (selectedContact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : selectedContact?.state || "",
-                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (selectedContact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : selectedContact?.zip_code || "",
-                                                        },
-                                                    }}
+                                                    componentId={moment().format('x')}
+                                                    selectedContactId={selectedContact.id}
                                                 />
                                             ),
                                         };
@@ -5404,24 +5536,48 @@ const Carriers = props => {
                                                     title="Contacts"
                                                     tabTimes={22000 + props.tabTimes}
                                                     panelName={`${props.panelName}-contacts`}
-                                                    savingContactUrl="/saveCarrierContact"
-                                                    deletingContactUrl="/deleteCarrierContact"
-                                                    uploadAvatarUrl="/uploadCarrierAvatar"
-                                                    removeAvatarUrl="/removeCarrierAvatar"
-                                                    permissionName="carrier contacts"
+                                                    selectedOwner={selectedCarrier}
+                                                    getContactsUrl='/getContactsByCarrierId'
+                                                    savingContactUrl='/saveCarrierContact'
+                                                    deletingContactUrl='/deleteCarrierContact'
+                                                    uploadAvatarUrl='/uploadCarrierAvatar'
+                                                    removeAvatarUrl='/removeCarrierAvatar'
+                                                    permissionName='carrier contacts'
                                                     origin={props.origin}
-                                                    owner="carrier"
+                                                    owner='carrier'
                                                     isEditingContact={true}
                                                     closingCallback={() => {
                                                         closePanel(`${props.panelName}-contacts`, props.origin);
-                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                        if (props.isOnPanel) {
+                                                            if (refCarrierCode?.current) {
+                                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                            }
+                                                        } else {
+                                                            if (props.refCarrierCode?.current) {
+                                                                props.refCarrierCode.current.focus({ preventScroll: true });
+                                                            }
+                                                        }
+                                                    }}
+                                                    savingCallback={(contact, contacts) => {
+                                                        setSelectedCarrier(prev => {
+                                                            return { ...prev, contacts: contacts }
+                                                        })
+
+                                                        if ((selectedContact?.id || 0) === contact.id) {
+                                                            setSelectedContact(contact);
+                                                        }
+                                                    }}
+                                                    deletingCallback={(contactId, contacts) => {
+                                                        setSelectedCarrier(prev => {
+                                                            return { ...prev, contacts: contacts }
+                                                        })
+
+                                                        if ((selectedContact?.id || 0) === contactId) {
+                                                            setSelectedContact({});
+                                                        }
                                                     }}
 
-                                                    componentId={moment().format("x")}
-                                                    contactSearchCustomer={{
-                                                        ...selectedCarrier,
-                                                        selectedContact: { id: 0, carrier_id: selectedCarrier?.id },
-                                                    }}
+                                                    componentId={moment().format('x')}
                                                 />
                                             ),
                                         };
@@ -6353,6 +6509,8 @@ const Carriers = props => {
                                                                     title="Contacts"
                                                                     tabTimes={22000 + props.tabTimes}
                                                                     panelName={`${props.panelName}-contacts`}
+                                                                    selectedOwner={selectedCarrier}
+                                                                    getContactsUrl="/getContactsByCarrierId"
                                                                     savingContactUrl="/saveCarrierContact"
                                                                     deletingContactUrl="/deleteCarrierContact"
                                                                     uploadAvatarUrl="/uploadCarrierAvatar"
@@ -6360,24 +6518,40 @@ const Carriers = props => {
                                                                     permissionName="carrier contacts"
                                                                     origin={props.origin}
                                                                     owner="carrier"
+                                                                    isEditingContact={true}
                                                                     closingCallback={() => {
                                                                         closePanel(`${props.panelName}-contacts`, props.origin);
-                                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                                        if (props.isOnPanel) {
+                                                                            if (refCarrierCode?.current) {
+                                                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                                            }
+                                                                        } else {
+                                                                            if (props.refCarrierCode?.current) {
+                                                                                props.refCarrierCode.current.focus({ preventScroll: true });
+                                                                            }
+                                                                        }
                                                                     }}
-
-                                                                    componentId={moment().format("x")}
-                                                                    contactSearchCustomer={{
-                                                                        ...selectedCarrier,
-                                                                        selectedContact: {
-                                                                            ...selectedContact,
-                                                                            company: (contact?.company || "") === "" ? selectedCarrier?.name || "" : contact.company,
-                                                                            address1: (selectedCarrier?.address1 || "").toLowerCase() === (contact?.address1 || "").toLowerCase() ? selectedCarrier?.address1 || "" : contact?.address1 || "",
-                                                                            address2: (selectedCarrier?.address2 || "").toLowerCase() === (contact?.address2 || "").toLowerCase() ? selectedCarrier?.address2 || "" : contact?.address2 || "",
-                                                                            city: (selectedCarrier?.city || "").toLowerCase() === (contact?.city || "").toLowerCase() ? selectedCarrier?.city || "" : contact?.city || "",
-                                                                            state: (selectedCarrier?.state || "").toLowerCase() === (contact?.state || "").toLowerCase() ? selectedCarrier?.state || "" : contact?.state || "",
-                                                                            zip_code: (selectedCarrier?.zip || "").toLowerCase() === (contact?.zip_code || "").toLowerCase() ? selectedCarrier?.zip || "" : contact?.zip_code || "",
-                                                                        },
+                                                                    savingCallback={(contact, contacts) => {
+                                                                        setSelectedCarrier(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+                
+                                                                        if ((selectedContact?.id || 0) === contact.id) {
+                                                                            setSelectedContact(contact);
+                                                                        }
                                                                     }}
+                                                                    deletingCallback={(contactId, contacts) => {
+                                                                        setSelectedCarrier(prev => {
+                                                                            return { ...prev, contacts: contacts }
+                                                                        })
+                
+                                                                        if ((selectedContact?.id || 0) === contactId) {
+                                                                            setSelectedContact({});
+                                                                        }
+                                                                    }}
+                
+                                                                    componentId={moment().format('x')}
+                                                                    selectedContactId={contact.id}
                                                                 />
                                                             ),
                                                         };
@@ -6640,6 +6814,19 @@ const Carriers = props => {
                             <div className="form-title">Insurances</div>
                             <div className="top-border top-border-middle"></div>
                             <div className="form-buttons">
+                                <div
+                                    className={`mochi-button${(selectedInsurance?.id || 0) === 0 ? " disabled" : ""}`}
+                                    style={{
+                                        userSelect: (selectedInsurance?.id || 0) === 0 ? "none" : "auto",
+                                    }}
+                                    onClick={() => { deleteInsurance() }}
+                                >
+                                    <div className="mochi-button-decorator mochi-button-decorator-left">(</div>
+                                    <div className="mochi-button-base" style={{
+                                        color: "darkred",
+                                    }}>Delete</div>
+                                    <div className="mochi-button-decorator mochi-button-decorator-right">)</div>
+                                </div>
                                 <div
                                     className="mochi-button"
                                     onClick={() => {
@@ -7426,7 +7613,15 @@ const Carriers = props => {
                                             isEditingDriver={true}
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-carrier-drivers`, props.origin);
-                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                if (props.isOnPanel) {
+                                                    if (refCarrierCode?.current) {
+                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                } else {
+                                                    if (props.refCarrierCode?.current) {
+                                                        props.refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                }
                                             }}
 
                                             componentId={moment().format('x')}
@@ -7470,7 +7665,15 @@ const Carriers = props => {
                                             isEditingDriver={true}
                                             closingCallback={() => {
                                                 closePanel(`${props.panelName}-carrier-drivers`, props.origin);
-                                                refCarrierCode.current.focus({ preventScroll: true });
+                                                if (props.isOnPanel) {
+                                                    if (refCarrierCode?.current) {
+                                                        refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                } else {
+                                                    if (props.refCarrierCode?.current) {
+                                                        props.refCarrierCode.current.focus({ preventScroll: true });
+                                                    }
+                                                }
                                             }}
 
                                             componentId={moment().format('x')}
@@ -8261,7 +8464,15 @@ const Carriers = props => {
                                                         order_id={order.id}
                                                         closingCallback={() => {
                                                             closePanel(`${props.panelName}-dispatch`, props.origin);
-                                                            refCarrierCode.current.focus({ preventScroll: true });
+                                                            if (props.isOnPanel) {
+                                                                if (refCarrierCode?.current) {
+                                                                    refCarrierCode.current.focus({ preventScroll: true });
+                                                                }
+                                                            } else {
+                                                                if (props.refCarrierCode?.current) {
+                                                                    props.refCarrierCode.current.focus({ preventScroll: true });
+                                                                }
+                                                            }
                                                         }}
                                                     />,
                                                 };
@@ -8399,7 +8610,15 @@ const Carriers = props => {
                                                         isEditingDriver={true}
                                                         closingCallback={() => {
                                                             closePanel(`${props.panelName}-carrier-drivers`, props.origin);
-                                                            refCarrierCode.current.focus({ preventScroll: true });
+                                                            if (props.isOnPanel) {
+                                                                if (refCarrierCode?.current) {
+                                                                    refCarrierCode.current.focus({ preventScroll: true });
+                                                                }
+                                                            } else {
+                                                                if (props.refCarrierCode?.current) {
+                                                                    props.refCarrierCode.current.focus({ preventScroll: true });
+                                                                }
+                                                            }
                                                         }}
 
                                                         componentId={moment().format('x')}

@@ -152,11 +152,27 @@
   border-radius: 15px;
   min-width: 140px !important;
   max-width: 140px !important;
-  height: 25px;
+  height: 30px;
   padding: 5px;
   font-size: 0.8rem;
   font-weight: bold;
   margin-left: 80px;
+  border: solid 1px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: ease 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dispatch-main-container .fields-container-row .agent-paid-btn {
+  position: relative;
+  background-color: lightgreen;
+  border-radius: 15px;
+  height: 18px;
+  padding: 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-right: -3px;
   border: solid 1px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: ease 0.3s;
@@ -298,19 +314,21 @@
   border-radius: 15px;
   min-width: 80px !important;
   max-width: 80px !important;
-  height: 22px;
+  height: 30px;
   padding: 5px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   margin-right: 3px;
   border: solid 1px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: ease 0.3s;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 .dispatch-main-container .pickups-container .order-pickup .pu-remove-btn {
   position: absolute;
-  right: 4px;
+  right: 2px;
   top: 50%;
   font-size: 0.7rem;
   cursor: pointer;
@@ -343,7 +361,7 @@
   background-color: rgba(0, 0, 0, 0.3);
   min-width: 22px !important;
   max-width: 22px !important;
-  height: 22px !important;
+  height: 30px !important;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -415,19 +433,21 @@
   border-radius: 15px;
   min-width: 80px !important;
   max-width: 80px !important;
-  height: 22px;
+  height: 30px;
   padding: 5px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   margin-right: 3px;
   border: solid 1px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: ease 0.3s;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 .dispatch-main-container .deliveries-container .order-delivery .delivery-remove-btn {
   position: absolute;
-  right: 4px;
+  right: 2px;
   top: 50%;
   font-size: 0.7rem;
   cursor: pointer;
@@ -485,6 +505,14 @@
 .dispatch-main-container .order-events-container {
   flex-grow: 1;
   position: relative;
+}
+.dispatch-main-container .order-events-container .order-cancelled-tag {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  color: rgba(255, 0, 0, 0.5);
 }
 .dispatch-main-container .order-events-container > .order-events-item {
   font-size: 0.7rem;
@@ -579,4 +607,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+.dispatch-main-container .mochi-item.profit {
+  padding: 3px 5px;
+  border-radius: 5px;
+  user-select: none;
+}
+.dispatch-main-container .mochi-item.profit:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
